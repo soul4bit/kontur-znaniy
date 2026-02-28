@@ -4,8 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-export function SignOutButton() {
+type SignOutButtonProps = {
+  className?: string;
+};
+
+export function SignOutButton({ className }: SignOutButtonProps) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
 
@@ -25,7 +30,10 @@ export function SignOutButton() {
     <Button
       type="button"
       variant="outline"
-      className="rounded-2xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]"
+      className={cn(
+        "rounded-2xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]",
+        className
+      )}
       onClick={handleSignOut}
       disabled={isPending}
     >

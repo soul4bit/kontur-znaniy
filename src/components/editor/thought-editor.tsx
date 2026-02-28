@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -30,23 +30,24 @@ const emptyDocument = {
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "Новая статья" }],
+      content: [{ type: "text", text: "РќРѕРІР°СЏ СЃС‚Р°С‚СЊСЏ" }],
     },
     {
       type: "paragraph",
-      content: [{ type: "text", text: "Зафиксируй разбор, команды и выводы по задаче." }],
+      content: [{ type: "text", text: "Р—Р°С„РёРєСЃРёСЂСѓР№ СЂР°Р·Р±РѕСЂ, РєРѕРјР°РЅРґС‹ Рё РІС‹РІРѕРґС‹ РїРѕ Р·Р°РґР°С‡Рµ." }],
     },
   ],
 };
 
 const emptyHtml = `
-  <h2>Новая статья</h2>
-  <p>Зафиксируй разбор, команды и выводы по задаче.</p>
+  <h2>РќРѕРІР°СЏ СЃС‚Р°С‚СЊСЏ</h2>
+  <p>Р—Р°С„РёРєСЃРёСЂСѓР№ СЂР°Р·Р±РѕСЂ, РєРѕРјР°РЅРґС‹ Рё РІС‹РІРѕРґС‹ РїРѕ Р·Р°РґР°С‡Рµ.</p>
 `;
 
 type ThoughtEditorProps = {
   article: ArticleRecord | null;
   topics: readonly ArticleTopic[];
+  defaultTopic: ArticleTopic;
 };
 
 type SaveFeedback = {
@@ -71,8 +72,8 @@ function EditorButton({ active = false, onClick, children }: EditorButtonProps) 
       size="sm"
       variant="outline"
       className={cn(
-        "rounded-xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]",
-        active && "border-[#2f7a67] bg-[#2f7a67] text-white hover:bg-[#2f7a67]"
+        "rounded-xl border-[#2b3531] bg-[#111513] text-[#dce6e0] hover:bg-[#1a201d]",
+        active && "border-[#53e6a6] bg-[#53e6a6] text-[#09120e] hover:bg-[#53e6a6]"
       )}
       onClick={onClick}
     >
@@ -98,17 +99,17 @@ async function saveArticleRequest(
 
   if (!response.ok) {
     const message = "message" in result ? result.message : undefined;
-    throw new Error(message ?? "Не удалось сохранить статью.");
+    throw new Error(message ?? "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ СЃС‚Р°С‚СЊСЋ.");
   }
 
   return result as ArticleResponse;
 }
 
-export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
+export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorProps) {
   const router = useRouter();
   const [title, setTitle] = useState(article?.title ?? "");
   const [summary, setSummary] = useState(article?.summary ?? "");
-  const [topic, setTopic] = useState<ArticleTopic>(article?.topic ?? topics[0]);
+  const [topic, setTopic] = useState<ArticleTopic>(article?.topic ?? defaultTopic);
   const [feedback, setFeedback] = useState<SaveFeedback>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [stats, setStats] = useState({ chars: 0, paragraphs: 0 });
@@ -122,7 +123,7 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: "Пиши разбор, шпаргалку, команды, выводы и свои заметки по задаче...",
+        placeholder: "РџРёС€Рё СЂР°Р·Р±РѕСЂ, С€РїР°СЂРіР°Р»РєСѓ, РєРѕРјР°РЅРґС‹, РІС‹РІРѕРґС‹ Рё СЃРІРѕРё Р·Р°РјРµС‚РєРё РїРѕ Р·Р°РґР°С‡Рµ...",
       }),
     ],
     content: initialJson,
@@ -144,7 +145,7 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
     editorProps: {
       attributes: {
         class:
-          "nook-editor min-h-80 rounded-[28px] border border-slate-200 bg-white/92 px-5 py-4 text-[15px] leading-7 text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] focus-visible:outline-none",
+          "nook-editor min-h-80 rounded-[28px] border border-[#2b3531] bg-[#111513] px-5 py-4 text-[15px] leading-7 text-[#edf4f0] focus-visible:outline-none",
       },
     },
   });
@@ -152,7 +153,7 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
   useEffect(() => {
     setTitle(article?.title ?? "");
     setSummary(article?.summary ?? "");
-    setTopic(article?.topic ?? topics[0]);
+    setTopic(article?.topic ?? defaultTopic);
     setFeedback(null);
 
     if (!editor) {
@@ -160,7 +161,7 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
     }
 
     editor.commands.setContent(article?.contentJson ?? emptyDocument);
-  }, [article, editor, topics]);
+  }, [article, defaultTopic, editor, topics]);
 
   async function handleSave() {
     if (!editor) {
@@ -171,12 +172,12 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
     const contentText = editor.getText().trim();
 
     if (!trimmedTitle) {
-      setFeedback({ tone: "error", text: "Укажите заголовок статьи." });
+      setFeedback({ tone: "error", text: "РЈРєР°Р¶РёС‚Рµ Р·Р°РіРѕР»РѕРІРѕРє СЃС‚Р°С‚СЊРё." });
       return;
     }
 
     if (!contentText) {
-      setFeedback({ tone: "error", text: "Статья не может быть пустой." });
+      setFeedback({ tone: "error", text: "РЎС‚Р°С‚СЊСЏ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚РѕР№." });
       return;
     }
 
@@ -195,14 +196,14 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
 
       setFeedback({
         tone: "success",
-        text: article ? "Статья обновлена." : "Статья создана.",
+        text: article ? "РЎС‚Р°С‚СЊСЏ РѕР±РЅРѕРІР»РµРЅР°." : "РЎС‚Р°С‚СЊСЏ СЃРѕР·РґР°РЅР°.",
       });
-      router.replace(`/app?article=${result.article.id}`);
+      router.replace(`/app?topic=${encodeURIComponent(result.article.topic)}&article=${result.article.id}`);
       router.refresh();
     } catch (error) {
       setFeedback({
         tone: "error",
-        text: error instanceof Error ? error.message : "Не удалось сохранить статью.",
+        text: error instanceof Error ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ СЃС‚Р°С‚СЊСЋ.",
       });
     } finally {
       setIsSaving(false);
@@ -212,10 +213,10 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
   function handleNewDraft() {
     setTitle("");
     setSummary("");
-    setTopic(topics[0]);
+    setTopic(defaultTopic);
     setFeedback(null);
     editor?.commands.setContent(emptyHtml);
-    router.replace("/app");
+    router.replace(`/app?topic=${encodeURIComponent(defaultTopic)}`);
   }
 
   if (!editor) return null;
@@ -224,35 +225,35 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
     <div className="space-y-5">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
         <div className="space-y-2">
-          <label htmlFor="article-title" className="text-sm font-medium text-slate-900">
-            Заголовок статьи
+          <label htmlFor="article-title" className="text-sm font-medium text-white">
+            Р—Р°РіРѕР»РѕРІРѕРє СЃС‚Р°С‚СЊРё
           </label>
           <Input
             id="article-title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Например: Kubernetes probes without pain"
-            className="h-12 rounded-2xl border-slate-200 bg-white text-slate-900"
+            placeholder="РќР°РїСЂРёРјРµСЂ: Kubernetes probes without pain"
+            className="h-12 rounded-2xl border-[#2b3531] bg-[#111513] text-white placeholder:text-[#6f877e]"
           />
         </div>
 
-        <div className="rounded-[24px] border border-slate-200 bg-[#f4f7f4] px-4 py-3 text-sm leading-6 text-slate-600">
-          <p className="font-medium text-slate-900">Черновик</p>
-          <p className="mt-2">{stats.paragraphs} блоков</p>
-          <p>{stats.chars} символов</p>
+        <div className="rounded-[24px] border border-[#2b3531] bg-[#181e1b] px-4 py-3 text-sm leading-6 text-[#8ca39b]">
+          <p className="font-medium text-white">Р§РµСЂРЅРѕРІРёРє</p>
+          <p className="mt-2">{stats.paragraphs} Р±Р»РѕРєРѕРІ</p>
+          <p>{stats.chars} СЃРёРјРІРѕР»РѕРІ</p>
         </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
         <div className="space-y-2">
-          <label htmlFor="article-topic" className="text-sm font-medium text-slate-900">
-            Направление
+          <label htmlFor="article-topic" className="text-sm font-medium text-white">
+            РќР°РїСЂР°РІР»РµРЅРёРµ
           </label>
           <select
             id="article-topic"
             value={topic}
             onChange={(event) => setTopic(event.target.value as ArticleTopic)}
-            className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none focus-visible:border-[#68a897]"
+            className="h-12 w-full rounded-2xl border border-[#2b3531] bg-[#181e1b] px-4 text-sm text-white outline-none focus-visible:border-[#53e6a6]"
           >
             {topics.map((item) => (
               <option key={item} value={item}>
@@ -263,15 +264,15 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="article-summary" className="text-sm font-medium text-slate-900">
-            Короткое описание
+          <label htmlFor="article-summary" className="text-sm font-medium text-white">
+            РљРѕСЂРѕС‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ
           </label>
           <Input
             id="article-summary"
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
-            placeholder="Пара строк, чтобы в списке было понятно, о чем статья"
-            className="h-12 rounded-2xl border-slate-200 bg-white text-slate-900"
+            placeholder="РџР°СЂР° СЃС‚СЂРѕРє, С‡С‚РѕР±С‹ РІ СЃРїРёСЃРєРµ Р±С‹Р»Рѕ РїРѕРЅСЏС‚РЅРѕ, Рѕ С‡РµРј СЃС‚Р°С‚СЊСЏ"
+            className="h-12 rounded-2xl border-[#2b3531] bg-[#181e1b] text-white placeholder:text-[#6f877e]"
           />
         </div>
       </div>
@@ -279,7 +280,7 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
       <div className="flex flex-wrap gap-2">
         <EditorButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
           <Bold />
-          Жирный
+          Р–РёСЂРЅС‹Р№
         </EditorButton>
         <EditorButton
           active={editor.isActive("heading", { level: 2 })}
@@ -300,36 +301,36 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
           <List />
-          Список
+          РЎРїРёСЃРѕРє
         </EditorButton>
         <EditorButton
           active={editor.isActive("orderedList")}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
           <ListOrdered />
-          Нумерация
+          РќСѓРјРµСЂР°С†РёСЏ
         </EditorButton>
         <EditorButton
           active={editor.isActive("blockquote")}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
           <Quote />
-          Цитата
+          Р¦РёС‚Р°С‚Р°
         </EditorButton>
         <EditorButton
           active={editor.isActive("codeBlock")}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         >
           <Code2 />
-          Код
+          РљРѕРґ
         </EditorButton>
         <EditorButton onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           <Minus />
-          Разделитель
+          Р Р°Р·РґРµР»РёС‚РµР»СЊ
         </EditorButton>
         <EditorButton onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}>
           <Type />
-          Сброс
+          РЎР±СЂРѕСЃ
         </EditorButton>
       </div>
 
@@ -340,8 +341,8 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
           className={cn(
             "rounded-[24px] border px-4 py-3 text-sm leading-6",
             feedback.tone === "success"
-              ? "border-slate-200 bg-[#edf3ef] text-teal-700"
-              : "border-rose-200 bg-rose-50 text-rose-700"
+              ? "border-[#245945] bg-[#14241d] text-[#53e6a6]"
+              : "border-rose-500/30 bg-rose-500/10 text-rose-200"
           )}
         >
           {feedback.text}
@@ -351,19 +352,19 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
       <div className="flex flex-wrap items-center gap-3">
         <Button
           type="button"
-          className="rounded-2xl bg-[#2f7a67] px-5 text-white hover:bg-[#286857]"
+          className="rounded-2xl bg-[#53e6a6] px-5 text-[#09120e] hover:bg-[#46ce93]"
           onClick={handleSave}
           disabled={isSaving}
         >
           {isSaving ? (
             <>
               <LoaderCircle className="size-4 animate-spin" />
-              Сохраняем...
+              РЎРѕС…СЂР°РЅСЏРµРј...
             </>
           ) : (
             <>
               <Save className="size-4" />
-              {article ? "Сохранить изменения" : "Создать статью"}
+              {article ? "РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ" : "РЎРѕР·РґР°С‚СЊ СЃС‚Р°С‚СЊСЋ"}
             </>
           )}
         </Button>
@@ -371,18 +372,19 @@ export function ThoughtEditor({ article, topics }: ThoughtEditorProps) {
         <Button
           type="button"
           variant="outline"
-          className="rounded-2xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]"
+          className="rounded-2xl border-[#2b3531] bg-[#181e1b] text-white hover:bg-[#1d2521]"
           onClick={handleNewDraft}
           disabled={isSaving}
         >
-          Новый черновик
+          РќРѕРІС‹Р№ С‡РµСЂРЅРѕРІРёРє
         </Button>
       </div>
 
-      <div className="rounded-[24px] border border-slate-200 bg-[#f4f7f4] p-4 text-sm leading-7 text-slate-600">
-        Текст статьи хранится в PostgreSQL. Картинки для статей лучше держать отдельными
-        файлами на сервере и сохранять в базе только путь к ним. Это будет следующим шагом.
+      <div className="rounded-[24px] border border-[#2b3531] bg-[#181e1b] p-4 text-sm leading-7 text-[#8ca39b]">
+        РўРµРєСЃС‚ СЃС‚Р°С‚СЊРё С…СЂР°РЅРёС‚СЃСЏ РІ PostgreSQL. РљР°СЂС‚РёРЅРєРё РґР»СЏ СЃС‚Р°С‚РµР№ Р»СѓС‡С€Рµ РґРµСЂР¶Р°С‚СЊ РѕС‚РґРµР»СЊРЅС‹РјРё
+        С„Р°Р№Р»Р°РјРё РЅР° СЃРµСЂРІРµСЂРµ Рё СЃРѕС…СЂР°РЅСЏС‚СЊ РІ Р±Р°Р·Рµ С‚РѕР»СЊРєРѕ РїСѓС‚СЊ Рє РЅРёРј. Р­С‚Рѕ Р±СѓРґРµС‚ СЃР»РµРґСѓСЋС‰РёРј С€Р°РіРѕРј.
       </div>
     </div>
   );
 }
+
