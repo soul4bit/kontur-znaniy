@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   BookOpenText,
@@ -15,18 +16,36 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentSession } from "@/lib/auth/session";
-import { devopsArticles, devopsTopics, featuredArticle } from "@/lib/content/devops-library";
+import { getArticleById, listArticlesByAuthor } from "@/lib/articles/server";
+import { articleTopics } from "@/lib/content/devops-library";
 
 const topicIcons = [ServerCog, Boxes, Cable, FolderKanban, HardDriveUpload, FolderKanban, HardDriveUpload];
 
-export default async function AppPage() {
+type AppPageProps = {
+  searchParams?: Promise<{
+    article?: string;
+  }>;
+};
+
+export default async function AppPage({ searchParams }: AppPageProps) {
   const session = await getCurrentSession();
 
   if (!session) {
     redirect("/auth");
   }
 
+  const params = searchParams ? await searchParams : undefined;
+  const selectedArticleId = params?.article;
+  const articles = await listArticlesByAuthor(session.user.id);
+  const selectedArticle =
+    (selectedArticleId ? await getArticleById(session.user.id, selectedArticleId) : null) ??
+    (articles[0] ? await getArticleById(session.user.id, articles[0].id) : null);
+
   const displayName = session.user.name?.trim() || session.user.email;
+  const topicCounts = articleTopics.map((topic) => ({
+    ...topic,
+    count: articles.filter((article) => article.topic === topic.name).length,
+  }));
 
   return (
     <div className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7f8f4_0%,#edf3ef_100%)] px-4 py-8 sm:px-6 lg:px-8">
@@ -51,11 +70,13 @@ export default async function AppPage() {
 
             <div className="flex flex-wrap items-center gap-2">
               <Button
-                type="button"
+                asChild
                 className="rounded-2xl bg-[#2f7a67] px-5 text-white hover:bg-[#286857]"
               >
-                <Plus className="size-4" />
-                Новая статья
+                <Link href="/app">
+                  <Plus className="size-4" />
+                  Новая статья
+                </Link>
               </Button>
               <SignOutButton />
             </div>
@@ -72,7 +93,7 @@ export default async function AppPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {devopsTopics.map((topic, index) => {
+                {topicCounts.map((topic, index) => {
                   const Icon = topicIcons[index] ?? ServerCog;
 
                   return (
@@ -80,15 +101,13 @@ export default async function AppPage() {
                       key={topic.name}
                       className="rounded-[22px] border border-slate-200 bg-[#f4f7f4] px-4 py-4"
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex size-10 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm">
-                            <Icon className="size-4" />
-                          </div>
-                          <div>
-                            <h2 className="text-sm font-semibold text-slate-900">{topic.name}</h2>
-                            <p className="mt-1 text-xs text-slate-500">{topic.count} статей</p>
-                          </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex size-10 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm">
+                          <Icon className="size-4" />
+                        </div>
+                        <div>
+                          <h2 className="text-sm font-semibold text-slate-900">{topic.name}</h2>
+                          <p className="mt-1 text-xs text-slate-500">{topic.count} статей</p>
                         </div>
                       </div>
                       <p className="mt-3 text-sm leading-6 text-slate-600">{topic.summary}</p>
@@ -113,7 +132,7 @@ export default async function AppPage() {
                   Картинки: отдельные файлы на сервере
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-[#f4f7f4] px-4 py-3">
-                  В базе храним только путь к изображению и контент статьи
+                  В базе храним текст, HTML/JSON документа и путь к изображению
                 </div>
               </CardContent>
             </Card>
@@ -123,7 +142,7 @@ export default async function AppPage() {
             <Card className="rounded-[32px] border-slate-200 bg-white/92 shadow-[0_24px_70px_rgba(39,70,63,0.08)]">
               <CardHeader className="gap-4 border-b border-slate-200 pb-6">
                 <div className="flex flex-wrap items-center gap-2">
-                  {devopsTopics.map((topic) => (
+                  {articleTopics.map((topic) => (
                     <Badge
                       key={topic.name}
                       variant="outline"
@@ -138,58 +157,64 @@ export default async function AppPage() {
                     Последние статьи
                   </CardTitle>
                   <CardDescription className="max-w-3xl text-base leading-7 text-slate-600">
-                    Здесь будет лента технических заметок: короткие разборы, чеклисты, команды и
-                    полноценные статьи по твоим DevOps-направлениям.
+                    Здесь уже показываются реальные статьи из базы. Открываешь нужную запись,
+                    читаешь ее справа и редактируешь в том же экране.
                   </CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="grid gap-4 pt-6 md:grid-cols-2">
-                {devopsArticles.map((article) => (
-                  <article
-                    key={article.title}
-                    className="rounded-[26px] border border-slate-200 bg-[#f6f8f6] p-5"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="rounded-full bg-[#2f7a67] px-3 py-1 text-white">
-                        {article.topic}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="rounded-full border-slate-200 bg-white px-3 py-1 text-slate-600"
-                      >
-                        {article.level}
-                      </Badge>
-                    </div>
-                    <h2 className="mt-4 text-xl font-semibold text-slate-900">{article.title}</h2>
-                    <p className="mt-3 text-sm leading-7 text-slate-600">{article.summary}</p>
-                    <div className="mt-4 flex items-center gap-2 text-xs text-teal-700/75">
-                      <Clock3 className="size-3.5" />
-                      обновлено {article.updatedAt}
-                    </div>
-                  </article>
-                ))}
+                {articles.length > 0 ? (
+                  articles.map((article) => (
+                    <Link key={article.id} href={`/app?article=${article.id}`}>
+                      <article className="rounded-[26px] border border-slate-200 bg-[#f6f8f6] p-5 transition-colors hover:bg-[#eef4f0]">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge className="rounded-full bg-[#2f7a67] px-3 py-1 text-white">
+                            {article.topic}
+                          </Badge>
+                        </div>
+                        <h2 className="mt-4 text-xl font-semibold text-slate-900">{article.title}</h2>
+                        <p className="mt-3 text-sm leading-7 text-slate-600">{article.summary}</p>
+                        <div className="mt-4 flex items-center gap-2 text-xs text-teal-700/75">
+                          <Clock3 className="size-3.5" />
+                          обновлено {new Date(article.updatedAt).toLocaleDateString("ru-RU")}
+                        </div>
+                      </article>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="rounded-[26px] border border-dashed border-slate-300 bg-[#f6f8f6] p-6 text-sm leading-7 text-slate-600 md:col-span-2">
+                    Пока нет ни одной статьи. Начни с первого разбора в редакторе ниже и сохрани его в базу.
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             <Card className="rounded-[32px] border-slate-200 bg-white/92 shadow-[0_24px_70px_rgba(39,70,63,0.08)]">
               <CardHeader className="gap-3 border-b border-slate-200 pb-6">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="rounded-full bg-[#2f7a67] px-3 py-1 text-white">
-                    {featuredArticle.topic}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="rounded-full border-slate-200 bg-[#f4f7f4] px-3 py-1 text-slate-600"
-                  >
-                    {featuredArticle.readingTime}
-                  </Badge>
-                </div>
-                <CardTitle className="text-2xl text-slate-900 sm:text-3xl">
-                  {featuredArticle.title}
-                </CardTitle>
-                <CardDescription className="max-w-3xl text-base leading-7 text-slate-600">
-                  {featuredArticle.summary}
-                </CardDescription>
+                {selectedArticle ? (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="rounded-full bg-[#2f7a67] px-3 py-1 text-white">
+                        {selectedArticle.topic}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-2xl text-slate-900 sm:text-3xl">
+                      {selectedArticle.title}
+                    </CardTitle>
+                    <CardDescription className="max-w-3xl text-base leading-7 text-slate-600">
+                      {selectedArticle.summary}
+                    </CardDescription>
+                  </>
+                ) : (
+                  <>
+                    <CardTitle className="text-2xl text-slate-900 sm:text-3xl">
+                      Открытая статья
+                    </CardTitle>
+                    <CardDescription className="max-w-3xl text-base leading-7 text-slate-600">
+                      Когда появится первая статья, здесь будет показан ее текст для чтения.
+                    </CardDescription>
+                  </>
+                )}
               </CardHeader>
               <CardContent className="grid gap-6 pt-6 lg:grid-cols-[minmax(0,1fr)_280px]">
                 <div className="space-y-5">
@@ -198,38 +223,29 @@ export default async function AppPage() {
                       <BookOpenText className="size-4" />
                       Тело статьи
                     </div>
-                    <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600">
-                      {featuredArticle.paragraphs.map((paragraph) => (
-                        <p key={paragraph}>{paragraph}</p>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[26px] border border-slate-200 bg-slate-950 p-5 text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">
-                      Commands
-                    </p>
-                    <div className="mt-4 space-y-2 font-mono text-sm leading-7">
-                      {featuredArticle.commands.map((command) => (
-                        <div key={command} className="rounded-2xl bg-white/5 px-4 py-3">
-                          {command}
-                        </div>
-                      ))}
-                    </div>
+                    <div
+                      className="nook-editor mt-4 space-y-4 text-sm leading-7 text-slate-600"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          selectedArticle?.contentHtml ??
+                          "<p>Сохрани первую статью, и здесь появится ее содержимое.</p>",
+                      }}
+                    />
                   </div>
                 </div>
 
                 <div className="rounded-[26px] border border-slate-200 bg-[#f5f8f5] p-5">
-                  <p className="text-sm font-medium text-slate-900">Чеклист</p>
+                  <p className="text-sm font-medium text-slate-900">Подсказка</p>
                   <div className="mt-4 space-y-3">
-                    {featuredArticle.checklist.map((item) => (
-                      <div
-                        key={item}
-                        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-600"
-                      >
-                        {item}
-                      </div>
-                    ))}
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
+                      Сначала создай статью в редакторе ниже.
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
+                      После сохранения запись появится в списке и сразу откроется.
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
+                      Дальше можно вернуться к ней, отредактировать и снова сохранить.
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -241,13 +257,15 @@ export default async function AppPage() {
                   Редактор статьи
                 </CardTitle>
                 <CardDescription className="max-w-3xl text-base leading-7 text-slate-600">
-                  Для DevOps-заметок нужен не просто textarea, а редактор, в котором удобно
-                  писать команды, чеклисты и длинные разборы. На этом шаге оставляем Tiptap и
-                  усиливаем его под технический контент.
+                  Этот редактор уже создает и сохраняет статьи в PostgreSQL. Если открыта
+                  запись из списка выше, сохранение обновит именно ее.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
-                <ThoughtEditor />
+                <ThoughtEditor
+                  article={selectedArticle}
+                  topics={articleTopics.map((topic) => topic.name)}
+                />
               </CardContent>
             </Card>
           </section>

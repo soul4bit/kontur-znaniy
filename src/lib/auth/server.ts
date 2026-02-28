@@ -11,7 +11,7 @@ declare global {
 
 const { databaseUrl, secret, baseUrl } = getAuthEnv();
 
-const pool =
+export const pool =
   globalThis.nookPgPool ??
   new Pool({
     connectionString: databaseUrl,
