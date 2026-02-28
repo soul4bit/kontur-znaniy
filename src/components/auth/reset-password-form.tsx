@@ -1,11 +1,10 @@
-﻿"use client";
+"use client";
 
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, KeyRound, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   extractAuthErrorMessage,
@@ -44,13 +43,13 @@ async function postAuth(path: string, payload: Record<string, unknown>) {
 function FeedbackBanner({ feedback }: { feedback: AuthFeedback }) {
   const toneClass =
     feedback.tone === "error"
-      ? "border-rose-200 bg-rose-50 text-rose-700"
+      ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
       : feedback.tone === "success"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-        : "border-amber-200 bg-amber-50 text-amber-700";
+        ? "border-[#245945] bg-[#14241d] text-[#53e6a6]"
+        : "border-amber-500/30 bg-amber-500/10 text-amber-200";
 
   return (
-    <div className={`rounded-2xl border px-4 py-3 text-sm ${toneClass}`}>
+    <div className={`rounded-2xl border px-4 py-3 text-sm leading-6 ${toneClass}`}>
       {feedback.text}
     </div>
   );
@@ -127,19 +126,18 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
   }
 
   return (
-    <Card className="overflow-hidden rounded-[28px] border-white/70 bg-white/85 shadow-[0_30px_80px_rgba(88,141,108,0.15)] backdrop-blur">
-      <CardHeader className="gap-3 border-b border-emerald-100/80 pb-6">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+    <div className="w-full rounded-[32px] border border-[#29312d] bg-[#171c19] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
+      <div className="border-b border-[#29312d] pb-6">
+        <div className="flex size-12 items-center justify-center rounded-2xl bg-[#111513] text-[#53e6a6]">
           <KeyRound className="size-5" />
         </div>
-        <CardTitle className="text-2xl text-emerald-950">
-          Новый пароль
-        </CardTitle>
-        <CardDescription className="max-w-md text-sm leading-6 text-emerald-900/70">
-          Ссылка из письма ведет сюда. Задайте новый пароль и затем вернитесь ко входу.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-5 pt-6">
+        <h2 className="mt-4 text-2xl font-semibold text-white">Новый пароль</h2>
+        <p className="mt-2 max-w-md text-sm leading-6 text-[#8fa59c]">
+          Задайте новый пароль для аккаунта и затем вернитесь к обычному входу.
+        </p>
+      </div>
+
+      <div className="space-y-5 pt-6">
         {feedback ? <FeedbackBanner feedback={feedback} /> : null}
 
         {invalidLink ? (
@@ -150,14 +148,18 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                 text: "Ссылка уже недействительна. Запросите новое письмо для сброса пароля.",
               }}
             />
-            <Button asChild variant="outline" className="w-full rounded-2xl border-emerald-200">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full rounded-2xl border-[#2b3531] bg-[#111513] text-white hover:bg-[#1a201d]"
+            >
               <Link href="/auth?mode=reset">Вернуться к форме сброса</Link>
             </Button>
           </div>
         ) : (
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
-              <label htmlFor="reset-password" className="text-sm font-medium text-emerald-950">
+              <label htmlFor="reset-password" className="text-sm font-medium text-white">
                 Новый пароль
               </label>
               <Input
@@ -168,6 +170,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="Минимум 8 символов"
+                className="h-12 rounded-2xl border-[#2b3531] bg-[#111513] text-white placeholder:text-[#6f877e]"
                 required
               />
             </div>
@@ -175,7 +178,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
             <div className="space-y-1.5">
               <label
                 htmlFor="reset-password-confirm"
-                className="text-sm font-medium text-emerald-950"
+                className="text-sm font-medium text-white"
               >
                 Повторите пароль
               </label>
@@ -187,13 +190,14 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 placeholder="Повторите пароль"
+                className="h-12 rounded-2xl border-[#2b3531] bg-[#111513] text-white placeholder:text-[#6f877e]"
                 required
               />
             </div>
 
             <Button
               type="submit"
-              className="h-11 w-full rounded-2xl"
+              className="h-11 w-full rounded-2xl bg-[#53e6a6] text-[#0b1510] hover:bg-[#47cf95]"
               disabled={isPending}
             >
               {isPending ? (
@@ -210,7 +214,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
               asChild
               type="button"
               variant="ghost"
-              className="w-full rounded-2xl text-emerald-900/70"
+              className="w-full rounded-2xl text-[#b7c8c0] hover:bg-[#111513] hover:text-white"
             >
               <Link href="/auth">
                 <ArrowLeft className="size-4" />
@@ -219,9 +223,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
             </Button>
           </form>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
-
-

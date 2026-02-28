@@ -1,10 +1,9 @@
-﻿"use client";
+"use client";
 
-import { type FormEvent, useMemo, useState } from "react";
+import { type ComponentProps, type FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, KeyRound, LoaderCircle, Mail, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   extractAuthErrorMessage,
@@ -55,15 +54,32 @@ function getAbsoluteUrl(path: string) {
 function FeedbackBanner({ feedback }: { feedback: AuthFeedback }) {
   const toneClass =
     feedback.tone === "error"
-      ? "border-rose-200 bg-rose-50 text-rose-700"
+      ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
       : feedback.tone === "success"
-        ? "border-slate-200 bg-[#edf3ef] text-teal-700"
-        : "border-sky-200 bg-sky-50 text-sky-700";
+        ? "border-[#245945] bg-[#14241d] text-[#53e6a6]"
+        : "border-sky-500/30 bg-sky-500/10 text-sky-200";
 
   return (
     <div className={`rounded-2xl border px-4 py-3 text-sm leading-6 ${toneClass}`}>
       {feedback.text}
     </div>
+  );
+}
+
+function FieldLabel({ htmlFor, children }: { htmlFor: string; children: string }) {
+  return (
+    <label htmlFor={htmlFor} className="text-sm font-medium text-white">
+      {children}
+    </label>
+  );
+}
+
+function DarkInput(props: ComponentProps<typeof Input>) {
+  return (
+    <Input
+      {...props}
+      className={`h-12 rounded-2xl border-[#2b3531] bg-[#111513] text-white placeholder:text-[#6f877e] ${props.className ?? ""}`}
+    />
   );
 }
 
@@ -102,7 +118,7 @@ export function AuthForms() {
       ? "Введите email и пароль, чтобы открыть свои заметки."
       : mode === "sign-up"
         ? "Создайте аккаунт и подтвердите email из письма."
-        : "Отправим ссылку для сброса пароля на вашу почту.";
+        : "Отправим письмо со ссылкой для создания нового пароля.";
 
   async function handleSignIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -130,7 +146,7 @@ export function AuthForms() {
         setLastEmail(email);
         setFeedback({
           tone: "info",
-          text: "Email еще не подтвержден. Отправьте письмо повторно и активируйте аккаунт.",
+          text: "Почта еще не подтверждена. Отправьте письмо повторно и активируйте аккаунт.",
         });
       } else {
         setFeedback({ tone: "error", text: getAuthErrorMessage(message) });
@@ -259,38 +275,35 @@ export function AuthForms() {
   }
 
   return (
-    <Card className="overflow-hidden rounded-[32px] border-slate-200 bg-white/92 shadow-[0_30px_80px_rgba(39,70,63,0.1)] backdrop-blur">
-      <CardHeader className="gap-4 border-b border-slate-200 pb-6">
-        <div className="space-y-3">
-          <div className="inline-flex rounded-full border border-slate-200 bg-[#edf3ef] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
-            {mode === "sign-in" ? "sign in" : mode === "sign-up" ? "sign up" : "reset access"}
-          </div>
-          <div className="space-y-2">
-            <CardTitle className="text-2xl text-slate-900">{title}</CardTitle>
-            <CardDescription className="max-w-md text-sm leading-6 text-slate-600">
-              {description}
-            </CardDescription>
-          </div>
+    <div className="w-full rounded-[32px] border border-[#29312d] bg-[#171c19] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
+      <div className="border-b border-[#29312d] pb-6">
+        <div className="inline-flex rounded-full border border-[#31413a] bg-[#111513] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[#94b7a7]">
+          {mode === "sign-in" ? "sign in" : mode === "sign-up" ? "sign up" : "reset access"}
         </div>
-      </CardHeader>
+        <div className="mt-4 space-y-2">
+          <h2 className="text-2xl font-semibold text-white">{title}</h2>
+          <p className="max-w-md text-sm leading-6 text-[#8fa59c]">{description}</p>
+        </div>
+      </div>
 
-      <CardContent className="space-y-5 pt-6">
+      <div className="space-y-5 pt-6">
         {activeFeedback ? <FeedbackBanner feedback={activeFeedback} /> : null}
 
         {awaitingVerification ? (
-          <div className="rounded-[24px] border border-slate-200 bg-[#edf3ef] p-4 text-sm leading-6 text-slate-700">
+          <div className="rounded-[24px] border border-[#245945] bg-[#14241d] p-4 text-sm leading-6 text-[#c9f4dd]">
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm">
+              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-[#0f1814] text-[#53e6a6]">
                 <Mail className="size-4" />
               </div>
               <div className="space-y-3">
                 <p>
-                  Подтвердите email <strong>{resendEmail || "вашего аккаунта"}</strong>, чтобы закончить регистрацию.
+                  Подтвердите email <strong>{resendEmail || "вашего аккаунта"}</strong>,
+                  чтобы завершить регистрацию.
                 </p>
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-2xl border-slate-200 bg-white text-slate-900 hover:bg-[#f5f8f5]"
+                  className="rounded-2xl border-[#2b3531] bg-[#111513] text-white hover:bg-[#1a201d]"
                   onClick={handleResendVerification}
                   disabled={pendingAction === "resend"}
                 >
@@ -315,10 +328,8 @@ export function AuthForms() {
           <>
             <form className="space-y-4" onSubmit={handleSignIn}>
               <div className="space-y-1.5">
-                <label htmlFor="signin-email" className="text-sm font-medium text-slate-900">
-                  Email
-                </label>
-                <Input
+                <FieldLabel htmlFor="signin-email">Email</FieldLabel>
+                <DarkInput
                   id="signin-email"
                   name="email"
                   type="email"
@@ -334,12 +345,10 @@ export function AuthForms() {
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <label htmlFor="signin-password" className="text-sm font-medium text-slate-900">
-                    Пароль
-                  </label>
+                  <FieldLabel htmlFor="signin-password">Пароль</FieldLabel>
                   <button
                     type="button"
-                    className="text-xs font-medium text-teal-700 hover:text-slate-900"
+                    className="text-xs font-medium text-[#8fb9a5] hover:text-white"
                     onClick={() => {
                       setMode("reset");
                       setFeedback(null);
@@ -349,7 +358,7 @@ export function AuthForms() {
                     Забыли пароль?
                   </button>
                 </div>
-                <Input
+                <DarkInput
                   id="signin-password"
                   name="password"
                   type="password"
@@ -365,7 +374,7 @@ export function AuthForms() {
 
               <Button
                 type="submit"
-                className="h-11 w-full rounded-2xl"
+                className="h-11 w-full rounded-2xl bg-[#53e6a6] text-[#0b1510] hover:bg-[#47cf95]"
                 disabled={pendingAction === "sign-in"}
               >
                 {pendingAction === "sign-in" ? (
@@ -382,12 +391,15 @@ export function AuthForms() {
               </Button>
             </form>
 
-            <div className="rounded-[24px] border border-slate-200 bg-[#f4f7f4] p-4">
-              <p className="text-sm font-medium text-slate-900">Нет аккаунта?</p>
+            <div className="rounded-[24px] border border-[#29312d] bg-[#111513] p-4">
+              <p className="text-sm font-medium text-white">Нет аккаунта?</p>
+              <p className="mt-2 text-sm leading-6 text-[#7f958b]">
+                Создай отдельный доступ и подтверди почту одним письмом.
+              </p>
               <Button
                 type="button"
                 variant="outline"
-                className="mt-4 w-full rounded-2xl border-slate-200 bg-white text-slate-900 hover:bg-[#f5f8f5]"
+                className="mt-4 w-full rounded-2xl border-[#2b3531] bg-[#171c19] text-white hover:bg-[#1b2220]"
                 onClick={() => {
                   setMode("sign-up");
                   setFeedback(null);
@@ -408,10 +420,8 @@ export function AuthForms() {
           <>
             <form className="space-y-4" onSubmit={handleSignUp}>
               <div className="space-y-1.5">
-                <label htmlFor="signup-name" className="text-sm font-medium text-slate-900">
-                  Имя
-                </label>
-                <Input
+                <FieldLabel htmlFor="signup-name">Имя</FieldLabel>
+                <DarkInput
                   id="signup-name"
                   name="name"
                   value={signUpForm.name}
@@ -423,11 +433,10 @@ export function AuthForms() {
                   required
                 />
               </div>
+
               <div className="space-y-1.5">
-                <label htmlFor="signup-email" className="text-sm font-medium text-slate-900">
-                  Email
-                </label>
-                <Input
+                <FieldLabel htmlFor="signup-email">Email</FieldLabel>
+                <DarkInput
                   id="signup-email"
                   name="email"
                   type="email"
@@ -440,12 +449,11 @@ export function AuthForms() {
                   required
                 />
               </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label htmlFor="signup-password" className="text-sm font-medium text-slate-900">
-                    Пароль
-                  </label>
-                  <Input
+                  <FieldLabel htmlFor="signup-password">Пароль</FieldLabel>
+                  <DarkInput
                     id="signup-password"
                     name="password"
                     type="password"
@@ -458,14 +466,10 @@ export function AuthForms() {
                     required
                   />
                 </div>
+
                 <div className="space-y-1.5">
-                  <label
-                    htmlFor="signup-password-repeat"
-                    className="text-sm font-medium text-slate-900"
-                  >
-                    Повторите пароль
-                  </label>
-                  <Input
+                  <FieldLabel htmlFor="signup-password-repeat">Повторите пароль</FieldLabel>
+                  <DarkInput
                     id="signup-password-repeat"
                     name="confirmPassword"
                     type="password"
@@ -485,7 +489,7 @@ export function AuthForms() {
 
               <Button
                 type="submit"
-                className="h-11 w-full rounded-2xl"
+                className="h-11 w-full rounded-2xl bg-[#53e6a6] text-[#0b1510] hover:bg-[#47cf95]"
                 disabled={pendingAction === "sign-up"}
               >
                 {pendingAction === "sign-up" ? (
@@ -505,7 +509,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-2xl text-slate-700 hover:bg-[#edf3ef]"
+              className="w-full rounded-2xl text-[#b7c8c0] hover:bg-[#111513] hover:text-white"
               onClick={() => {
                 setMode("sign-in");
                 setFeedback(null);
@@ -525,10 +529,8 @@ export function AuthForms() {
           <>
             <form className="space-y-4" onSubmit={handleReset}>
               <div className="space-y-1.5">
-                <label htmlFor="reset-email" className="text-sm font-medium text-slate-900">
-                  Email для восстановления
-                </label>
-                <Input
+                <FieldLabel htmlFor="reset-email">Email для восстановления</FieldLabel>
+                <DarkInput
                   id="reset-email"
                   name="email"
                   type="email"
@@ -539,9 +541,10 @@ export function AuthForms() {
                   required
                 />
               </div>
+
               <Button
                 type="submit"
-                className="h-11 w-full rounded-2xl"
+                className="h-11 w-full rounded-2xl bg-[#53e6a6] text-[#0b1510] hover:bg-[#47cf95]"
                 disabled={pendingAction === "reset"}
               >
                 {pendingAction === "reset" ? (
@@ -561,7 +564,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-2xl text-slate-700 hover:bg-[#edf3ef]"
+              className="w-full rounded-2xl text-[#b7c8c0] hover:bg-[#111513] hover:text-white"
               onClick={() => {
                 setMode("sign-in");
                 setFeedback(null);
@@ -576,9 +579,7 @@ export function AuthForms() {
             </Button>
           </>
         ) : null}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
-
-
