@@ -57,7 +57,7 @@ function FeedbackBanner({ feedback }: { feedback: AuthFeedback }) {
     feedback.tone === "error"
       ? "border-rose-200 bg-rose-50 text-rose-700"
       : feedback.tone === "success"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+        ? "border-slate-200 bg-[#edf3ef] text-teal-700"
         : "border-sky-200 bg-sky-50 text-sky-700";
 
   return (
@@ -259,15 +259,15 @@ export function AuthForms() {
   }
 
   return (
-    <Card className="overflow-hidden rounded-[32px] border-white/75 bg-white/90 shadow-[0_35px_95px_rgba(80,132,99,0.16)] backdrop-blur">
-      <CardHeader className="gap-4 border-b border-emerald-100/80 pb-6">
+    <Card className="overflow-hidden rounded-[32px] border-slate-200 bg-white/92 shadow-[0_30px_80px_rgba(39,70,63,0.1)] backdrop-blur">
+      <CardHeader className="gap-4 border-b border-slate-200 pb-6">
         <div className="space-y-3">
-          <div className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
+          <div className="inline-flex rounded-full border border-slate-200 bg-[#edf3ef] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
             {mode === "sign-in" ? "sign in" : mode === "sign-up" ? "sign up" : "reset access"}
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-2xl text-emerald-950">{title}</CardTitle>
-            <CardDescription className="max-w-md text-sm leading-6 text-emerald-900/68">
+            <CardTitle className="text-2xl text-slate-900">{title}</CardTitle>
+            <CardDescription className="max-w-md text-sm leading-6 text-slate-600">
               {description}
             </CardDescription>
           </div>
@@ -278,9 +278,9 @@ export function AuthForms() {
         {activeFeedback ? <FeedbackBanner feedback={activeFeedback} /> : null}
 
         {awaitingVerification ? (
-          <div className="rounded-[24px] border border-emerald-200 bg-emerald-50/80 p-4 text-sm leading-6 text-emerald-800">
+          <div className="rounded-[24px] border border-slate-200 bg-[#edf3ef] p-4 text-sm leading-6 text-slate-700">
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-white text-emerald-600 shadow-sm">
+              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm">
                 <Mail className="size-4" />
               </div>
               <div className="space-y-3">
@@ -290,7 +290,7 @@ export function AuthForms() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-2xl border-emerald-200 bg-white/90 text-emerald-900 hover:bg-white"
+                  className="rounded-2xl border-slate-200 bg-white text-slate-900 hover:bg-[#f5f8f5]"
                   onClick={handleResendVerification}
                   disabled={pendingAction === "resend"}
                 >
@@ -315,7 +315,7 @@ export function AuthForms() {
           <>
             <form className="space-y-4" onSubmit={handleSignIn}>
               <div className="space-y-1.5">
-                <label htmlFor="signin-email" className="text-sm font-medium text-emerald-950">
+                <label htmlFor="signin-email" className="text-sm font-medium text-slate-900">
                   Email
                 </label>
                 <Input
@@ -334,12 +334,12 @@ export function AuthForms() {
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <label htmlFor="signin-password" className="text-sm font-medium text-emerald-950">
+                  <label htmlFor="signin-password" className="text-sm font-medium text-slate-900">
                     Пароль
                   </label>
                   <button
                     type="button"
-                    className="text-xs font-medium text-emerald-700 hover:text-emerald-900"
+                    className="text-xs font-medium text-teal-700 hover:text-slate-900"
                     onClick={() => {
                       setMode("reset");
                       setFeedback(null);
@@ -382,12 +382,12 @@ export function AuthForms() {
               </Button>
             </form>
 
-            <div className="rounded-[24px] border border-emerald-100 bg-emerald-50/60 p-4">
-              <p className="text-sm font-medium text-emerald-950">Нет аккаунта?</p>
+            <div className="rounded-[24px] border border-slate-200 bg-[#f4f7f4] p-4">
+              <p className="text-sm font-medium text-slate-900">Нет аккаунта?</p>
               <Button
                 type="button"
                 variant="outline"
-                className="mt-4 w-full rounded-2xl border-emerald-200 bg-white/90 text-emerald-900 hover:bg-white"
+                className="mt-4 w-full rounded-2xl border-slate-200 bg-white text-slate-900 hover:bg-[#f5f8f5]"
                 onClick={() => {
                   setMode("sign-up");
                   setFeedback(null);
@@ -408,7 +408,7 @@ export function AuthForms() {
           <>
             <form className="space-y-4" onSubmit={handleSignUp}>
               <div className="space-y-1.5">
-                <label htmlFor="signup-name" className="text-sm font-medium text-emerald-950">
+                <label htmlFor="signup-name" className="text-sm font-medium text-slate-900">
                   Имя
                 </label>
                 <Input
@@ -424,7 +424,7 @@ export function AuthForms() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="signup-email" className="text-sm font-medium text-emerald-950">
+                <label htmlFor="signup-email" className="text-sm font-medium text-slate-900">
                   Email
                 </label>
                 <Input
@@ -442,7 +442,7 @@ export function AuthForms() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label htmlFor="signup-password" className="text-sm font-medium text-emerald-950">
+                  <label htmlFor="signup-password" className="text-sm font-medium text-slate-900">
                     Пароль
                   </label>
                   <Input
@@ -461,7 +461,7 @@ export function AuthForms() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="signup-password-repeat"
-                    className="text-sm font-medium text-emerald-950"
+                    className="text-sm font-medium text-slate-900"
                   >
                     Повторите пароль
                   </label>
@@ -505,7 +505,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-2xl text-emerald-800 hover:bg-emerald-50"
+              className="w-full rounded-2xl text-slate-700 hover:bg-[#edf3ef]"
               onClick={() => {
                 setMode("sign-in");
                 setFeedback(null);
@@ -525,7 +525,7 @@ export function AuthForms() {
           <>
             <form className="space-y-4" onSubmit={handleReset}>
               <div className="space-y-1.5">
-                <label htmlFor="reset-email" className="text-sm font-medium text-emerald-950">
+                <label htmlFor="reset-email" className="text-sm font-medium text-slate-900">
                   Email для восстановления
                 </label>
                 <Input
@@ -561,7 +561,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-2xl text-emerald-800 hover:bg-emerald-50"
+              className="w-full rounded-2xl text-slate-700 hover:bg-[#edf3ef]"
               onClick={() => {
                 setMode("sign-in");
                 setFeedback(null);
@@ -580,4 +580,5 @@ export function AuthForms() {
     </Card>
   );
 }
+
 

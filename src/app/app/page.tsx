@@ -35,20 +35,20 @@ export default async function AppPage() {
   const displayName = session.user.name?.trim() || session.user.email;
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f9fcf8_0%,#eef5ef_100%)] px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7f8f4_0%,#edf3ef_100%)] px-4 py-8 sm:px-6 lg:px-8">
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="rounded-[32px] border border-emerald-100 bg-white/90 p-5 shadow-[0_20px_60px_rgba(88,141,108,0.08)] sm:p-6">
+        <header className="rounded-[32px] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_60px_rgba(39,70,63,0.07)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3">
-              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
+              <span className="rounded-full border border-slate-200 bg-[#edf3ef] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
                 Nook notes
               </span>
               <div className="space-y-2">
-                <h1 className="text-3xl font-semibold tracking-tight text-balance text-emerald-950 sm:text-4xl">
+                <h1 className="text-3xl font-semibold tracking-tight text-balance text-slate-900 sm:text-4xl">
                   {displayName}
                 </h1>
-                <p className="max-w-2xl text-sm leading-6 text-emerald-900/68 sm:text-base">
-                  Слева список заметок. В центре чтение. Ниже новый текст. Этого достаточно для первой версии Nook.
+                <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+                  Здесь живут заметки, к которым ты возвращаешься не из обязанности, а потому что они продолжают работать на тебя.
                 </p>
               </div>
             </div>
@@ -56,7 +56,7 @@ export default async function AppPage() {
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 asChild
-                className="rounded-2xl bg-emerald-500 px-5 text-white hover:bg-emerald-600"
+                className="rounded-2xl bg-[#2f7a67] px-5 text-white hover:bg-[#286857]"
               >
                 <Link href="/app">
                   <Plus className="size-4" />
@@ -70,39 +70,39 @@ export default async function AppPage() {
 
         <section className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
           <aside className="space-y-4">
-            <Card className="rounded-[28px] border-emerald-100 bg-white/90 shadow-[0_18px_50px_rgba(88,141,108,0.08)]">
+            <Card className="rounded-[28px] border-slate-200 bg-white/90 shadow-[0_18px_50px_rgba(39,70,63,0.06)]">
               <CardHeader className="gap-3">
-                <CardTitle className="flex items-center gap-2 text-lg text-emerald-950">
-                  <List className="size-5 text-emerald-600" />
+                <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
+                  <List className="size-5 text-teal-700" />
                   Заметки
                 </CardTitle>
-                <CardDescription className="text-emerald-900/65">
+                <CardDescription className="text-slate-600">
                   Быстрый список того, что уже можно открыть и перечитать.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 {notes.map((note, index) => (
                   <article
-                    key={note.title}
-                    className={`rounded-[22px] border px-4 py-4 ${
-                      index === 0
-                        ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-emerald-100 bg-emerald-50/55 text-emerald-950"
-                    }`}
-                  >
-                    <div>
-                      <h2 className="text-sm font-semibold">{note.title}</h2>
-                      <p
-                        className={`mt-2 text-sm leading-6 ${
-                          index === 0 ? "text-white/85" : "text-emerald-900/68"
-                        }`}
-                      >
-                        {note.excerpt}
+                  key={note.title}
+                  className={`rounded-[22px] border px-4 py-4 ${
+                    index === 0
+                      ? "border-[#2f7a67] bg-[#2f7a67] text-white"
+                      : "border-slate-200 bg-[#f4f7f4] text-slate-900"
+                  }`}
+                >
+                  <div>
+                    <h2 className="text-sm font-semibold">{note.title}</h2>
+                    <p
+                      className={`mt-2 text-sm leading-6 ${
+                        index === 0 ? "text-white/85" : "text-slate-600"
+                      }`}
+                    >
+                      {note.excerpt}
                       </p>
                     </div>
                     <div
                       className={`mt-3 flex items-center gap-2 text-xs ${
-                        index === 0 ? "text-white/75" : "text-emerald-700/70"
+                        index === 0 ? "text-white/75" : "text-teal-700/70"
                       }`}
                     >
                       <Clock3 className="size-3.5" />
@@ -115,40 +115,40 @@ export default async function AppPage() {
           </aside>
 
           <section className="grid gap-6">
-            <Card className="rounded-[32px] border-emerald-100 bg-white/92 shadow-[0_24px_70px_rgba(88,141,108,0.1)]">
-              <CardHeader className="gap-3 border-b border-emerald-100 pb-6">
-                <CardTitle className="text-2xl text-emerald-950 sm:text-3xl">
+            <Card className="rounded-[32px] border-slate-200 bg-white/92 shadow-[0_24px_70px_rgba(39,70,63,0.08)]">
+              <CardHeader className="gap-3 border-b border-slate-200 pb-6">
+                <CardTitle className="text-2xl text-slate-900 sm:text-3xl">
                   Открытая заметка
                 </CardTitle>
-                <CardDescription className="max-w-2xl text-base leading-7 text-emerald-900/68">
-                  Основной режим Nook. Спокойный экран для чтения и возвращения к своим записям.
+                <CardDescription className="max-w-2xl text-base leading-7 text-slate-600">
+                  Здесь заметка должна звучать первой. Интерфейс только поддерживает чтение, но не вмешивается.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5 pt-6">
-                <div className="rounded-[26px] border border-emerald-100 bg-[#f8fbf8] p-5">
-                  <div className="flex items-center gap-2 text-sm font-medium text-emerald-700">
+                <div className="rounded-[26px] border border-slate-200 bg-[#f5f8f5] p-5">
+                  <div className="flex items-center gap-2 text-sm font-medium text-teal-700">
                     <BookOpenText className="size-4" />
                     Идеи для Nook
                   </div>
-                  <div className="mt-4 space-y-4 text-sm leading-7 text-emerald-900/75">
+                  <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600">
                     <p>
-                      Nook должен быть местом, куда легко скинуть мысль без сопротивления, а потом так же легко вернуться и перечитать ее в чистом виде.
+                      Хорошие заметки не шумят. Они просто лежат рядом, ждут своего часа и в нужный момент снова становятся ясными.
                     </p>
                     <p>
-                      Для этого интерфейс лучше делать спокойным: список заметок слева, читаемая страница по центру и простой редактор без лишней мишуры.
+                      Поэтому Nook строится как тихая рабочая поверхность: список слева, текст по центру, новый черновик сразу под рукой.
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="rounded-[32px] border-emerald-100 bg-white/92 shadow-[0_24px_70px_rgba(88,141,108,0.1)]">
-              <CardHeader className="gap-3 border-b border-emerald-100 pb-6">
-                <CardTitle className="text-2xl text-emerald-950 sm:text-3xl">
+            <Card className="rounded-[32px] border-slate-200 bg-white/92 shadow-[0_24px_70px_rgba(39,70,63,0.08)]">
+              <CardHeader className="gap-3 border-b border-slate-200 pb-6">
+                <CardTitle className="text-2xl text-slate-900 sm:text-3xl">
                   Новая заметка
                 </CardTitle>
-                <CardDescription className="max-w-2xl text-base leading-7 text-emerald-900/68">
-                  Быстрый редактор для новой записи. Следующим шагом подключим сохранение в базу.
+                <CardDescription className="max-w-2xl text-base leading-7 text-slate-600">
+                  Новая запись начинается здесь. Быстро, спокойно и без лишних переходов между экранами.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">

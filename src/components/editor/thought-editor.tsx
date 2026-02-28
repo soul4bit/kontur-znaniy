@@ -25,7 +25,7 @@ export function ThoughtEditor() {
     editorProps: {
       attributes: {
         class:
-          "nook-editor min-h-72 rounded-[28px] border border-emerald-100 bg-white/90 px-5 py-4 text-[15px] leading-7 text-emerald-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] focus-visible:outline-none",
+          "nook-editor min-h-72 rounded-[28px] border border-slate-200 bg-white/92 px-5 py-4 text-[15px] leading-7 text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] focus-visible:outline-none",
       },
     },
   });
@@ -40,9 +40,9 @@ export function ThoughtEditor() {
           size="sm"
           variant="outline"
           className={cn(
-            "rounded-xl border-emerald-200 bg-white/80 text-emerald-950 hover:bg-emerald-50",
+            "rounded-xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]",
             editor.isActive("bold") &&
-              "border-emerald-500 bg-emerald-500 text-white hover:bg-emerald-500"
+              "border-[#2f7a67] bg-[#2f7a67] text-white hover:bg-[#2f7a67]"
           )}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
@@ -54,9 +54,9 @@ export function ThoughtEditor() {
           size="sm"
           variant="outline"
           className={cn(
-            "rounded-xl border-emerald-200 bg-white/80 text-emerald-950 hover:bg-emerald-50",
+            "rounded-xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]",
             editor.isActive("heading", { level: 2 }) &&
-              "border-emerald-500 bg-emerald-500 text-white hover:bg-emerald-500"
+              "border-[#2f7a67] bg-[#2f7a67] text-white hover:bg-[#2f7a67]"
           )}
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         >
@@ -68,9 +68,9 @@ export function ThoughtEditor() {
           size="sm"
           variant="outline"
           className={cn(
-            "rounded-xl border-emerald-200 bg-white/80 text-emerald-950 hover:bg-emerald-50",
+            "rounded-xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]",
             editor.isActive("bulletList") &&
-              "border-emerald-500 bg-emerald-500 text-white hover:bg-emerald-500"
+              "border-[#2f7a67] bg-[#2f7a67] text-white hover:bg-[#2f7a67]"
           )}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
@@ -82,9 +82,9 @@ export function ThoughtEditor() {
           size="sm"
           variant="outline"
           className={cn(
-            "rounded-xl border-emerald-200 bg-white/80 text-emerald-950 hover:bg-emerald-50",
+            "rounded-xl border-slate-200 bg-white/80 text-slate-900 hover:bg-[#edf3ef]",
             editor.isActive("orderedList") &&
-              "border-emerald-500 bg-emerald-500 text-white hover:bg-emerald-500"
+              "border-[#2f7a67] bg-[#2f7a67] text-white hover:bg-[#2f7a67]"
           )}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
