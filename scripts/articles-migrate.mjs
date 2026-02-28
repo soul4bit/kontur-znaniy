@@ -14,6 +14,7 @@ const migrationSql = `
   create table if not exists articles (
     id text primary key,
     author_id text not null references "user"(id) on delete cascade,
+    updated_by_id text references "user"(id) on delete set null,
     title text not null,
     slug text not null,
     topic text not null,
@@ -25,6 +26,13 @@ const migrationSql = `
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
   );
+
+  alter table articles
+    add column if not exists updated_by_id text references "user"(id) on delete set null;
+
+  update articles
+  set updated_by_id = author_id
+  where updated_by_id is null;
 
   create unique index if not exists articles_author_slug_idx
     on articles(author_id, slug);

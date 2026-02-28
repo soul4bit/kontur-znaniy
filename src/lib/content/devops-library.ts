@@ -8,7 +8,7 @@ export const articleTopics = [
     summary: "images, compose, registries, layer cache",
   },
   {
-    name: "Сети",
+    name: "\u0421\u0435\u0442\u0438",
     summary: "dns, routing, nat, tcpdump, vpn",
   },
   {

@@ -24,29 +24,59 @@ import { type ArticleRecord } from "@/lib/articles/server";
 import { type ArticleTopic } from "@/lib/content/devops-library";
 import { cn } from "@/lib/utils";
 
+const copy = {
+  emptyTitle: "\u041d\u043e\u0432\u0430\u044f \u0441\u0442\u0430\u0442\u044c\u044f",
+  emptyBody:
+    "\u0417\u0430\u0444\u0438\u043a\u0441\u0438\u0440\u0443\u0439 \u0440\u0430\u0437\u0431\u043e\u0440, \u043a\u043e\u043c\u0430\u043d\u0434\u044b, \u0432\u044b\u0432\u043e\u0434\u044b \u0438 \u043a\u043e\u0440\u043e\u0442\u043a\u0438\u0435 \u043f\u0440\u0430\u043a\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0437\u0430\u043c\u0435\u0442\u043a\u0438 \u043f\u043e \u0437\u0430\u0434\u0430\u0447\u0435.",
+  placeholder:
+    "\u041f\u0438\u0448\u0438 \u0440\u0430\u0437\u0431\u043e\u0440, \u0448\u043f\u0430\u0440\u0433\u0430\u043b\u043a\u0443, \u043a\u043e\u043c\u0430\u043d\u0434\u044b, \u0432\u044b\u0432\u043e\u0434\u044b \u0438 \u0441\u0432\u043e\u0438 \u0437\u0430\u043c\u0435\u0442\u043a\u0438 \u043f\u043e \u0437\u0430\u0434\u0430\u0447\u0435...",
+  saveError: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0441\u0442\u0430\u0442\u044c\u044e.",
+  titleRequired: "\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u0437\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a \u0441\u0442\u0430\u0442\u044c\u0438.",
+  bodyRequired: "\u0421\u0442\u0430\u0442\u044c\u044f \u043d\u0435 \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u043f\u0443\u0441\u0442\u043e\u0439.",
+  updated: "\u0421\u0442\u0430\u0442\u044c\u044f \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0430.",
+  created: "\u0421\u0442\u0430\u0442\u044c\u044f \u0441\u043e\u0437\u0434\u0430\u043d\u0430.",
+  titleLabel: "\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a \u0441\u0442\u0430\u0442\u044c\u0438",
+  titlePlaceholder: "\u041d\u0430\u043f\u0440\u0438\u043c\u0435\u0440: Kubernetes probes without pain",
+  draft: "\u0427\u0435\u0440\u043d\u043e\u0432\u0438\u043a",
+  blocks: "\u0431\u043b\u043e\u043a\u043e\u0432",
+  chars: "\u0441\u0438\u043c\u0432\u043e\u043b\u043e\u0432",
+  topicLabel: "\u0420\u0430\u0437\u0434\u0435\u043b",
+  summaryLabel: "\u041a\u043e\u0440\u043e\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435",
+  summaryPlaceholder:
+    "\u041f\u0430\u0440\u0430 \u0441\u0442\u0440\u043e\u043a, \u0447\u0442\u043e\u0431\u044b \u0432 \u0441\u043f\u0438\u0441\u043a\u0435 \u0431\u044b\u043b\u043e \u043f\u043e\u043d\u044f\u0442\u043d\u043e, \u043e \u0447\u0435\u043c \u0441\u0442\u0430\u0442\u044c\u044f",
+  bold: "\u0416\u0438\u0440\u043d\u044b\u0439",
+  list: "\u0421\u043f\u0438\u0441\u043e\u043a",
+  ordered: "\u041d\u0443\u043c\u0435\u0440\u0430\u0446\u0438\u044f",
+  quote: "\u0426\u0438\u0442\u0430\u0442\u0430",
+  code: "\u041a\u043e\u0434",
+  divider: "\u0420\u0430\u0437\u0434\u0435\u043b\u0438\u0442\u0435\u043b\u044c",
+  reset: "\u0421\u0431\u0440\u043e\u0441",
+  saving: "\u0421\u043e\u0445\u0440\u0430\u043d\u044f\u0435\u043c...",
+  saveChanges: "\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f",
+  createArticle: "\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0441\u0442\u0430\u0442\u044c\u044e",
+  newDraft: "\u041d\u043e\u0432\u044b\u0439 \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a",
+  footer:
+    "\u0422\u0435\u043a\u0441\u0442 \u0441\u0442\u0430\u0442\u044c\u0438 \u0445\u0440\u0430\u043d\u0438\u0442\u0441\u044f \u0432 PostgreSQL. \u041a\u0430\u0440\u0442\u0438\u043d\u043a\u0438 \u0434\u043b\u044f \u0441\u0442\u0430\u0442\u0435\u0439 \u043b\u0443\u0447\u0448\u0435 \u0434\u0435\u0440\u0436\u0430\u0442\u044c \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u044b\u043c\u0438 \u0444\u0430\u0439\u043b\u0430\u043c\u0438 \u043d\u0430 \u0441\u0435\u0440\u0432\u0435\u0440\u0435 \u0438 \u0441\u043e\u0445\u0440\u0430\u043d\u044f\u0442\u044c \u0432 \u0431\u0430\u0437\u0435 \u0442\u043e\u043b\u044c\u043a\u043e \u043f\u0443\u0442\u044c \u043a \u043d\u0438\u043c. \u042d\u0442\u043e \u0431\u0443\u0434\u0435\u0442 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0438\u043c \u0448\u0430\u0433\u043e\u043c.",
+} as const;
+
 const emptyDocument = {
   type: "doc",
   content: [
     {
       type: "heading",
       attrs: { level: 2 },
-      content: [{ type: "text", text: "Новая статья" }],
+      content: [{ type: "text", text: copy.emptyTitle }],
     },
     {
       type: "paragraph",
-      content: [
-        {
-          type: "text",
-          text: "Зафиксируй разбор, команды, выводы и короткие практические заметки по задаче.",
-        },
-      ],
+      content: [{ type: "text", text: copy.emptyBody }],
     },
   ],
 };
 
 const emptyHtml = `
-  <h2>Новая статья</h2>
-  <p>Зафиксируй разбор, команды, выводы и короткие практические заметки по задаче.</p>
+  <h2>${copy.emptyTitle}</h2>
+  <p>${copy.emptyBody}</p>
 `;
 
 type ThoughtEditorProps = {
@@ -87,10 +117,7 @@ function EditorButton({ active = false, onClick, children }: EditorButtonProps) 
   );
 }
 
-async function saveArticleRequest(
-  articleId: string | null,
-  payload: Record<string, unknown>
-) {
+async function saveArticleRequest(articleId: string | null, payload: Record<string, unknown>) {
   const response = await fetch(articleId ? `/api/articles/${articleId}` : "/api/articles", {
     method: articleId ? "PATCH" : "POST",
     headers: {
@@ -104,7 +131,7 @@ async function saveArticleRequest(
 
   if (!response.ok) {
     const message = "message" in result ? result.message : undefined;
-    throw new Error(message ?? "Не удалось сохранить статью.");
+    throw new Error(message ?? copy.saveError);
   }
 
   return result as ArticleResponse;
@@ -128,8 +155,7 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder:
-          "Пиши разбор, шпаргалку, команды, выводы и свои заметки по задаче...",
+        placeholder: copy.placeholder,
       }),
     ],
     content: initialJson,
@@ -178,12 +204,12 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
     const contentText = editor.getText().trim();
 
     if (!trimmedTitle) {
-      setFeedback({ tone: "error", text: "Укажите заголовок статьи." });
+      setFeedback({ tone: "error", text: copy.titleRequired });
       return;
     }
 
     if (!contentText) {
-      setFeedback({ tone: "error", text: "Статья не может быть пустой." });
+      setFeedback({ tone: "error", text: copy.bodyRequired });
       return;
     }
 
@@ -202,16 +228,16 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
 
       setFeedback({
         tone: "success",
-        text: article ? "Статья обновлена." : "Статья создана.",
+        text: article ? copy.updated : copy.created,
       });
       router.replace(
-        `/app?topic=${encodeURIComponent(result.article.topic)}&article=${result.article.id}`
+        `/app?topic=${encodeURIComponent(result.article.topic)}&draft=0&article=${result.article.id}`
       );
       router.refresh();
     } catch (error) {
       setFeedback({
         tone: "error",
-        text: error instanceof Error ? error.message : "Не удалось сохранить статью.",
+        text: error instanceof Error ? error.message : copy.saveError,
       });
     } finally {
       setIsSaving(false);
@@ -224,7 +250,7 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
     setTopic(defaultTopic);
     setFeedback(null);
     editor?.commands.setContent(emptyHtml);
-    router.replace(`/app?topic=${encodeURIComponent(defaultTopic)}`);
+    router.replace(`/app?topic=${encodeURIComponent(defaultTopic)}&draft=1`);
   }
 
   if (!editor) return null;
@@ -234,28 +260,32 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
         <div className="space-y-2">
           <label htmlFor="article-title" className="text-sm font-medium text-white">
-            Заголовок статьи
+            {copy.titleLabel}
           </label>
           <Input
             id="article-title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Например: Kubernetes probes without pain"
+            placeholder={copy.titlePlaceholder}
             className="h-12 rounded-2xl border-[#2b3531] bg-[#111513] text-white placeholder:text-[#6f877e]"
           />
         </div>
 
         <div className="rounded-[24px] border border-[#2b3531] bg-[#181e1b] px-4 py-3 text-sm leading-6 text-[#8ca39b]">
-          <p className="font-medium text-white">Черновик</p>
-          <p className="mt-2">{stats.paragraphs} блоков</p>
-          <p>{stats.chars} символов</p>
+          <p className="font-medium text-white">{copy.draft}</p>
+          <p className="mt-2">
+            {stats.paragraphs} {copy.blocks}
+          </p>
+          <p>
+            {stats.chars} {copy.chars}
+          </p>
         </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
         <div className="space-y-2">
           <label htmlFor="article-topic" className="text-sm font-medium text-white">
-            Раздел
+            {copy.topicLabel}
           </label>
           <select
             id="article-topic"
@@ -273,13 +303,13 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
 
         <div className="space-y-2">
           <label htmlFor="article-summary" className="text-sm font-medium text-white">
-            Короткое описание
+            {copy.summaryLabel}
           </label>
           <Input
             id="article-summary"
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
-            placeholder="Пара строк, чтобы в списке было понятно, о чем статья"
+            placeholder={copy.summaryPlaceholder}
             className="h-12 rounded-2xl border-[#2b3531] bg-[#181e1b] text-white placeholder:text-[#6f877e]"
           />
         </div>
@@ -288,7 +318,7 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
       <div className="flex flex-wrap gap-2">
         <EditorButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
           <Bold />
-          Жирный
+          {copy.bold}
         </EditorButton>
         <EditorButton
           active={editor.isActive("heading", { level: 2 })}
@@ -309,36 +339,36 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
           <List />
-          Список
+          {copy.list}
         </EditorButton>
         <EditorButton
           active={editor.isActive("orderedList")}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
           <ListOrdered />
-          Нумерация
+          {copy.ordered}
         </EditorButton>
         <EditorButton
           active={editor.isActive("blockquote")}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
           <Quote />
-          Цитата
+          {copy.quote}
         </EditorButton>
         <EditorButton
           active={editor.isActive("codeBlock")}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         >
           <Code2 />
-          Код
+          {copy.code}
         </EditorButton>
         <EditorButton onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           <Minus />
-          Разделитель
+          {copy.divider}
         </EditorButton>
         <EditorButton onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}>
           <Type />
-          Сброс
+          {copy.reset}
         </EditorButton>
       </div>
 
@@ -367,12 +397,12 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
           {isSaving ? (
             <>
               <LoaderCircle className="size-4 animate-spin" />
-              Сохраняем...
+              {copy.saving}
             </>
           ) : (
             <>
               <Save className="size-4" />
-              {article ? "Сохранить изменения" : "Создать статью"}
+              {article ? copy.saveChanges : copy.createArticle}
             </>
           )}
         </Button>
@@ -384,14 +414,12 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
           onClick={handleNewDraft}
           disabled={isSaving}
         >
-          Новый черновик
+          {copy.newDraft}
         </Button>
       </div>
 
       <div className="rounded-[24px] border border-[#2b3531] bg-[#181e1b] p-4 text-sm leading-7 text-[#8ca39b]">
-        Текст статьи хранится в PostgreSQL. Картинки для статей лучше держать
-        отдельными файлами на сервере и сохранять в базе только путь к ним.
-        Это будет следующим шагом.
+        {copy.footer}
       </div>
     </div>
   );

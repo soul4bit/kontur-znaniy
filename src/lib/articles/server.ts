@@ -5,6 +5,9 @@ import { articleTopicNames, type ArticleTopic } from "@/lib/content/devops-libra
 type ArticleRow = {
   id: string;
   author_id: string;
+  author_name: string | null;
+  updated_by_id: string | null;
+  updated_by_name: string | null;
   title: string;
   slug: string;
   topic: string;
@@ -23,6 +26,8 @@ export type ArticleListItem = {
   slug: string;
   topic: ArticleTopic;
   summary: string;
+  authorName: string;
+  updatedByName: string;
   updatedAt: string;
 };
 
@@ -36,6 +41,7 @@ export type ArticleRecord = ArticleListItem & {
 
 export type SaveArticleInput = {
   authorId: string;
+  editorId: string;
   title: string;
   topic: ArticleTopic;
   summary: string;
@@ -45,12 +51,17 @@ export type SaveArticleInput = {
 };
 
 function mapArticle(row: ArticleRow): ArticleRecord {
+  const authorName = row.author_name?.trim() || "\u0410\u0432\u0442\u043e\u0440";
+  const updatedByName = row.updated_by_name?.trim() || authorName;
+
   return {
     id: row.id,
     title: row.title,
     slug: row.slug,
     topic: row.topic as ArticleTopic,
     summary: row.summary,
+    authorName,
+    updatedByName,
     contentHtml: row.content_html,
     contentJson: row.content_json,
     contentText: row.content_text,
@@ -67,6 +78,8 @@ function toListItem(article: ArticleRecord): ArticleListItem {
     slug: article.slug,
     topic: article.topic,
     summary: article.summary,
+    authorName: article.authorName,
+    updatedByName: article.updatedByName,
     updatedAt: article.updatedAt,
   };
 }
@@ -121,6 +134,18 @@ async function createUniqueSlug(authorId: string, title: string, excludeId?: str
   }
 }
 
+function articleSelectSql() {
+  return `
+    select
+      articles.*,
+      author_user.name as author_name,
+      updated_user.name as updated_by_name
+    from articles
+    left join "user" as author_user on author_user.id = articles.author_id
+    left join "user" as updated_user on updated_user.id = articles.updated_by_id
+  `;
+}
+
 export function isArticleTopic(value: string): value is ArticleTopic {
   return articleTopicNames.includes(value as ArticleTopic);
 }
@@ -128,10 +153,9 @@ export function isArticleTopic(value: string): value is ArticleTopic {
 export async function listArticlesByAuthor(authorId: string) {
   const { rows } = await pool.query<ArticleRow>(
     `
-      select *
-      from articles
-      where author_id = $1
-      order by updated_at desc
+      ${articleSelectSql()}
+      where articles.author_id = $1
+      order by articles.updated_at desc
     `,
     [authorId]
   );
@@ -142,9 +166,8 @@ export async function listArticlesByAuthor(authorId: string) {
 export async function getArticleById(authorId: string, articleId: string) {
   const { rows } = await pool.query<ArticleRow>(
     `
-      select *
-      from articles
-      where id = $1 and author_id = $2
+      ${articleSelectSql()}
+      where articles.id = $1 and articles.author_id = $2
       limit 1
     `,
     [articleId, authorId]
@@ -163,6 +186,7 @@ export async function createArticle(input: SaveArticleInput) {
       insert into articles (
         id,
         author_id,
+        updated_by_id,
         title,
         slug,
         topic,
@@ -172,12 +196,16 @@ export async function createArticle(input: SaveArticleInput) {
         content_text,
         cover_image_path
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, null)
-      returning *
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, null)
+      returning
+        *,
+        null::text as author_name,
+        null::text as updated_by_name
     `,
     [
       id,
       input.authorId,
+      input.editorId,
       input.title.trim(),
       slug,
       input.topic,
@@ -188,13 +216,10 @@ export async function createArticle(input: SaveArticleInput) {
     ]
   );
 
-  return mapArticle(rows[0]);
+  return (await getArticleById(input.authorId, rows[0].id)) as ArticleRecord;
 }
 
-export async function updateArticle(
-  articleId: string,
-  input: SaveArticleInput
-) {
+export async function updateArticle(articleId: string, input: SaveArticleInput) {
   const slug = await createUniqueSlug(input.authorId, input.title, articleId);
   const summary = normalizeSummary(input.summary, input.contentText);
 
@@ -209,9 +234,13 @@ export async function updateArticle(
         content_html = $7,
         content_json = $8::jsonb,
         content_text = $9,
+        updated_by_id = $10,
         updated_at = now()
       where id = $1 and author_id = $2
-      returning *
+      returning
+        *,
+        null::text as author_name,
+        null::text as updated_by_name
     `,
     [
       articleId,
@@ -223,8 +252,13 @@ export async function updateArticle(
       input.contentHtml,
       JSON.stringify(input.contentJson),
       input.contentText,
+      input.editorId,
     ]
   );
 
-  return rows[0] ? mapArticle(rows[0]) : null;
+  if (!rows[0]) {
+    return null;
+  }
+
+  return getArticleById(input.authorId, rows[0].id);
 }
