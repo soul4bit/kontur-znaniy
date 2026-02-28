@@ -92,8 +92,11 @@ function buildAppHref(topic: string, options?: { articleId?: string; draft?: boo
   return `/app?${params.toString()}`;
 }
 
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("ru-RU");
+function formatDateTime(date: string) {
+  return new Date(date).toLocaleString("ru-RU", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 }
 
 export default async function AppPage({ searchParams }: AppPageProps) {
@@ -319,7 +322,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                     {copy.lastUpdate}
                   </p>
                   <p className="mt-2 text-sm font-medium text-white">
-                    {articles[0] ? formatDate(articles[0].updatedAt) : copy.emptyValue}
+                    {articles[0] ? formatDateTime(articles[0].updatedAt) : copy.emptyValue}
                   </p>
                 </div>
               </div>
@@ -336,7 +339,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                     </span>
                     <span className="inline-flex items-center gap-2 text-xs text-[#7f948b]">
                       <Clock3 className="size-3.5" />
-                      {copy.updated} {formatDate(selectedArticle.updatedAt)}
+                      {copy.updated} {formatDateTime(selectedArticle.updatedAt)}
                     </span>
                   </div>
 
@@ -357,7 +360,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                         {selectedArticle.authorName}
                       </p>
                       <p className="mt-1 text-xs text-[#7f948b]">
-                        {copy.created} {formatDate(selectedArticle.createdAt)}
+                        {copy.created} {formatDateTime(selectedArticle.createdAt)}
                       </p>
                     </div>
 
@@ -370,7 +373,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                         {selectedArticle.updatedByName}
                       </p>
                       <p className="mt-1 text-xs text-[#7f948b]">
-                        {copy.updated} {formatDate(selectedArticle.updatedAt)}
+                        {copy.updated} {formatDateTime(selectedArticle.updatedAt)}
                       </p>
                     </div>
                   </div>
