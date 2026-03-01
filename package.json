@@ -10,6 +10,7 @@
     "admin:create": "node --env-file=.env.local scripts/create-admin.mjs",
     "auth:sql": "node --env-file=.env.local scripts/better-auth-sql.mjs",
     "auth:migrate": "node --env-file=.env.local scripts/better-auth-migrate.mjs",
+    "auth:guard:migrate": "node --env-file=.env.local scripts/auth-guard-migrate.mjs",
     "articles:migrate": "node --env-file=.env.local scripts/articles-migrate.mjs",
     "account:migrate": "node --env-file=.env.local scripts/account-migrate.mjs"
   },

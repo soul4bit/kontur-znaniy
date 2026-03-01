@@ -23,6 +23,7 @@ jobs:
             git pull --ff-only origin main
             npm ci
             npm run auth:migrate
+            npm run auth:guard:migrate
             npm run account:migrate
             npm run articles:migrate
             npm run build

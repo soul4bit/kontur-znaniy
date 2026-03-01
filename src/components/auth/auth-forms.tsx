@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { type ComponentProps, type FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,9 +14,14 @@ import {
 
 type AuthMode = "sign-in" | "sign-up" | "reset";
 type PendingAction = "sign-in" | "sign-up" | "reset" | "resend" | null;
+type GuardAction = "sign-in" | "sign-up" | "reset" | "resend";
+type GuardState = {
+  startedAt: number;
+  website: string;
+};
 
 async function postAuth(path: string, payload: Record<string, unknown>) {
-  const response = await fetch(`/api/auth${path}`, {
+  const response = await fetch(path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -51,6 +56,13 @@ function getAbsoluteUrl(path: string) {
   return new URL(path, window.location.origin).toString();
 }
 
+function createGuardState(): GuardState {
+  return {
+    startedAt: Date.now(),
+    website: "",
+  };
+}
+
 function FeedbackBanner({ feedback }: { feedback: AuthFeedback }) {
   const toneClass =
     feedback.tone === "error"
@@ -83,6 +95,21 @@ function DarkInput(props: ComponentProps<typeof Input>) {
   );
 }
 
+function BotTrap({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  return (
+    <input
+      type="text"
+      name="website"
+      tabIndex={-1}
+      autoComplete="off"
+      aria-hidden="true"
+      className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden opacity-0"
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+    />
+  );
+}
+
 export function AuthForms() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,6 +123,12 @@ export function AuthForms() {
   const [feedback, setFeedback] = useState<AuthFeedback | null>(null);
   const [lastEmail, setLastEmail] = useState("");
   const [awaitingVerification, setAwaitingVerification] = useState(false);
+  const [guardState, setGuardState] = useState<Record<GuardAction, GuardState>>({
+    "sign-in": createGuardState(),
+    "sign-up": createGuardState(),
+    reset: createGuardState(),
+    resend: createGuardState(),
+  });
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });
   const [signUpForm, setSignUpForm] = useState({
     name: "",
@@ -117,8 +150,40 @@ export function AuthForms() {
     mode === "sign-in"
       ? "Введите email и пароль, чтобы открыть свои заметки."
       : mode === "sign-up"
-        ? "Создайте аккаунт и подтвердите email из письма."
-        : "Отправим письмо со ссылкой для создания нового пароля.";
+        ? "Создайте аккаунт, подтвердите email и после этого входите в Nook."
+        : "Отправим письмо со ссылкой, чтобы вы могли задать новый пароль.";
+
+  function updateGuard(action: GuardAction, patch: Partial<GuardState>) {
+    setGuardState((current) => ({
+      ...current,
+      [action]: {
+        ...current[action],
+        ...patch,
+      },
+    }));
+  }
+
+  function resetGuard(action: GuardAction) {
+    setGuardState((current) => ({
+      ...current,
+      [action]: createGuardState(),
+    }));
+  }
+
+  function openMode(nextMode: AuthMode) {
+    setMode(nextMode);
+    setFeedback(null);
+    setAwaitingVerification(false);
+    if (nextMode === "sign-in") {
+      resetGuard("sign-in");
+    }
+    if (nextMode === "sign-up") {
+      resetGuard("sign-up");
+    }
+    if (nextMode === "reset") {
+      resetGuard("reset");
+    }
+  }
 
   async function handleSignIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -135,7 +200,11 @@ export function AuthForms() {
     setFeedback(null);
 
     try {
-      await postAuth("/sign-in/email", { email, password });
+      await postAuth("/api/auth-guard/sign-in", {
+        email,
+        password,
+        ...guardState["sign-in"],
+      });
       router.replace("/app");
       router.refresh();
     } catch (error) {
@@ -153,6 +222,7 @@ export function AuthForms() {
       }
     } finally {
       setPendingAction(null);
+      resetGuard("sign-in");
     }
   }
 
@@ -174,8 +244,11 @@ export function AuthForms() {
       return;
     }
 
-    if (password.length < 8) {
-      setFeedback({ tone: "error", text: "Пароль должен быть не короче 8 символов." });
+    if (password.length < 10 || !/\p{L}/u.test(password) || !/\d/.test(password)) {
+      setFeedback({
+        tone: "error",
+        text: "Пароль должен быть от 10 до 128 символов и содержать буквы и цифры.",
+      });
       return;
     }
 
@@ -183,11 +256,12 @@ export function AuthForms() {
     setFeedback(null);
 
     try {
-      await postAuth("/sign-up/email", {
+      await postAuth("/api/auth-guard/sign-up", {
         name,
         email,
         password,
         callbackURL: getAbsoluteUrl("/app"),
+        ...guardState["sign-up"],
       });
 
       setAwaitingVerification(true);
@@ -206,6 +280,7 @@ export function AuthForms() {
       });
     } finally {
       setPendingAction(null);
+      resetGuard("sign-up");
     }
   }
 
@@ -223,9 +298,10 @@ export function AuthForms() {
     setFeedback(null);
 
     try {
-      await postAuth("/request-password-reset", {
+      await postAuth("/api/auth-guard/request-password-reset", {
         email,
         redirectTo: getAbsoluteUrl("/auth/reset-password"),
+        ...guardState.reset,
       });
       setLastEmail(email);
       setFeedback({
@@ -239,6 +315,7 @@ export function AuthForms() {
       });
     } finally {
       setPendingAction(null);
+      resetGuard("reset");
     }
   }
 
@@ -257,9 +334,10 @@ export function AuthForms() {
     setFeedback(null);
 
     try {
-      await postAuth("/send-verification-email", {
+      await postAuth("/api/auth-guard/send-verification-email", {
         email,
         callbackURL: getAbsoluteUrl("/app"),
+        ...guardState.resend,
       });
       setAwaitingVerification(true);
       setLastEmail(email);
@@ -271,6 +349,7 @@ export function AuthForms() {
       });
     } finally {
       setPendingAction(null);
+      resetGuard("resend");
     }
   }
 
@@ -297,8 +376,8 @@ export function AuthForms() {
               </div>
               <div className="space-y-3">
                 <p>
-                  Подтвердите email <strong>{resendEmail || "вашего аккаунта"}</strong>,
-                  чтобы завершить регистрацию.
+                  Подтвердите email <strong>{resendEmail || "вашего аккаунта"}</strong>, чтобы
+                  завершить регистрацию.
                 </p>
                 <Button
                   type="button"
@@ -327,6 +406,11 @@ export function AuthForms() {
         {mode === "sign-in" ? (
           <>
             <form className="space-y-4" onSubmit={handleSignIn}>
+              <BotTrap
+                value={guardState["sign-in"].website}
+                onChange={(value) => updateGuard("sign-in", { website: value })}
+              />
+
               <div className="space-y-1.5">
                 <FieldLabel htmlFor="signin-email">Email</FieldLabel>
                 <DarkInput
@@ -350,8 +434,7 @@ export function AuthForms() {
                     type="button"
                     className="text-xs font-medium text-[#8fb9a5] hover:text-white"
                     onClick={() => {
-                      setMode("reset");
-                      setFeedback(null);
+                      openMode("reset");
                       setResetEmail(signInForm.email);
                     }}
                   >
@@ -394,15 +477,14 @@ export function AuthForms() {
             <div className="rounded-[24px] border border-[#29312d] bg-[#111513] p-4">
               <p className="text-sm font-medium text-white">Нет аккаунта?</p>
               <p className="mt-2 text-sm leading-6 text-[#7f958b]">
-                Создай отдельный доступ и подтверди почту одним письмом.
+                Создайте отдельный доступ, подтвердите почту и после этого входите в Nook.
               </p>
               <Button
                 type="button"
                 variant="outline"
                 className="mt-4 w-full rounded-2xl border-[#2b3531] bg-[#171c19] text-white hover:bg-[#1b2220]"
                 onClick={() => {
-                  setMode("sign-up");
-                  setFeedback(null);
+                  openMode("sign-up");
                   setSignUpForm((current) => ({
                     ...current,
                     email: signInForm.email || current.email,
@@ -419,6 +501,11 @@ export function AuthForms() {
         {mode === "sign-up" ? (
           <>
             <form className="space-y-4" onSubmit={handleSignUp}>
+              <BotTrap
+                value={guardState["sign-up"].website}
+                onChange={(value) => updateGuard("sign-up", { website: value })}
+              />
+
               <div className="space-y-1.5">
                 <FieldLabel htmlFor="signup-name">Имя</FieldLabel>
                 <DarkInput
@@ -461,7 +548,7 @@ export function AuthForms() {
                     onChange={(event) =>
                       setSignUpForm((current) => ({ ...current, password: event.target.value }))
                     }
-                    placeholder="Минимум 8 символов"
+                    placeholder="Минимум 10 символов"
                     autoComplete="new-password"
                     required
                   />
@@ -511,8 +598,7 @@ export function AuthForms() {
               variant="ghost"
               className="w-full rounded-2xl text-[#b7c8c0] hover:bg-[#111513] hover:text-white"
               onClick={() => {
-                setMode("sign-in");
-                setFeedback(null);
+                openMode("sign-in");
                 setSignInForm((current) => ({
                   ...current,
                   email: signUpForm.email || current.email,
@@ -528,6 +614,11 @@ export function AuthForms() {
         {mode === "reset" ? (
           <>
             <form className="space-y-4" onSubmit={handleReset}>
+              <BotTrap
+                value={guardState.reset.website}
+                onChange={(value) => updateGuard("reset", { website: value })}
+              />
+
               <div className="space-y-1.5">
                 <FieldLabel htmlFor="reset-email">Email для восстановления</FieldLabel>
                 <DarkInput
@@ -566,8 +657,7 @@ export function AuthForms() {
               variant="ghost"
               className="w-full rounded-2xl text-[#b7c8c0] hover:bg-[#111513] hover:text-white"
               onClick={() => {
-                setMode("sign-in");
-                setFeedback(null);
+                openMode("sign-in");
                 setSignInForm((current) => ({
                   ...current,
                   email: resetEmail || current.email,
@@ -583,3 +673,4 @@ export function AuthForms() {
     </div>
   );
 }
+

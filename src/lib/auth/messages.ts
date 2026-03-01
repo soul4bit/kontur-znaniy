@@ -43,6 +43,30 @@ export function getAuthErrorMessage(message?: string) {
     return message;
   }
 
+  if (message.startsWith("Слишком много")) {
+    return message;
+  }
+
+  if (message.startsWith("Похоже на автоматический запрос.")) {
+    return message;
+  }
+
+  if (message.startsWith("Форма устарела.")) {
+    return message;
+  }
+
+  if (message.startsWith("Слишком быстрый запрос.")) {
+    return message;
+  }
+
+  if (message.startsWith("Не удалось подтвердить запрос.")) {
+    return message;
+  }
+
+  if (message.startsWith("Имя ")) {
+    return message;
+  }
+
   switch (message) {
     case "Invalid email or password":
       return "Неверный email или пароль.";
@@ -53,10 +77,17 @@ export function getAuthErrorMessage(message?: string) {
     case "Password is too short":
     case "Password too short":
       return "Пароль должен быть не короче 8 символов.";
+    case "Пароль должен быть от 10 до 128 символов и содержать буквы и цифры.":
+      return message;
     case "Password too long":
       return "Пароль слишком длинный. Используйте более короткий пароль.";
     case "Invalid email":
       return "Введите корректный email.";
+    case "Введите email.":
+    case "Введите пароль.":
+    case "Некорректный формат запроса.":
+    case "Ссылка для сброса пароля недействительна.":
+      return message;
     case "Email not verified":
       return "Email еще не подтвержден. Отправьте письмо повторно или проверьте входящие.";
     case "Reset password isn't enabled":

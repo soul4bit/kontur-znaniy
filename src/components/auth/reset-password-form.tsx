@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
@@ -13,7 +13,7 @@ import {
 } from "@/lib/auth/messages";
 
 async function postAuth(path: string, payload: Record<string, unknown>) {
-  const response = await fetch(`/api/auth${path}`, {
+  const response = await fetch(path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -66,6 +66,8 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [feedback, setFeedback] = useState<AuthFeedback | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [startedAt, setStartedAt] = useState(() => Date.now());
+  const [website, setWebsite] = useState("");
 
   const invalidLink = !token || error === "INVALID_TOKEN";
 
@@ -96,10 +98,10 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
       return;
     }
 
-    if (password.length < 8) {
+    if (password.length < 10 || !/\p{L}/u.test(password) || !/\d/.test(password)) {
       setFeedback({
         tone: "error",
-        text: "Пароль должен быть не короче 8 символов.",
+        text: "Пароль должен быть от 10 до 128 символов и содержать буквы и цифры.",
       });
       return;
     }
@@ -108,9 +110,11 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
     setFeedback(null);
 
     try {
-      await postAuth("/reset-password", {
+      await postAuth("/api/auth-guard/reset-password", {
         token,
         newPassword: password,
+        startedAt,
+        website,
       });
 
       router.replace("/auth?mode=sign-in&reset=success");
@@ -122,6 +126,8 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
       });
     } finally {
       setIsPending(false);
+      setStartedAt(Date.now());
+      setWebsite("");
     }
   }
 
@@ -158,6 +164,17 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
           </div>
         ) : (
           <form className="space-y-4" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden opacity-0"
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
+            />
+
             <div className="space-y-1.5">
               <label htmlFor="reset-password" className="text-sm font-medium text-white">
                 Новый пароль
@@ -169,7 +186,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                 autoComplete="new-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="Минимум 8 символов"
+                placeholder="Минимум 10 символов"
                 className="h-12 rounded-2xl border-[#2b3531] bg-[#111513] text-white placeholder:text-[#6f877e]"
                 required
               />
