@@ -386,6 +386,14 @@ function validateHumanChallenge(
 ) {
   const honeypot = getString(body.website);
 
+  // Для входа оставляем защиту rate-limit, но не блокируем из-за honeypot:
+  // браузеры и менеджеры паролей иногда автозаполняют скрытые поля.
+  if (action === "sign-in") {
+    if (honeypot) {
+      return;
+    }
+  }
+
   if (honeypot) {
     throw new AuthGuardError("Похоже на автоматический запрос. Попробуйте еще раз.", {
       code: "honeypot_triggered",
