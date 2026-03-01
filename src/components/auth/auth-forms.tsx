@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { type ComponentProps, type FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,6 +18,11 @@ type GuardAction = "sign-in" | "sign-up" | "reset" | "resend";
 type GuardState = {
   startedAt: number;
   website: string;
+};
+
+type AuthSuccessResponse = {
+  status?: string;
+  message?: string;
 };
 
 async function postAuth(path: string, payload: Record<string, unknown>) {
@@ -45,7 +50,7 @@ async function postAuth(path: string, payload: Record<string, unknown>) {
     throw new Error(extractAuthErrorMessage(result) ?? `HTTP_${response.status}`);
   }
 
-  return result;
+  return (result ?? {}) as AuthSuccessResponse;
 }
 
 function getAbsoluteUrl(path: string) {
@@ -150,7 +155,7 @@ export function AuthForms() {
     mode === "sign-in"
       ? "Введите email и пароль, чтобы открыть свои статьи."
       : mode === "sign-up"
-        ? "Создайте аккаунт, подтвердите почту и сразу переходите к базе знаний."
+        ? "Создайте заявку на доступ. Администратор получит ее в Telegram и вручную одобрит или отклонит."
         : "Отправим письмо со ссылкой для установки нового пароля.";
 
   function updateGuard(action: GuardAction, patch: Partial<GuardState>) {
@@ -254,9 +259,10 @@ export function AuthForms() {
 
     setPendingAction("sign-up");
     setFeedback(null);
+    setAwaitingVerification(false);
 
     try {
-      await postAuth("/api/auth-guard/sign-up", {
+      const result = await postAuth("/api/auth-guard/sign-up", {
         name,
         email,
         password,
@@ -264,14 +270,15 @@ export function AuthForms() {
         ...guardState["sign-up"],
       });
 
-      setAwaitingVerification(true);
       setLastEmail(email);
       setMode("sign-in");
       setSignInForm({ email, password: "" });
       setSignUpForm({ name: "", email: "", password: "", confirmPassword: "" });
       setFeedback({
         tone: "success",
-        text: `Аккаунт создан. Отправили письмо на ${email}. Подтвердите адрес и войдите.`,
+        text:
+          result.message ??
+          "Заявка на регистрацию отправлена администратору в Telegram. После одобрения вы сможете войти.",
       });
     } catch (error) {
       setFeedback({
@@ -377,7 +384,7 @@ export function AuthForms() {
               <div className="space-y-3">
                 <p>
                   Подтвердите email <strong>{resendEmail || "вашего аккаунта"}</strong>, чтобы
-                  завершить регистрацию.
+                  завершить активацию.
                 </p>
                 <Button
                   type="button"
@@ -455,7 +462,7 @@ export function AuthForms() {
                 />
               </div>
 
-                <Button
+              <Button
                 type="submit"
                 className="h-11 w-full rounded-2xl bg-[#1e9f86] text-white hover:bg-[#1b8b75]"
                 disabled={pendingAction === "sign-in"}
@@ -477,7 +484,7 @@ export function AuthForms() {
             <div className="rounded-[20px] border border-slate-700/80 bg-[#132231] p-4">
               <p className="text-sm font-medium text-slate-100">Нет аккаунта?</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
-                Создайте доступ, подтвердите email и после этого входите в Контур Знаний.
+                Отправьте заявку, а администратор рассмотрит ее в Telegram и примет решение.
               </p>
               <Button
                 type="button"
@@ -492,7 +499,7 @@ export function AuthForms() {
                 }}
               >
                 <UserPlus className="size-4" />
-                Зарегистрироваться
+                Отправить заявку
               </Button>
             </div>
           </>
@@ -582,12 +589,12 @@ export function AuthForms() {
                 {pendingAction === "sign-up" ? (
                   <>
                     <LoaderCircle className="size-4 animate-spin" />
-                    Создаем аккаунт...
+                    Отправляем заявку...
                   </>
                 ) : (
                   <>
                     <UserPlus className="size-4" />
-                    Создать аккаунт
+                    Отправить заявку
                   </>
                 )}
               </Button>

@@ -21,7 +21,11 @@ type GuardPolicy = {
 
 type GuardRouteConfig<TPayload extends Record<string, unknown>> = {
   action: AuthGuardAction;
-  targetPath: string;
+  targetPath?: string;
+  customHandler?: (
+    request: NextRequest,
+    payload: TPayload
+  ) => Promise<NextResponse>;
   validate: (body: Record<string, unknown>, request: NextRequest) => TPayload;
 };
 
@@ -618,6 +622,14 @@ export async function handleGuardedAuthRequest<TPayload extends Record<string, u
       ipAddress,
       email,
     });
+
+    if (config.customHandler) {
+      return await config.customHandler(request, payload);
+    }
+
+    if (!config.targetPath) {
+      throw new Error("Auth guard route config is missing targetPath.");
+    }
 
     return await proxyToBetterAuth(request, config.targetPath, payload);
   } catch (error) {

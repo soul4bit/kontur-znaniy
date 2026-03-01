@@ -14,6 +14,7 @@
 ## Возможности
 
 - Авторизация/регистрация на `Better Auth`
+- Ручная модерация регистрации через Telegram (approve/reject)
 - Подтверждение email и восстановление пароля
 - Anti-spam guard для auth-эндпоинтов (rate limit + журнал причин в PostgreSQL)
 - Личный кабинет: аватар, смена пароля, ограничение смены пароля по времени
@@ -83,6 +84,7 @@ scripts
    ```bash
    npm run auth:migrate
    npm run auth:guard:migrate
+   npm run registration:migrate
    npm run articles:migrate
    npm run account:migrate
    ```
@@ -110,6 +112,8 @@ SMTP_SECURE=true
 SMTP_USER=nook@example.com
 SMTP_PASSWORD=CHANGE_ME_MAIL_PASSWORD
 MAIL_FROM="Nook <nook@example.com>"
+TELEGRAM_BOT_TOKEN=CHANGE_ME_TELEGRAM_BOT_TOKEN
+TELEGRAM_ADMIN_CHAT_ID=123456789
 ```
 
 Комментарии:
@@ -118,6 +122,7 @@ MAIL_FROM="Nook <nook@example.com>"
 - `BETTER_AUTH_SECRET`: длинный случайный секрет для сессий/токенов
 - `BETTER_AUTH_URL`: внешний URL приложения (обязательно поменять на проде)
 - `SMTP_*` и `MAIL_FROM`: отправка писем подтверждения и сброса пароля
+- `TELEGRAM_BOT_TOKEN` и `TELEGRAM_ADMIN_CHAT_ID`: модерация новых регистраций через Telegram
 
 ## PostgreSQL: минимальная инициализация
 
@@ -138,6 +143,7 @@ npm run lint
 npm run auth:sql
 npm run auth:migrate
 npm run auth:guard:migrate
+npm run registration:migrate
 npm run articles:migrate
 npm run account:migrate
 
@@ -154,6 +160,7 @@ git pull --ff-only origin main
 npm ci
 npm run auth:migrate
 npm run auth:guard:migrate
+npm run registration:migrate
 npm run account:migrate
 npm run articles:migrate
 npm run build
