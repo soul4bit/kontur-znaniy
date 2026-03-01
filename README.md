@@ -1,80 +1,130 @@
 ﻿# Контур Знаний
 
-Личная DevOps-вики: заметки, статьи и база знаний в одном месте.
+![Логотип](./public/branding/logo-lockup.svg)
+
+Личная DevOps-вики на `Next.js + PostgreSQL + Better Auth`.
+
+- Пишете статьи в редакторе (Tiptap)
+- Храните знания в `markdown + html + json`
+- Ищете по базе через PostgreSQL FTS
+- Связываете статьи wiki-ссылками `[[slug-статьи]]`
 
 ![Обложка проекта](./public/readme/hero.svg)
 
-## Что уже есть
+## Возможности
 
-- Авторизация и регистрация на `Better Auth` + `PostgreSQL`
-- Защита auth-форм (rate limit и guard-логи в БД)
-- Статьи в формате `markdown + html + json (Tiptap)`
-- Категории и темы (Linux, Docker, Сети, Ansible, K8S, Terraform, CI/CD)
-- Картинки в статьях
-- Профиль пользователя (аватар, смена пароля с ограничением по времени)
-- Полнотекстовый поиск по статьям (PostgreSQL FTS)
-- Wiki-ссылки в тексте `[[slug-статьи]]`
-- Кодовые сниппеты с подсветкой и кнопкой `Копировать`
+- Авторизация/регистрация на `Better Auth`
+- Подтверждение email и восстановление пароля
+- Anti-spam guard для auth-эндпоинтов (rate limit + журнал причин в PostgreSQL)
+- Личный кабинет: аватар, смена пароля, ограничение смены пароля по времени
+- CRUD статей
+- Категории и темы: Linux, Docker, Сети, Ansible, K8S, Terraform, CI/CD
+- Хранение статьи в трех видах: `content_markdown`, `content_html`, `content_json`
+- Загрузка картинок в статьи
+- Подсветка кода + кнопка «Копировать»
+- Wiki-ссылки между статьями
+- Полнотекстовый поиск
 
 ## Архитектура
 
 ![Схема архитектуры](./public/readme/architecture.svg)
 
-## Стек
+## Технологии
 
-- `Next.js 16` (App Router, SSR)
+- `Next.js 16` (App Router)
 - `React 19`
+- `TypeScript`
 - `Tailwind CSS + shadcn/ui`
 - `Tiptap`
 - `PostgreSQL (pg)`
 - `Better Auth`
-- `Nodemailer (SMTP)`
-- `highlight.js` (подсветка кода)
-- `Dexie` (опционально, для локального кеша)
+- `Nodemailer`
+- `highlight.js`
+
+## Структура проекта
+
+```text
+src/app
+  /auth                 страницы входа/регистрации/сброса
+  /app                  основной интерфейс вики
+  /api/auth             Better Auth handler
+  /api/auth-guard       защищенные auth-роуты
+  /api/articles         API статей
+  /api/account          API профиля (аватар/пароль)
+
+src/lib
+  /auth                 конфиг Better Auth + guard + сообщения
+  /articles             работа со статьями в БД
+  /account              логика профиля
+  /mail                 SMTP
+
+scripts
+  миграции auth/guard/articles/account + создание админа
+```
+
+## Требования
+
+- Node.js `22+`
+- PostgreSQL `14+` (рекомендуется)
+- SMTP-ящик для писем подтверждения и сброса пароля
 
 ## Быстрый старт (локально)
 
-1. Установить Node.js LTS (рекомендуется Node 22+).
-2. Скопировать переменные окружения:
-   ```bash
-   cp .env.example .env.local
-   ```
-3. Заполнить `.env.local` (пример ниже).
-4. Установить зависимости:
+1. Установите зависимости:
    ```bash
    npm ci
    ```
-5. Выполнить миграции:
+2. Скопируйте переменные окружения:
+   ```bash
+   cp .env.example .env.local
+   ```
+3. Заполните `.env.local`.
+4. Выполните миграции:
    ```bash
    npm run auth:migrate
    npm run auth:guard:migrate
    npm run articles:migrate
    npm run account:migrate
    ```
-6. Создать администратора:
+5. (Опционально) создайте администратора:
    ```bash
    npm run admin:create -- --email=admin@example.com --password=CHANGE_ME --name="Admin"
    ```
-7. Запустить проект:
+6. Запустите проект:
    ```bash
    npm run dev
    ```
-8. Открыть `http://localhost:3000`.
+7. Откройте `http://localhost:3000`.
 
 ## Переменные окружения
 
-Пример файла: [`.env.example`](./.env.example)
+Пример: [`.env.example`](./.env.example)
 
 ```env
 DATABASE_URL=postgres://nook:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/nook
 BETTER_AUTH_SECRET=CHANGE_ME_LONG_RANDOM_SECRET
 BETTER_AUTH_URL=http://localhost:3000
-SMTP_HOST=smtp.beget.com
+SMTP_HOST=CHANGE_ME
 SMTP_PORT=465
 SMTP_SECURE=true
-SMTP_USER=nook@wiki-soul4bit.ru
+SMTP_USER=nook@example.com
 SMTP_PASSWORD=CHANGE_ME_MAIL_PASSWORD
-MAIL_FROM="Nook <nook@wiki-soul4bit.ru>"
+MAIL_FROM="Nook <nook@example.com>"
+```
+
+Комментарии:
+
+- `DATABASE_URL`: подключение к PostgreSQL
+- `BETTER_AUTH_SECRET`: длинный случайный секрет для сессий/токенов
+- `BETTER_AUTH_URL`: внешний URL приложения (обязательно поменять на проде)
+- `SMTP_*` и `MAIL_FROM`: отправка писем подтверждения и сброса пароля
+
+## PostgreSQL: минимальная инициализация
+
+```sql
+CREATE USER nook WITH ENCRYPTED PASSWORD 'CHANGE_ME_STRONG_PASSWORD';
+CREATE DATABASE nook OWNER nook;
+GRANT ALL PRIVILEGES ON DATABASE nook TO nook;
 ```
 
 ## Полезные npm-скрипты
@@ -94,59 +144,70 @@ npm run account:migrate
 npm run admin:create -- --email=admin@example.com --password=CHANGE_ME --name="Admin"
 ```
 
-## Деплой на VPS (Nginx + systemd)
+## Деплой
 
-Базовый порядок:
+### Вручную на VPS
 
-1. На сервере:
-   ```bash
-   cd /var/www/nook
-   git pull --ff-only origin main
-   npm ci
-   npm run auth:migrate
-   npm run auth:guard:migrate
-   npm run articles:migrate
-   npm run account:migrate
-   npm run build
-   sudo systemctl restart nook
-   ```
-2. Проверка сервиса:
-   ```bash
-   sudo systemctl status nook --no-pager
-   sudo journalctl -u nook -n 100 --no-pager
-   ```
+```bash
+cd /var/www/nook
+git pull --ff-only origin main
+npm ci
+npm run auth:migrate
+npm run auth:guard:migrate
+npm run account:migrate
+npm run articles:migrate
+npm run build
+sudo systemctl restart nook
+sudo systemctl status nook --no-pager
+```
 
-## SSL и домен
+### Автодеплой через GitHub Actions
 
-- Для IDN-домена (кириллица) в `certbot` и `nginx` используйте `punycode` (`xn--...`).
-- Перед выпуском сертификата убедитесь, что домен уже резолвится:
-  ```bash
-  dig +short A your-domain
-  ```
-- После смены домена обновите:
-  - `BETTER_AUTH_URL`
-  - `MAIL_FROM` и SMTP (если меняется почтовый домен)
+В проекте есть workflow: [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml)
 
-## Поиск, wiki-ссылки и сниппеты
+Нужные secrets в GitHub:
 
-- Поиск: строка в боковой панели `/app` ищет по `title`, `summary`, `content_text`, `content_markdown`.
-- Wiki-ссылки: в тексте статьи пишите `[[slug-статьи]]`.
-- Сниппеты: код-блоки в статье рендерятся с подсветкой и кнопкой копирования.
+- `DEPLOY_HOST`
+- `DEPLOY_USER`
+- `DEPLOY_KEY`
+
+Pipeline делает:
+
+- `git pull`
+- `npm ci`
+- миграции
+- `npm run build`
+- `systemctl restart nook`
 
 ## Частые проблемы
 
-- `Supabase env vars missing...`
-  - Проект больше не использует Supabase. Проверьте, что заполнены `DATABASE_URL` и `BETTER_AUTH_*`.
-- `Form is outdated` / `Слишком быстрый запрос`
-  - Обновите страницу и повторите ввод.
-- `password authentication failed for user`
-  - Проверьте пароль пользователя PostgreSQL в `DATABASE_URL`.
-- `NXDOMAIN` при certbot
-  - DNS-запись домена еще не разошлась или указан неверный `punycode`.
+### `Better Auth env vars missing: DATABASE_URL and BETTER_AUTH_SECRET`
 
-## Планы развития
+Не заполнены переменные в `.env.local`.
 
-- История версий статей + diff + откат
-- Экспорт/импорт базы статей (markdown + assets)
-- Backlinks и граф связей между статьями
-- ACL/роли для командной работы
+### `password authentication failed for user "nook"`
+
+Неверный пароль в `DATABASE_URL` или пароль пользователя PostgreSQL.
+
+### `Слишком много попыток входа...`
+
+Сработал rate limit в `auth_guard_events`. Можно очистить счетчики в БД для нужного email/IP.
+
+### `Форма устарела` / `Слишком быстрый запрос`
+
+Обновите страницу и повторите ввод.
+
+### `NXDOMAIN` при выпуске сертификата
+
+Домен еще не резолвится в DNS или неверный punycode.
+
+## Планы
+
+- История версий статей и diff
+- Экспорт/импорт базы (`markdown + assets`)
+- Backlinks и граф связей
+- Роли/ACL для командной работы
+
+---
+
+Проект приватный, для личной базы знаний и небольших команд.
