@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { pool } from "@/lib/auth/server";
 import { articleTopicNames, type ArticleTopic } from "@/lib/content/devops-library";
+import { tiptapJsonToMarkdown } from "@/lib/articles/markdown";
 
 type ArticleRow = {
   id: string;
@@ -14,6 +15,7 @@ type ArticleRow = {
   category: string;
   summary: string;
   content_html: string;
+  content_markdown: string;
   content_json: Record<string, unknown>;
   content_text: string;
   cover_image_path: string | null;
@@ -35,6 +37,7 @@ export type ArticleListItem = {
 
 export type ArticleRecord = ArticleListItem & {
   contentHtml: string;
+  contentMarkdown: string;
   contentJson: Record<string, unknown>;
   contentText: string;
   coverImagePath: string | null;
@@ -67,6 +70,7 @@ function mapArticle(row: ArticleRow): ArticleRecord {
     authorName,
     updatedByName,
     contentHtml: row.content_html,
+    contentMarkdown: row.content_markdown,
     contentJson: row.content_json,
     contentText: row.content_text,
     coverImagePath: row.cover_image_path,
@@ -190,6 +194,7 @@ export async function createArticle(input: SaveArticleInput) {
   const id = randomUUID();
   const slug = await createUniqueSlug(input.authorId, input.title);
   const summary = normalizeSummary(input.summary, input.contentText);
+  const contentMarkdown = tiptapJsonToMarkdown(input.contentJson, input.contentText);
 
   const { rows } = await pool.query<ArticleRow>(
     `
@@ -203,11 +208,12 @@ export async function createArticle(input: SaveArticleInput) {
         category,
         summary,
         content_html,
+        content_markdown,
         content_json,
         content_text,
         cover_image_path
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, null)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, null)
       returning
         *,
         null::text as author_name,
@@ -223,6 +229,7 @@ export async function createArticle(input: SaveArticleInput) {
       normalizeCategory(input.category),
       summary,
       input.contentHtml,
+      contentMarkdown,
       JSON.stringify(input.contentJson),
       input.contentText,
     ]
@@ -234,6 +241,7 @@ export async function createArticle(input: SaveArticleInput) {
 export async function updateArticle(articleId: string, input: SaveArticleInput) {
   const slug = await createUniqueSlug(input.authorId, input.title, articleId);
   const summary = normalizeSummary(input.summary, input.contentText);
+  const contentMarkdown = tiptapJsonToMarkdown(input.contentJson, input.contentText);
 
   const { rows } = await pool.query<ArticleRow>(
     `
@@ -245,9 +253,10 @@ export async function updateArticle(articleId: string, input: SaveArticleInput) 
         category = $6,
         summary = $7,
         content_html = $8,
-        content_json = $9::jsonb,
-        content_text = $10,
-        updated_by_id = $11,
+        content_markdown = $9,
+        content_json = $10::jsonb,
+        content_text = $11,
+        updated_by_id = $12,
         updated_at = now()
       where id = $1 and author_id = $2
       returning
@@ -264,6 +273,7 @@ export async function updateArticle(articleId: string, input: SaveArticleInput) 
       normalizeCategory(input.category),
       summary,
       input.contentHtml,
+      contentMarkdown,
       JSON.stringify(input.contentJson),
       input.contentText,
       input.editorId,

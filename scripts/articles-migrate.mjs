@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+﻿import { Pool } from "pg";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -21,6 +21,7 @@ const migrationSql = `
     category text not null default 'Общее',
     summary text not null,
     content_html text not null,
+    content_markdown text not null default '',
     content_json jsonb not null,
     content_text text not null,
     cover_image_path text,
@@ -34,6 +35,9 @@ const migrationSql = `
   alter table articles
     add column if not exists category text not null default 'Общее';
 
+  alter table articles
+    add column if not exists content_markdown text not null default '';
+
   update articles
   set updated_by_id = author_id
   where updated_by_id is null;
@@ -41,6 +45,10 @@ const migrationSql = `
   update articles
   set category = 'Общее'
   where category is null or btrim(category) = '';
+
+  update articles
+  set content_markdown = content_text
+  where content_markdown is null or btrim(content_markdown) = '';
 
   create unique index if not exists articles_author_slug_idx
     on articles(author_id, slug);
