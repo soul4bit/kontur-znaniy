@@ -14,9 +14,11 @@ import {
   ServerCog,
   Sparkles,
   UserRound,
+  UserRoundCog,
 } from "lucide-react";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ThoughtEditor } from "@/components/editor/thought-editor";
+import { UserAvatar } from "@/components/user/user-avatar";
 import { Button } from "@/components/ui/button";
 import { getCurrentSession } from "@/lib/auth/session";
 import {
@@ -31,6 +33,7 @@ const copy = {
   workspaceText:
     "\u0422\u0438\u0445\u0430\u044f \u0431\u0430\u0437\u0430 \u0437\u043d\u0430\u043d\u0438\u0439 \u043f\u043e Linux, Docker, \u0441\u0435\u0442\u044f\u043c, Ansible, Kubernetes, Terraform \u0438 CI/CD. \u0421\u043b\u0435\u0432\u0430 \u0440\u0430\u0437\u0434\u0435\u043b\u044b, \u0432\u043d\u0443\u0442\u0440\u0438 \u0441\u0442\u0430\u0442\u044c\u0438, \u0441\u043f\u0440\u0430\u0432\u0430 \u0447\u0442\u0435\u043d\u0438\u0435 \u0438 \u0440\u0435\u0434\u0430\u043a\u0442\u043e\u0440.",
   newArticle: "\u041d\u043e\u0432\u0430\u044f \u0441\u0442\u0430\u0442\u044c\u044f",
+  account: "\u041b\u0438\u0447\u043d\u044b\u0439 \u043a\u0430\u0431\u0438\u043d\u0435\u0442",
   sections: "\u0420\u0430\u0437\u0434\u0435\u043b\u044b",
   articlesSuffix: "\u0441\u0442\u0430\u0442\u0435\u0439",
   noArticlesInSection:
@@ -163,20 +166,39 @@ export default async function AppPage({ searchParams }: AppPageProps) {
             <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-[#6d8379]">
               {copy.workspace}
             </p>
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-white">
-              {displayName}
-            </h1>
+            <div className="mt-4 flex items-center gap-4">
+              <UserAvatar image={session.user.image} name={displayName} />
+              <div className="min-w-0">
+                <h1 className="truncate text-2xl font-semibold tracking-tight text-white">
+                  {displayName}
+                </h1>
+                <p className="mt-1 truncate text-sm text-[#8fa59c]">{session.user.email}</p>
+              </div>
+            </div>
             <p className="mt-3 text-sm leading-7 text-[#90a69d]">{copy.workspaceText}</p>
 
-            <Button
-              asChild
-              className="mt-5 h-11 w-full rounded-2xl bg-[#53e6a6] text-[#0c1511] hover:bg-[#47cf95]"
-            >
-              <Link href={buildAppHref(selectedTopic, { draft: true })}>
-                <Plus className="size-4" />
-                {copy.newArticle}
-              </Link>
-            </Button>
+            <div className="mt-5 grid gap-3">
+              <Button
+                asChild
+                className="h-11 w-full rounded-2xl bg-[#53e6a6] text-[#0c1511] hover:bg-[#47cf95]"
+              >
+                <Link href={buildAppHref(selectedTopic, { draft: true })}>
+                  <Plus className="size-4" />
+                  {copy.newArticle}
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                className="h-11 w-full rounded-2xl border-[#2b3531] bg-[#111513] text-white hover:bg-[#1a201d]"
+              >
+                <Link href="/app/account">
+                  <UserRoundCog className="size-4" />
+                  {copy.account}
+                </Link>
+              </Button>
+            </div>
           </div>
 
           <div className="mt-6 flex-1 overflow-y-auto pr-1">

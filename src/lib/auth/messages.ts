@@ -42,6 +42,8 @@ export function getAuthErrorMessage(message?: string) {
   switch (message) {
     case "Invalid email or password":
       return "Неверный email или пароль.";
+    case "Invalid password":
+      return "Неверный текущий пароль.";
     case "User already exists. Use another email.":
       return "Такой email уже зарегистрирован.";
     case "Password is too short":
@@ -61,6 +63,8 @@ export function getAuthErrorMessage(message?: string) {
       return "Ссылка устарела или уже недействительна.";
     case "HTTP_500":
       return "Серверная ошибка при авторизации. Проверьте настройки почты и логи сервера.";
+    case "No fields to update":
+      return "Нет изменений для сохранения.";
     default:
       return "Не удалось выполнить запрос авторизации.";
   }
