@@ -1,4 +1,5 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { authHandlers } from "@/lib/auth/handler";
 import { pool } from "@/lib/auth/server";
 
 type AuthGuardAction =
@@ -340,27 +341,29 @@ async function proxyToBetterAuth(
   path: string,
   payload: Record<string, unknown>
 ) {
-  const response = await fetch(new URL(`/api/auth${path}`, request.url), {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      cookie: request.headers.get("cookie") ?? "",
-    },
-    body: JSON.stringify(payload),
-    cache: "no-store",
-  });
+  const headers = new Headers(request.headers);
+  headers.set("content-type", "application/json");
 
-  const headers = new Headers();
+  const internalRequest = new NextRequest(
+    new Request(new URL(`/api/auth${path}`, request.url), {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    })
+  );
+
+  const response = await authHandlers.POST(internalRequest);
+  const responseHeaders = new Headers();
   const contentType = response.headers.get("content-type");
 
   if (contentType) {
-    headers.set("content-type", contentType);
+    responseHeaders.set("content-type", contentType);
   }
 
   const location = response.headers.get("location");
 
   if (location) {
-    headers.set("location", location);
+    responseHeaders.set("location", location);
   }
 
   const setCookies =
@@ -369,12 +372,12 @@ async function proxyToBetterAuth(
       : [];
 
   for (const cookie of setCookies) {
-    headers.append("set-cookie", cookie);
+    responseHeaders.append("set-cookie", cookie);
   }
 
   return new NextResponse(response.body, {
     status: response.status,
-    headers,
+    headers: responseHeaders,
   });
 }
 
