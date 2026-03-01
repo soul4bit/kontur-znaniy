@@ -1,4 +1,5 @@
-﻿import { cn } from "@/lib/utils";
+﻿import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 type KnowledgeLogoProps = {
   className?: string;
@@ -19,32 +20,18 @@ export function KnowledgeLogo({
     <div className={cn("flex items-center gap-3", className)}>
       <div
         className={cn(
-          "flex h-12 w-16 items-center justify-center rounded-[14px] border border-[#324252] bg-[#0c1520] text-[#21c0a1]",
+          "flex h-12 w-16 items-center justify-center rounded-[14px] border border-[#324252] bg-[#0c1520]",
           markClassName
         )}
       >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 96 64"
-          className="h-8 w-12"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect x="2" y="27" width="8" height="10" rx="2" fill="currentColor" />
-          <path
-            d="M18 10h20v14h-9c-8 0-14 6-14 14v16H2V26c0-9 7-16 16-16z"
-            fill="currentColor"
-          />
-          <path
-            d="M39 54h-13c0-11 6-16 15-23 10-8 13-12 13-21h14c0 12-4 19-14 27-8 6-15 10-15 17z"
-            fill="currentColor"
-          />
-          <path
-            d="M56 54V38c0-8 6-14 14-14h9V10h13v28c0 9-7 16-16 16H56z"
-            fill="currentColor"
-          />
-          <rect x="86" y="27" width="8" height="10" rx="2" fill="currentColor" />
-        </svg>
+        <Image
+          src="/branding/logo-mark.svg"
+          alt="Логотип Контур Знаний"
+          width={48}
+          height={36}
+          className="h-8 w-12 object-contain"
+          priority
+        />
       </div>
       <div>
         <p
