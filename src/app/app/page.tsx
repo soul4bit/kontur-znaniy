@@ -77,12 +77,20 @@ type AppPageProps = {
   searchParams?: Promise<{
     article?: string;
     topic?: string;
+    category?: string;
     draft?: string;
   }>;
 };
 
-function buildAppHref(topic: string, options?: { articleId?: string; draft?: boolean }) {
+function buildAppHref(
+  topic: string,
+  options?: { articleId?: string; draft?: boolean; category?: string }
+) {
   const params = new URLSearchParams({ topic });
+
+  if (options?.category) {
+    params.set("category", options.category);
+  }
 
   if (options?.articleId) {
     params.set("article", options.articleId);
@@ -111,6 +119,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
 
   const params = searchParams ? await searchParams : undefined;
   const requestedTopic = params?.topic && isArticleTopic(params.topic) ? params.topic : null;
+  const requestedCategory = params?.category?.trim() || null;
   const requestedArticleId = params?.article;
   const draftMode = params?.draft === "1";
   const articles = await listArticlesByAuthor(session.user.id);
@@ -120,12 +129,37 @@ export default async function AppPage({ searchParams }: AppPageProps) {
 
   const selectedTopic = requestedArticle?.topic ?? requestedTopic ?? articleTopics[0].name;
   const topicArticles = articles.filter((article) => article.topic === selectedTopic);
+  const topicCategoryMap = Object.fromEntries(
+    articleTopics.map((topic) => [
+      topic.name,
+      Array.from(
+        new Set([
+          ...topic.categories,
+          ...articles
+            .filter((article) => article.topic === topic.name)
+            .map((article) => article.category),
+          "Общее",
+        ])
+      ),
+    ])
+  ) as Record<string, string[]>;
+  const currentTopic =
+    articleTopics.find((topic) => topic.name === selectedTopic) ?? articleTopics[0];
+  const selectedCategory =
+    requestedArticle?.category ??
+    requestedCategory ??
+    topicArticles[0]?.category ??
+    currentTopic.categories[0] ??
+    "Общее";
+  const categoryArticles = topicArticles.filter(
+    (article) => article.category === selectedCategory
+  );
   const selectedArticleSummary =
     draftMode
       ? null
       : requestedArticle && requestedArticle.topic === selectedTopic
         ? requestedArticle
-        : topicArticles[0] ?? null;
+        : categoryArticles[0] ?? null;
   const selectedArticle =
     selectedArticleSummary && (!requestedArticle || requestedArticle.id !== selectedArticleSummary.id)
       ? await getArticleById(session.user.id, selectedArticleSummary.id)
@@ -133,8 +167,6 @@ export default async function AppPage({ searchParams }: AppPageProps) {
         ? null
         : requestedArticle;
 
-  const currentTopic =
-    articleTopics.find((topic) => topic.name === selectedTopic) ?? articleTopics[0];
   const displayName = session.user.name?.trim() || session.user.email;
   const totalArticles = articles.length;
 
@@ -182,7 +214,12 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 asChild
                 className="h-11 w-full rounded-2xl bg-[#53e6a6] text-[#0c1511] hover:bg-[#47cf95]"
               >
-                <Link href={buildAppHref(selectedTopic, { draft: true })}>
+                <Link
+                  href={buildAppHref(selectedTopic, {
+                    draft: true,
+                    category: selectedCategory,
+                  })}
+                >
                   <Plus className="size-4" />
                   {copy.newArticle}
                 </Link>
@@ -217,6 +254,9 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 const isActive = topic.name === selectedTopic;
                 const nestedArticles = articles.filter(
                   (article) => article.topic === topic.name
+                );
+                const nestedCategories = Array.from(
+                  new Set([...topic.categories, ...nestedArticles.map((article) => article.category)])
                 );
 
                 return (
@@ -254,41 +294,75 @@ export default async function AppPage({ searchParams }: AppPageProps) {
 
                     {isActive ? (
                       <div className="border-t border-[#29312d] px-3 py-3">
-                        {nestedArticles.length > 0 ? (
-                          <div className="space-y-2">
-                            {nestedArticles.map((article) => {
-                              const isSelected = article.id === selectedArticle?.id;
+                        {nestedCategories.length > 0 ? (
+                          <div className="space-y-4">
+                            {nestedCategories.map((categoryName) => {
+                              const groupedArticles = nestedArticles.filter(
+                                (article) => article.category === categoryName
+                              );
+                              const isCategoryActive = categoryName === selectedCategory;
 
                               return (
-                                <Link
-                                  key={article.id}
-                                  href={buildAppHref(topic.name, {
-                                    articleId: article.id,
-                                  })}
-                                  className={`block rounded-2xl px-3 py-3 transition-colors ${
-                                    isSelected
-                                      ? "bg-[#53e6a6] text-[#0b1510]"
-                                      : "bg-[#111513] text-[#dce6e0] hover:bg-[#1a201d]"
-                                  }`}
-                                >
-                                  <div className="flex items-start justify-between gap-3">
-                                    <div className="min-w-0">
-                                      <p className="truncate text-sm font-medium">
-                                        {article.title}
-                                      </p>
-                                      <p
-                                        className={`mt-1 line-clamp-2 text-xs leading-5 ${
-                                          isSelected
-                                            ? "text-[#183226]"
-                                            : "text-[#88a096]"
-                                        }`}
-                                      >
-                                        {article.summary}
-                                      </p>
+                                <div key={categoryName} className="space-y-2">
+                                  <Link
+                                    href={buildAppHref(topic.name, {
+                                      category: categoryName,
+                                    })}
+                                    className={`flex items-center justify-between rounded-2xl px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors ${
+                                      isCategoryActive
+                                        ? "bg-[#202b26] text-[#53e6a6]"
+                                        : "bg-[#151917] text-[#7f948b] hover:bg-[#1a1f1d]"
+                                    }`}
+                                  >
+                                    <span>{categoryName}</span>
+                                    <span>{groupedArticles.length}</span>
+                                  </Link>
+
+                                  {groupedArticles.length > 0 ? (
+                                    <div className="space-y-2">
+                                      {groupedArticles.map((article) => {
+                                        const isSelected = article.id === selectedArticle?.id;
+
+                                        return (
+                                          <Link
+                                            key={article.id}
+                                            href={buildAppHref(topic.name, {
+                                              articleId: article.id,
+                                              category: categoryName,
+                                            })}
+                                            className={`block rounded-2xl px-3 py-3 transition-colors ${
+                                              isSelected
+                                                ? "bg-[#53e6a6] text-[#0b1510]"
+                                                : "bg-[#111513] text-[#dce6e0] hover:bg-[#1a201d]"
+                                            }`}
+                                          >
+                                            <div className="flex items-start justify-between gap-3">
+                                              <div className="min-w-0">
+                                                <p className="truncate text-sm font-medium">
+                                                  {article.title}
+                                                </p>
+                                                <p
+                                                  className={`mt-1 line-clamp-2 text-xs leading-5 ${
+                                                    isSelected
+                                                      ? "text-[#183226]"
+                                                      : "text-[#88a096]"
+                                                  }`}
+                                                >
+                                                  {article.summary}
+                                                </p>
+                                              </div>
+                                              <ArrowUpRight className="mt-0.5 size-3.5 shrink-0" />
+                                            </div>
+                                          </Link>
+                                        );
+                                      })}
                                     </div>
-                                    <ArrowUpRight className="mt-0.5 size-3.5 shrink-0" />
-                                  </div>
-                                </Link>
+                                  ) : (
+                                    <div className="rounded-2xl border border-dashed border-[#314039] px-3 py-3 text-sm leading-6 text-[#7e948a]">
+                                      В этой категории пока нет статей.
+                                    </div>
+                                  )}
+                                </div>
                               );
                             })}
                           </div>
@@ -316,8 +390,11 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 <span className="inline-flex rounded-full bg-[#53e6a6] px-3 py-1 text-sm font-medium text-[#0a1410]">
                   {currentTopic.name}
                 </span>
+                <span className="inline-flex rounded-full border border-[#2d3934] px-3 py-1 text-sm font-medium text-[#dce6e0]">
+                  {selectedCategory}
+                </span>
                 <span className="text-sm text-[#8fa59c]">
-                  {topicArticles.length} {copy.sectionCount}
+                  {categoryArticles.length} {copy.sectionCount}
                 </span>
               </div>
               <h2 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-[2.5rem]">
@@ -341,6 +418,12 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 </div>
                 <div className="rounded-[24px] border border-[#29312d] bg-[#111513] px-4 py-4">
                   <p className="text-xs uppercase tracking-[0.22em] text-[#6d8379]">
+                    Категория
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-white">{selectedCategory}</p>
+                </div>
+                <div className="rounded-[24px] border border-[#29312d] bg-[#111513] px-4 py-4">
+                  <p className="text-xs uppercase tracking-[0.22em] text-[#6d8379]">
                     {copy.lastUpdate}
                   </p>
                   <p className="mt-2 text-sm font-medium text-white">
@@ -358,6 +441,9 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="inline-flex rounded-full bg-[#53e6a6] px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-[#0a1410]">
                       {selectedArticle.topic}
+                    </span>
+                    <span className="inline-flex rounded-full border border-[#2d3934] px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-[#dce6e0]">
+                      {selectedArticle.category}
                     </span>
                     <span className="inline-flex items-center gap-2 text-xs text-[#7f948b]">
                       <Clock3 className="size-3.5" />
@@ -441,6 +527,11 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 article={selectedArticle}
                 topics={articleTopics.map((topic) => topic.name)}
                 defaultTopic={selectedTopic}
+                topicCategories={topicCategoryMap as Record<
+                  (typeof articleTopics)[number]["name"],
+                  string[]
+                >}
+                defaultCategory={selectedCategory}
               />
             </div>
           </section>

@@ -49,6 +49,7 @@ export async function POST(request: Request) {
     editorId: session.user.id,
     title: body.title,
     topic: body.topic,
+    category: body.category,
     summary: body.summary ?? "",
     contentHtml: body.contentHtml,
     contentJson: body.contentJson as Record<string, unknown>,

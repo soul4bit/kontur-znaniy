@@ -83,6 +83,8 @@ type ThoughtEditorProps = {
   article: ArticleRecord | null;
   topics: readonly ArticleTopic[];
   defaultTopic: ArticleTopic;
+  topicCategories: Record<ArticleTopic, readonly string[]>;
+  defaultCategory: string;
 };
 
 type SaveFeedback = {
@@ -137,14 +139,25 @@ async function saveArticleRequest(articleId: string | null, payload: Record<stri
   return result as ArticleResponse;
 }
 
-export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorProps) {
+export function ThoughtEditor({
+  article,
+  topics,
+  defaultTopic,
+  topicCategories,
+  defaultCategory,
+}: ThoughtEditorProps) {
   const router = useRouter();
   const [title, setTitle] = useState(article?.title ?? "");
   const [summary, setSummary] = useState(article?.summary ?? "");
   const [topic, setTopic] = useState<ArticleTopic>(article?.topic ?? defaultTopic);
+  const [category, setCategory] = useState(article?.category ?? defaultCategory);
   const [feedback, setFeedback] = useState<SaveFeedback>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [stats, setStats] = useState({ chars: 0, paragraphs: 0 });
+  const availableCategories = useMemo(
+    () => topicCategories[topic] ?? [],
+    [topic, topicCategories]
+  );
 
   const initialJson = useMemo(
     () => article?.contentJson ?? emptyDocument,
@@ -186,6 +199,7 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
     setTitle(article?.title ?? "");
     setSummary(article?.summary ?? "");
     setTopic(article?.topic ?? defaultTopic);
+    setCategory(article?.category ?? defaultCategory);
     setFeedback(null);
 
     if (!editor) {
@@ -193,7 +207,18 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
     }
 
     editor.commands.setContent(article?.contentJson ?? emptyDocument);
-  }, [article, defaultTopic, editor, topics]);
+  }, [article, defaultCategory, defaultTopic, editor, topics]);
+
+  useEffect(() => {
+    if (!category.trim()) {
+      setCategory(availableCategories[0] ?? "Общее");
+      return;
+    }
+
+    if (!availableCategories.includes(category)) {
+      setCategory(availableCategories[0] ?? "Общее");
+    }
+  }, [availableCategories, category]);
 
   async function handleSave() {
     if (!editor) {
@@ -220,6 +245,7 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
       const result = await saveArticleRequest(article?.id ?? null, {
         title: trimmedTitle,
         topic,
+        category,
         summary,
         contentHtml: editor.getHTML(),
         contentJson: editor.getJSON(),
@@ -231,7 +257,9 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
         text: article ? copy.updated : copy.created,
       });
       router.replace(
-        `/app?topic=${encodeURIComponent(result.article.topic)}&draft=0&article=${result.article.id}`
+        `/app?topic=${encodeURIComponent(result.article.topic)}&category=${encodeURIComponent(
+          result.article.category
+        )}&draft=0&article=${result.article.id}`
       );
       router.refresh();
     } catch (error) {
@@ -248,9 +276,14 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
     setTitle("");
     setSummary("");
     setTopic(defaultTopic);
+    setCategory(defaultCategory);
     setFeedback(null);
     editor?.commands.setContent(emptyHtml);
-    router.replace(`/app?topic=${encodeURIComponent(defaultTopic)}&draft=1`);
+    router.replace(
+      `/app?topic=${encodeURIComponent(defaultTopic)}&category=${encodeURIComponent(
+        defaultCategory
+      )}&draft=1`
+    );
   }
 
   if (!editor) return null;
@@ -282,7 +315,7 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
+      <div className="grid gap-4 lg:grid-cols-[220px_220px_minmax(0,1fr)]">
         <div className="space-y-2">
           <label htmlFor="article-topic" className="text-sm font-medium text-white">
             {copy.topicLabel}
@@ -299,6 +332,25 @@ export function ThoughtEditor({ article, topics, defaultTopic }: ThoughtEditorPr
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="article-category" className="text-sm font-medium text-white">
+            Категория
+          </label>
+          <Input
+            id="article-category"
+            list="article-category-list"
+            value={category}
+            onChange={(event) => setCategory(event.target.value)}
+            placeholder="Например: systemd"
+            className="h-12 rounded-2xl border-[#2b3531] bg-[#181e1b] text-white placeholder:text-[#6f877e]"
+          />
+          <datalist id="article-category-list">
+            {availableCategories.map((item) => (
+              <option key={item} value={item} />
+            ))}
+          </datalist>
         </div>
 
         <div className="space-y-2">

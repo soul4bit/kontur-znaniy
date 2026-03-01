@@ -11,6 +11,7 @@ type ArticleRow = {
   title: string;
   slug: string;
   topic: string;
+  category: string;
   summary: string;
   content_html: string;
   content_json: Record<string, unknown>;
@@ -25,6 +26,7 @@ export type ArticleListItem = {
   title: string;
   slug: string;
   topic: ArticleTopic;
+  category: string;
   summary: string;
   authorName: string;
   updatedByName: string;
@@ -44,6 +46,7 @@ export type SaveArticleInput = {
   editorId: string;
   title: string;
   topic: ArticleTopic;
+  category?: string;
   summary: string;
   contentHtml: string;
   contentJson: Record<string, unknown>;
@@ -59,6 +62,7 @@ function mapArticle(row: ArticleRow): ArticleRecord {
     title: row.title,
     slug: row.slug,
     topic: row.topic as ArticleTopic,
+    category: row.category,
     summary: row.summary,
     authorName,
     updatedByName,
@@ -77,6 +81,7 @@ function toListItem(article: ArticleRecord): ArticleListItem {
     title: article.title,
     slug: article.slug,
     topic: article.topic,
+    category: article.category,
     summary: article.summary,
     authorName: article.authorName,
     updatedByName: article.updatedByName,
@@ -92,6 +97,11 @@ function normalizeSummary(summary: string, contentText: string) {
   }
 
   return contentText.trim().replace(/\s+/g, " ").slice(0, 240);
+}
+
+function normalizeCategory(category?: string) {
+  const cleaned = category?.trim();
+  return cleaned ? cleaned.slice(0, 80) : "\u041e\u0431\u0449\u0435\u0435";
 }
 
 function slugify(title: string) {
@@ -190,13 +200,14 @@ export async function createArticle(input: SaveArticleInput) {
         title,
         slug,
         topic,
+        category,
         summary,
         content_html,
         content_json,
         content_text,
         cover_image_path
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, null)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, null)
       returning
         *,
         null::text as author_name,
@@ -209,6 +220,7 @@ export async function createArticle(input: SaveArticleInput) {
       input.title.trim(),
       slug,
       input.topic,
+      normalizeCategory(input.category),
       summary,
       input.contentHtml,
       JSON.stringify(input.contentJson),
@@ -230,11 +242,12 @@ export async function updateArticle(articleId: string, input: SaveArticleInput) 
         title = $3,
         slug = $4,
         topic = $5,
-        summary = $6,
-        content_html = $7,
-        content_json = $8::jsonb,
-        content_text = $9,
-        updated_by_id = $10,
+        category = $6,
+        summary = $7,
+        content_html = $8,
+        content_json = $9::jsonb,
+        content_text = $10,
+        updated_by_id = $11,
         updated_at = now()
       where id = $1 and author_id = $2
       returning
@@ -248,6 +261,7 @@ export async function updateArticle(articleId: string, input: SaveArticleInput) 
       input.title.trim(),
       slug,
       input.topic,
+      normalizeCategory(input.category),
       summary,
       input.contentHtml,
       JSON.stringify(input.contentJson),

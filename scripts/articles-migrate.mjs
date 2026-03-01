@@ -18,6 +18,7 @@ const migrationSql = `
     title text not null,
     slug text not null,
     topic text not null,
+    category text not null default 'Общее',
     summary text not null,
     content_html text not null,
     content_json jsonb not null,
@@ -30,15 +31,25 @@ const migrationSql = `
   alter table articles
     add column if not exists updated_by_id text references "user"(id) on delete set null;
 
+  alter table articles
+    add column if not exists category text not null default 'Общее';
+
   update articles
   set updated_by_id = author_id
   where updated_by_id is null;
+
+  update articles
+  set category = 'Общее'
+  where category is null or btrim(category) = '';
 
   create unique index if not exists articles_author_slug_idx
     on articles(author_id, slug);
 
   create index if not exists articles_author_updated_idx
     on articles(author_id, updated_at desc);
+
+  create index if not exists articles_author_topic_category_idx
+    on articles(author_id, topic, category, updated_at desc);
 `;
 
 try {
