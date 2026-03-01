@@ -439,7 +439,7 @@ export function ThoughtEditor({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[220px_220px_minmax(0,1fr)]">
+      <div className="grid gap-4 lg:grid-cols-[220px_220px]">
         <div className="space-y-2">
           <label htmlFor="article-topic" className="text-sm font-medium text-white">
             {copy.topicLabel}
@@ -476,20 +476,20 @@ export function ThoughtEditor({
             ))}
           </datalist>
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <label htmlFor="article-summary" className="text-sm font-medium text-white">
-            {copy.summaryLabel}
-          </label>
-          <Textarea
-            id="article-summary"
-            value={summary}
-            onChange={(event) => setSummary(event.target.value)}
-            placeholder={copy.summaryPlaceholder}
-            rows={3}
-            className="min-h-12 rounded-2xl border-[#2b3531] bg-[#181e1b] text-white placeholder:text-[#6f877e]"
-          />
-        </div>
+      <div className="space-y-2">
+        <label htmlFor="article-summary" className="text-sm font-medium text-white">
+          {copy.summaryLabel}
+        </label>
+        <Textarea
+          id="article-summary"
+          value={summary}
+          onChange={(event) => setSummary(event.target.value)}
+          placeholder={copy.summaryPlaceholder}
+          rows={3}
+          className="min-h-12 rounded-2xl border-[#2b3531] bg-[#181e1b] text-white placeholder:text-[#6f877e]"
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
