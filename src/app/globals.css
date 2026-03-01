@@ -199,6 +199,17 @@
   border-top: 1px solid #2b3531;
 }
 
+.nook-editor img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1rem 0;
+  border: 1px solid #2b3531;
+  border-radius: 1.25rem;
+  background: #111513;
+  object-fit: cover;
+}
+
 .nook-editor p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   color: #6f877e;

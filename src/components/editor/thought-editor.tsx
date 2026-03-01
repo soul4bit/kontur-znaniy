@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditorContent, useEditor } from "@tiptap/react";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -10,6 +10,7 @@ import {
   Code2,
   Heading2,
   Heading3,
+  ImageUp,
   List,
   ListOrdered,
   LoaderCircle,
@@ -21,8 +22,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { type ArticleRecord } from "@/lib/articles/server";
 import { type ArticleTopic } from "@/lib/content/devops-library";
+import { NookImage } from "@/lib/editor/nook-image";
 import { cn } from "@/lib/utils";
 
 const copy = {
@@ -56,6 +59,10 @@ const copy = {
   saveChanges: "\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f",
   createArticle: "\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0441\u0442\u0430\u0442\u044c\u044e",
   newDraft: "\u041d\u043e\u0432\u044b\u0439 \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a",
+  image: "\u041a\u0430\u0440\u0442\u0438\u043d\u043a\u0430",
+  uploadingImage: "\u0413\u0440\u0443\u0437\u0438\u043c \u043a\u0430\u0440\u0442\u0438\u043d\u043a\u0443...",
+  imageUploaded: "\u041a\u0430\u0440\u0442\u0438\u043d\u043a\u0430 \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0430 \u0432 \u0441\u0442\u0430\u0442\u044c\u044e.",
+  imageUploadError: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u043a\u0430\u0440\u0442\u0438\u043d\u043a\u0443.",
   deleteArticle: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u0430\u0442\u044c\u044e",
   deleting: "\u0423\u0434\u0430\u043b\u044f\u0435\u043c...",
   deleteConfirm:
@@ -166,6 +173,25 @@ async function deleteArticleRequest(articleId: string) {
   return result as DeleteResponse;
 }
 
+async function uploadArticleImage(file: File) {
+  const formData = new FormData();
+  formData.set("file", file);
+
+  const response = await fetch("/api/articles/image", {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+
+  const result = (await response.json()) as { imageUrl?: string; message?: string };
+
+  if (!response.ok || !result.imageUrl) {
+    throw new Error(result.message ?? copy.imageUploadError);
+  }
+
+  return result.imageUrl;
+}
+
 export function ThoughtEditor({
   article,
   topics,
@@ -174,6 +200,7 @@ export function ThoughtEditor({
   defaultCategory,
 }: ThoughtEditorProps) {
   const router = useRouter();
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState(article?.title ?? "");
   const [summary, setSummary] = useState(article?.summary ?? "");
   const [topic, setTopic] = useState<ArticleTopic>(article?.topic ?? defaultTopic);
@@ -181,6 +208,7 @@ export function ThoughtEditor({
   const [feedback, setFeedback] = useState<SaveFeedback>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [stats, setStats] = useState({ chars: 0, paragraphs: 0 });
   const availableCategories = useMemo(
     () => topicCategories[topic] ?? [],
@@ -195,6 +223,7 @@ export function ThoughtEditor({
   const editor = useEditor({
     extensions: [
       StarterKit,
+      NookImage,
       Placeholder.configure({
         placeholder: copy.placeholder,
       }),
@@ -235,7 +264,7 @@ export function ThoughtEditor({
     }
 
     editor.commands.setContent(article?.contentJson ?? emptyDocument);
-  }, [article, defaultCategory, defaultTopic, editor, topics]);
+  }, [article, defaultCategory, defaultTopic, editor]);
 
   useEffect(() => {
     if (!category.trim()) {
@@ -312,6 +341,43 @@ export function ThoughtEditor({
         defaultCategory
       )}&draft=1`
     );
+  }
+
+  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file || !editor) {
+      return;
+    }
+
+    setIsUploadingImage(true);
+    setFeedback(null);
+
+    try {
+      const imageUrl = await uploadArticleImage(file);
+      editor.chain().focus().insertContent({
+        type: "nookImage",
+        attrs: {
+          src: imageUrl,
+          alt: title.trim() || "Article image",
+          title: title.trim() || undefined,
+        },
+      }).run();
+      setFeedback({
+        tone: "success",
+        text: copy.imageUploaded,
+      });
+    } catch (error) {
+      setFeedback({
+        tone: "error",
+        text: error instanceof Error ? error.message : copy.imageUploadError,
+      });
+    } finally {
+      setIsUploadingImage(false);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
+    }
   }
 
   async function handleDelete() {
@@ -415,12 +481,13 @@ export function ThoughtEditor({
           <label htmlFor="article-summary" className="text-sm font-medium text-white">
             {copy.summaryLabel}
           </label>
-          <Input
+          <Textarea
             id="article-summary"
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
             placeholder={copy.summaryPlaceholder}
-            className="h-12 rounded-2xl border-[#2b3531] bg-[#181e1b] text-white placeholder:text-[#6f877e]"
+            rows={3}
+            className="min-h-12 rounded-2xl border-[#2b3531] bg-[#181e1b] text-white placeholder:text-[#6f877e]"
           />
         </div>
       </div>
@@ -472,6 +539,10 @@ export function ThoughtEditor({
           <Code2 />
           {copy.code}
         </EditorButton>
+        <EditorButton onClick={() => imageInputRef.current?.click()}>
+          <ImageUp />
+          {isUploadingImage ? copy.uploadingImage : copy.image}
+        </EditorButton>
         <EditorButton onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           <Minus />
           {copy.divider}
@@ -481,6 +552,14 @@ export function ThoughtEditor({
           {copy.reset}
         </EditorButton>
       </div>
+
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className="hidden"
+        onChange={handleImageChange}
+      />
 
       <EditorContent editor={editor} />
 
@@ -502,7 +581,7 @@ export function ThoughtEditor({
           type="button"
           className="rounded-2xl bg-[#53e6a6] px-5 text-[#09120e] hover:bg-[#46ce93]"
           onClick={handleSave}
-          disabled={isSaving || isDeleting}
+          disabled={isSaving || isDeleting || isUploadingImage}
         >
           {isSaving ? (
             <>
@@ -522,7 +601,7 @@ export function ThoughtEditor({
           variant="outline"
           className="rounded-2xl border-[#2b3531] bg-[#181e1b] text-white hover:bg-[#1d2521]"
           onClick={handleNewDraft}
-          disabled={isSaving || isDeleting}
+          disabled={isSaving || isDeleting || isUploadingImage}
         >
           {copy.newDraft}
         </Button>
@@ -533,7 +612,7 @@ export function ThoughtEditor({
             variant="outline"
             className="rounded-2xl border-rose-500/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
             onClick={handleDelete}
-            disabled={isSaving || isDeleting}
+            disabled={isSaving || isDeleting || isUploadingImage}
           >
             {isDeleting ? (
               <>
