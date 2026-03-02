@@ -128,6 +128,9 @@ async function reviewPendingRequestAction(formData: FormData) {
     redirect(buildAdminHref("Некорректные параметры заявки.", "error"));
   }
 
+  let notice = "";
+  let tone: NoticeTone = "success";
+
   try {
     const result = await reviewPendingRegistrationById({
       decision,
@@ -135,22 +138,25 @@ async function reviewPendingRequestAction(formData: FormData) {
       reviewedBy: `admin:${session.user.email}`,
     });
 
-    revalidatePath("/app/admin");
-
     if (result.status === "not_found") {
-      redirect(buildAdminHref("Заявка уже обработана или не найдена.", "info"));
+      notice = "Заявка уже обработана или не найдена.";
+      tone = "info";
+    } else {
+      const notificationPart = result.notificationSent
+        ? " Пользователь получил письмо с решением."
+        : " Письмо отправить не удалось, проверьте SMTP.";
+      const actionText = decision === "approve" ? "Заявка одобрена." : "Заявка отклонена.";
+      notice = `${actionText}${notificationPart}`;
+      tone = "success";
     }
-
-    const notificationPart = result.notificationSent
-      ? " Пользователь получил письмо с решением."
-      : " Письмо отправить не удалось, проверьте SMTP.";
-    const actionText = decision === "approve" ? "Заявка одобрена." : "Заявка отклонена.";
-
-    redirect(buildAdminHref(`${actionText}${notificationPart}`, "success"));
   } catch (error) {
     console.error("[admin:pending:review:error]", error);
-    redirect(buildAdminHref("Не удалось обработать заявку.", "error"));
+    notice = "Не удалось обработать заявку.";
+    tone = "error";
   }
+
+  revalidatePath("/app/admin");
+  redirect(buildAdminHref(notice, tone));
 }
 
 async function manageUserAction(formData: FormData) {
@@ -182,35 +188,47 @@ async function manageUserAction(formData: FormData) {
     redirect(buildAdminHref("Это действие нельзя применять к своему аккаунту.", "error"));
   }
 
+  let notice = "";
+  let tone: NoticeTone = "success";
+
   try {
     switch (action) {
       case "promote":
         await adminSetUserRole(userId, "admin");
-        redirect(buildAdminHref("Пользователь получил роль admin.", "success"));
+        notice = "Пользователь получил роль admin.";
+        break;
       case "demote":
         await adminSetUserRole(userId, "user");
-        redirect(buildAdminHref("Права администратора сняты.", "success"));
+        notice = "Права администратора сняты.";
+        break;
       case "ban":
         await adminBanUser(userId, "Заблокирован администратором через панель управления.");
-        redirect(buildAdminHref("Пользователь заблокирован.", "success"));
+        notice = "Пользователь заблокирован.";
+        break;
       case "unban":
         await adminUnbanUser(userId);
-        redirect(buildAdminHref("Пользователь разблокирован.", "success"));
+        notice = "Пользователь разблокирован.";
+        break;
       case "revoke_sessions":
         await adminRevokeUserSessions(userId);
-        redirect(buildAdminHref("Все сессии пользователя завершены.", "success"));
+        notice = "Все сессии пользователя завершены.";
+        break;
       case "delete":
         await adminRemoveUser(userId);
-        redirect(buildAdminHref("Аккаунт пользователя удален.", "success"));
+        notice = "Аккаунт пользователя удален.";
+        break;
       default:
-        redirect(buildAdminHref("Неизвестное действие.", "error"));
+        notice = "Неизвестное действие.";
+        tone = "error";
     }
   } catch (error) {
     console.error("[admin:user:action:error]", error);
-    redirect(buildAdminHref(getAdminActionError(error), "error"));
-  } finally {
-    revalidatePath("/app/admin");
+    notice = getAdminActionError(error);
+    tone = "error";
   }
+
+  revalidatePath("/app/admin");
+  redirect(buildAdminHref(notice, tone));
 }
 
 export default async function AdminRegistrationPage({ searchParams }: AdminPageProps) {
