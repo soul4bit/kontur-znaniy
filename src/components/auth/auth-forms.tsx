@@ -71,13 +71,13 @@ function createGuardState(): GuardState {
 function FeedbackBanner({ feedback }: { feedback: AuthFeedback }) {
   const toneClass =
     feedback.tone === "error"
-      ? "border-rose-500/40 bg-rose-950/40 text-rose-300"
+      ? "border-rose-400/45 bg-rose-950/35 text-rose-200"
       : feedback.tone === "success"
-        ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-300"
-        : "border-cyan-500/40 bg-cyan-950/30 text-cyan-300";
+        ? "border-emerald-400/45 bg-emerald-950/30 text-emerald-200"
+        : "border-sky-400/45 bg-sky-950/30 text-sky-200";
 
   return (
-    <div className={`rounded-2xl border px-4 py-3 text-sm leading-6 ${toneClass}`}>
+    <div className={`rounded-2xl border px-4 py-3 text-sm leading-6 backdrop-blur-sm ${toneClass}`}>
       {feedback.text}
     </div>
   );
@@ -85,7 +85,7 @@ function FeedbackBanner({ feedback }: { feedback: AuthFeedback }) {
 
 function FieldLabel({ htmlFor, children }: { htmlFor: string; children: string }) {
   return (
-    <label htmlFor={htmlFor} className="text-sm font-medium text-slate-300">
+    <label htmlFor={htmlFor} className="text-sm font-medium text-slate-200">
       {children}
     </label>
   );
@@ -95,7 +95,7 @@ function FormInput(props: ComponentProps<typeof Input>) {
   return (
     <Input
       {...props}
-      className={`h-12 rounded-2xl border-slate-700/80 bg-[#0f1b28] text-slate-100 placeholder:text-slate-500 ${props.className ?? ""}`}
+      className={`h-12 rounded-2xl border-slate-500/45 bg-[#0e1d2d]/92 text-slate-100 placeholder:text-slate-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -157,6 +157,11 @@ export function AuthForms() {
       : mode === "sign-up"
         ? "Оставьте заявку на доступ. Администратор проверит ее в Telegram и отправит решение на почту."
         : "Отправим письмо со ссылкой для безопасного сброса пароля.";
+  const modeOptions: Array<{ id: AuthMode; label: string }> = [
+    { id: "sign-in", label: "Вход" },
+    { id: "sign-up", label: "Регистрация" },
+    { id: "reset", label: "Сброс" },
+  ];
 
   function updateGuard(action: GuardAction, patch: Partial<GuardState>) {
     setGuardState((current) => ({
@@ -361,14 +366,40 @@ export function AuthForms() {
   }
 
   return (
-    <div className="w-full rounded-[28px] border border-slate-700/80 bg-[#132230]/85 p-5 shadow-[0_30px_90px_rgba(2,8,15,0.45)] sm:p-6">
-      <div className="border-b border-slate-700/80 pb-6">
-        <div className="inline-flex rounded-full border border-slate-700/80 bg-[#172a3b] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-          {mode === "sign-in" ? "вход" : mode === "sign-up" ? "заявка" : "сброс"}
+    <div className="nook-surface w-full rounded-[30px] p-5 shadow-[0_32px_80px_rgba(2,8,15,0.48)] sm:p-6">
+      <div className="border-b border-slate-600/65 pb-6">
+        <div className="grid grid-cols-3 gap-2 rounded-2xl border border-slate-600/65 bg-[#0d1b2a]/85 p-1">
+          {modeOptions.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={`rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+                mode === option.id
+                  ? "bg-[#1f3e58] text-[#84efd5]"
+                  : "text-slate-300 hover:bg-[#172b40] hover:text-slate-100"
+              }`}
+              onClick={() => {
+                openMode(option.id);
+                if (option.id === "sign-up") {
+                  setSignUpForm((current) => ({
+                    ...current,
+                    email: signInForm.email || current.email,
+                  }));
+                }
+                if (option.id === "reset") {
+                  setResetEmail(signInForm.email || resetEmail);
+                }
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
-        <div className="mt-4 space-y-2">
-          <h2 className="text-2xl font-semibold text-slate-100">{title}</h2>
-          <p className="max-w-md text-sm leading-6 text-slate-400">{description}</p>
+
+        <div className="mt-5 space-y-2">
+          <span className="nook-kicker">{mode === "sign-up" ? "заявка" : mode === "reset" ? "сброс" : "доступ"}</span>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-100">{title}</h2>
+          <p className="max-w-md text-sm leading-6 text-slate-300">{description}</p>
         </div>
       </div>
 
@@ -376,9 +407,9 @@ export function AuthForms() {
         {activeFeedback ? <FeedbackBanner feedback={activeFeedback} /> : null}
 
         {awaitingVerification ? (
-          <div className="rounded-[20px] border border-cyan-500/40 bg-cyan-950/30 p-4 text-sm leading-6 text-cyan-200">
+          <div className="rounded-[20px] border border-sky-400/40 bg-sky-950/25 p-4 text-sm leading-6 text-sky-200">
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-[#0f1b28] text-[#56e3c2]">
+              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-[#102131] text-[#79ebcf]">
                 <Mail className="size-4" />
               </div>
               <div className="space-y-3">
@@ -389,7 +420,7 @@ export function AuthForms() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-2xl border-slate-600/70 bg-[#0f1b28] text-slate-200 hover:bg-[#18293b]"
+                  className="rounded-2xl border-slate-500/45 bg-[#112131] text-slate-100 hover:bg-[#183049]"
                   onClick={handleResendVerification}
                   disabled={pendingAction === "resend"}
                 >
@@ -439,7 +470,7 @@ export function AuthForms() {
                   <FieldLabel htmlFor="signin-password">Пароль</FieldLabel>
                   <button
                     type="button"
-                    className="text-xs font-medium text-[#56e3c2] hover:text-[#87efd7]"
+                    className="text-xs font-semibold text-[#79ebcf] hover:text-[#a4f6e2]"
                     onClick={() => {
                       openMode("reset");
                       setResetEmail(signInForm.email);
@@ -462,11 +493,7 @@ export function AuthForms() {
                 />
               </div>
 
-              <Button
-                type="submit"
-                className="h-11 w-full rounded-2xl bg-[#21ab8f] text-white hover:bg-[#1b947d]"
-                disabled={pendingAction === "sign-in"}
-              >
+              <Button type="submit" className="h-11 w-full rounded-2xl" disabled={pendingAction === "sign-in"}>
                 {pendingAction === "sign-in" ? (
                   <>
                     <LoaderCircle className="size-4 animate-spin" />
@@ -481,15 +508,15 @@ export function AuthForms() {
               </Button>
             </form>
 
-            <div className="rounded-[20px] border border-slate-700/80 bg-[#152638] p-4">
+            <div className="nook-surface-soft rounded-[20px] p-4">
               <p className="text-sm font-medium text-slate-100">Нет аккаунта?</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p className="mt-2 text-sm leading-6 text-slate-300">
                 Отправьте заявку, и после одобрения вам придет письмо с подтверждением доступа.
               </p>
               <Button
                 type="button"
                 variant="outline"
-                className="mt-4 w-full rounded-2xl border-slate-600/70 bg-[#0f1b28] text-slate-200 hover:bg-[#18293b]"
+                className="mt-4 w-full rounded-2xl border-slate-500/45 bg-[#112131] text-slate-100 hover:bg-[#183049]"
                 onClick={() => {
                   openMode("sign-up");
                   setSignUpForm((current) => ({
@@ -581,11 +608,7 @@ export function AuthForms() {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="h-11 w-full rounded-2xl bg-[#21ab8f] text-white hover:bg-[#1b947d]"
-                disabled={pendingAction === "sign-up"}
-              >
+              <Button type="submit" className="h-11 w-full rounded-2xl" disabled={pendingAction === "sign-up"}>
                 {pendingAction === "sign-up" ? (
                   <>
                     <LoaderCircle className="size-4 animate-spin" />
@@ -603,7 +626,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-2xl text-slate-400 hover:bg-[#18293b] hover:text-slate-100"
+              className="w-full rounded-2xl text-slate-300 hover:bg-[#183049] hover:text-slate-100"
               onClick={() => {
                 openMode("sign-in");
                 setSignInForm((current) => ({
@@ -640,11 +663,7 @@ export function AuthForms() {
                 />
               </div>
 
-              <Button
-                type="submit"
-                className="h-11 w-full rounded-2xl bg-[#21ab8f] text-white hover:bg-[#1b947d]"
-                disabled={pendingAction === "reset"}
-              >
+              <Button type="submit" className="h-11 w-full rounded-2xl" disabled={pendingAction === "reset"}>
                 {pendingAction === "reset" ? (
                   <>
                     <LoaderCircle className="size-4 animate-spin" />
@@ -662,7 +681,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-2xl text-slate-400 hover:bg-[#18293b] hover:text-slate-100"
+              className="w-full rounded-2xl text-slate-300 hover:bg-[#183049] hover:text-slate-100"
               onClick={() => {
                 openMode("sign-in");
                 setSignInForm((current) => ({

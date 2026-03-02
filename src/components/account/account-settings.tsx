@@ -95,10 +95,10 @@ function formatDateTime(value: string) {
 function FeedbackBanner({ feedback }: { feedback: AuthFeedback }) {
   const toneClass =
     feedback.tone === "error"
-      ? "border-rose-500/40 bg-rose-950/40 text-rose-300"
+      ? "border-rose-400/45 bg-rose-950/35 text-rose-200"
       : feedback.tone === "success"
-        ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-300"
-        : "border-cyan-500/40 bg-cyan-950/30 text-cyan-300";
+        ? "border-emerald-400/45 bg-emerald-950/30 text-emerald-200"
+        : "border-sky-400/45 bg-sky-950/30 text-sky-200";
 
   return (
     <div className={`rounded-2xl border px-4 py-3 text-sm leading-6 ${toneClass}`}>
@@ -276,7 +276,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-      <section className="rounded-[28px] border border-slate-700/80 bg-[#132230]/85 p-6">
+      <section className="nook-surface rounded-[28px] p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
@@ -293,7 +293,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
           <Button
             asChild
             variant="outline"
-            className="rounded-2xl border-slate-700/80 bg-[#152638] text-slate-300 hover:bg-[#18293b]"
+            className="rounded-2xl border-slate-500/45 bg-[#132436] text-slate-100 hover:bg-[#1a3148]"
           >
             <Link href="/app">
               <ArrowLeft className="size-4" />К заметкам
@@ -301,19 +301,19 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
           </Button>
         </div>
 
-        <div className="mt-8 rounded-[20px] border border-slate-600/70 bg-[#172a3b] p-5">
+        <div className="mt-8 rounded-[20px] border border-slate-500/45 bg-[#15293d] p-5">
           <div className="flex items-center gap-4">
             <UserAvatar
               image={previewImage}
               name={user.name || user.email}
-              className="size-20 rounded-[20px] border-slate-600/70 bg-[#0f1b28]"
-              fallbackClassName="text-xl text-[#56e3c2]"
+              className="size-20 rounded-[20px] border-slate-500/45 bg-[#0f1d2d]"
+              fallbackClassName="text-xl text-[#79ebcf]"
             />
             <div>
               <p className="text-xl font-semibold text-slate-100">{user.name || "Без имени"}</p>
               <p className="mt-1 text-sm text-slate-400">{user.email}</p>
-              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-600/70 bg-[#0f1b28] px-3 py-1 text-xs text-slate-400">
-                <ShieldCheck className="size-3.5 text-[#56e3c2]" />
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-500/45 bg-[#0f1d2d] px-3 py-1 text-xs text-slate-300">
+                <ShieldCheck className="size-3.5 text-[#79ebcf]" />
                 {user.emailVerified ? "Почта подтверждена" : "Почта не подтверждена"}
               </div>
             </div>
@@ -327,9 +327,9 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
             <label htmlFor="avatar" className="text-sm font-medium text-slate-300">
               Аватар
             </label>
-            <div className="rounded-[20px] border border-slate-600/70 bg-[#172a3b] p-4">
+            <div className="rounded-[20px] border border-slate-500/45 bg-[#15293d] p-4">
               <div className="flex flex-wrap items-center gap-3">
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-600/70 bg-[#0f1b28] px-4 py-2 text-sm text-slate-300 hover:bg-[#18293b]">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-500/45 bg-[#112131] px-4 py-2 text-sm text-slate-100 hover:bg-[#183049]">
                   <ImagePlus className="size-4" />
                   Выбрать изображение
                   <input
@@ -345,7 +345,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-2xl border-slate-700/80 bg-[#152638] text-slate-300 hover:bg-[#18293b]"
+                  className="rounded-2xl border-slate-500/45 bg-[#132436] text-slate-100 hover:bg-[#1a3148]"
                   onClick={() => {
                     setSelectedFile(null);
                     setRemoveAvatar(true);
@@ -367,7 +367,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
 
           <Button
             type="submit"
-            className="rounded-2xl bg-[#21ab8f] px-5 text-white hover:bg-[#1b947d]"
+            className="rounded-2xl px-5"
             disabled={pendingAction === "profile"}
           >
             {pendingAction === "profile" ? (
@@ -385,19 +385,19 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
         </form>
       </section>
 
-      <section className="rounded-[28px] border border-slate-700/80 bg-[#132230]/85 p-6">
+      <section className="nook-surface rounded-[28px] p-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
           Безопасность
         </p>
         <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-100">
           Смена пароля
         </h2>
-        <p className="mt-3 text-sm leading-7 text-slate-400">
+        <p className="mt-3 text-sm leading-7 text-slate-300">
           Пароль можно менять не чаще одного раза в 24 часа. После успешной смены остальные
           сессии автоматически завершаются.
         </p>
 
-        <div className="mt-5 rounded-[18px] border border-slate-600/70 bg-[#172a3b] px-4 py-3 text-sm leading-7 text-slate-400">
+        <div className="mt-5 rounded-[18px] border border-slate-500/45 bg-[#15293d] px-4 py-3 text-sm leading-7 text-slate-300">
           {passwordCooldownText}
         </div>
 
@@ -418,7 +418,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                   currentPassword: event.target.value,
                 }))
               }
-              className="h-12 rounded-2xl border-slate-600/70 bg-[#0f1b28] text-slate-100 placeholder:text-slate-400"
+              className="h-12 rounded-2xl border-slate-500/45 bg-[#0f1d2d] text-slate-100 placeholder:text-slate-400"
               placeholder="Введите текущий пароль"
             />
           </div>
@@ -437,7 +437,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                   newPassword: event.target.value,
                 }))
               }
-              className="h-12 rounded-2xl border-slate-600/70 bg-[#0f1b28] text-slate-100 placeholder:text-slate-400"
+              className="h-12 rounded-2xl border-slate-500/45 bg-[#0f1d2d] text-slate-100 placeholder:text-slate-400"
               placeholder="Минимум 8 символов"
             />
           </div>
@@ -456,14 +456,14 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                   confirmPassword: event.target.value,
                 }))
               }
-              className="h-12 rounded-2xl border-slate-600/70 bg-[#0f1b28] text-slate-100 placeholder:text-slate-400"
+              className="h-12 rounded-2xl border-slate-500/45 bg-[#0f1d2d] text-slate-100 placeholder:text-slate-400"
               placeholder="Повторите новый пароль"
             />
           </div>
 
           <Button
             type="submit"
-            className="rounded-2xl bg-[#21ab8f] px-5 text-white hover:bg-[#1b947d]"
+            className="rounded-2xl px-5"
             disabled={pendingAction === "password" || isPasswordLocked}
           >
             {pendingAction === "password" ? (
@@ -480,9 +480,9 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
           </Button>
         </form>
 
-        <div className="mt-8 rounded-[18px] border border-slate-600/70 bg-[#172a3b] p-4 text-sm leading-7 text-slate-400">
+        <div className="mt-8 rounded-[18px] border border-slate-500/45 bg-[#15293d] p-4 text-sm leading-7 text-slate-300">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
-            <UserRoundCog className="size-4 text-[#56e3c2]" />
+            <UserRoundCog className="size-4 text-[#79ebcf]" />
             Где хранится аватар
           </div>
           <p>

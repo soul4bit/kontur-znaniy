@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "highlight.js/styles/github-dark.css";
@@ -49,72 +49,72 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: #080d12;
-  --foreground: #e8f1fb;
-  --card: #101822;
-  --card-foreground: #e8f1fb;
-  --popover: #101822;
-  --popover-foreground: #e8f1fb;
-  --primary: #34d3a7;
-  --primary-foreground: #03291f;
-  --secondary: #1b2634;
-  --secondary-foreground: #cedcec;
-  --muted: #16202d;
-  --muted-foreground: #97a9bb;
-  --accent: #1b2a39;
-  --accent-foreground: #d4e4f4;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: #283646;
-  --input: #283646;
-  --ring: #3de2b6;
-  --chart-1: #34d3a7;
-  --chart-2: #4cb4d8;
-  --chart-3: #5b8ee0;
-  --chart-4: #79ddcb;
-  --chart-5: #7a8fdd;
-  --sidebar: #0d141d;
-  --sidebar-foreground: #e8f1fb;
-  --sidebar-primary: #34d3a7;
-  --sidebar-primary-foreground: #03291f;
-  --sidebar-accent: #15202d;
-  --sidebar-accent-foreground: #d4e4f4;
-  --sidebar-border: #283646;
-  --sidebar-ring: #3de2b6;
+  --radius: 0.75rem;
+  --background: #050c13;
+  --foreground: #edf4ff;
+  --card: #0f1b29;
+  --card-foreground: #edf4ff;
+  --popover: #0f1b29;
+  --popover-foreground: #edf4ff;
+  --primary: #30c7a4;
+  --primary-foreground: #042720;
+  --secondary: #1a2b3d;
+  --secondary-foreground: #d2e2f4;
+  --muted: #152434;
+  --muted-foreground: #8fa6bc;
+  --accent: #1f344b;
+  --accent-foreground: #dfedfd;
+  --destructive: #dc4d68;
+  --border: #294056;
+  --input: #294056;
+  --ring: #50d8b7;
+  --chart-1: #30c7a4;
+  --chart-2: #54bee2;
+  --chart-3: #7ba3ff;
+  --chart-4: #6fd6c2;
+  --chart-5: #ffb86b;
+  --sidebar: #0b151f;
+  --sidebar-foreground: #edf4ff;
+  --sidebar-primary: #30c7a4;
+  --sidebar-primary-foreground: #042720;
+  --sidebar-accent: #142536;
+  --sidebar-accent-foreground: #d9e7f9;
+  --sidebar-border: #294056;
+  --sidebar-ring: #50d8b7;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #050c13;
+  --foreground: #edf4ff;
+  --card: #0f1b29;
+  --card-foreground: #edf4ff;
+  --popover: #0f1b29;
+  --popover-foreground: #edf4ff;
+  --primary: #30c7a4;
+  --primary-foreground: #042720;
+  --secondary: #1a2b3d;
+  --secondary-foreground: #d2e2f4;
+  --muted: #152434;
+  --muted-foreground: #8fa6bc;
+  --accent: #1f344b;
+  --accent-foreground: #dfedfd;
+  --destructive: #dc4d68;
+  --border: #294056;
+  --input: #294056;
+  --ring: #50d8b7;
+  --chart-1: #30c7a4;
+  --chart-2: #54bee2;
+  --chart-3: #7ba3ff;
+  --chart-4: #6fd6c2;
+  --chart-5: #ffb86b;
+  --sidebar: #0b151f;
+  --sidebar-foreground: #edf4ff;
+  --sidebar-primary: #30c7a4;
+  --sidebar-primary-foreground: #042720;
+  --sidebar-accent: #142536;
+  --sidebar-accent-foreground: #d9e7f9;
+  --sidebar-border: #294056;
+  --sidebar-ring: #50d8b7;
 }
 
 @layer base {
@@ -122,45 +122,145 @@
     @apply border-border outline-ring/50;
   }
 
+  html,
   body {
-    @apply bg-background text-foreground;
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(circle at 10% 4%, rgba(52, 211, 167, 0.16), transparent 38%),
-      radial-gradient(circle at 90% 92%, rgba(61, 136, 224, 0.18), transparent 34%),
-      linear-gradient(180deg, #060b10 0%, #0a1118 100%);
+      radial-gradient(circle at 14% 8%, rgba(48, 199, 164, 0.2), transparent 34%),
+      radial-gradient(circle at 92% 90%, rgba(93, 132, 241, 0.24), transparent 35%),
+      linear-gradient(180deg, #040912 0%, #0b131d 56%, #0e1824 100%);
     min-height: 100vh;
   }
 
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(rgba(121, 156, 189, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(121, 156, 189, 0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.22;
+    z-index: -1;
+  }
+
   ::selection {
-    background: rgba(52, 211, 167, 0.35);
-    color: #f2fffb;
+    background: rgba(48, 199, 164, 0.33);
+    color: #f6fffb;
   }
 }
 
-.nook-editor h2 {
-  font-size: 1.5rem;
-  line-height: 1.2;
+@keyframes nook-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nook-reveal {
+  animation: nook-fade-up 0.42s ease both;
+}
+
+.nook-shell {
+  border: 1px solid rgba(67, 93, 118, 0.78);
+  background: linear-gradient(180deg, rgba(9, 20, 32, 0.94) 0%, rgba(10, 22, 35, 0.9) 100%);
+  box-shadow:
+    0 42px 110px rgba(2, 7, 12, 0.72),
+    inset 0 1px 0 rgba(136, 170, 203, 0.14);
+  backdrop-filter: blur(16px);
+}
+
+.nook-surface {
+  border: 1px solid rgba(64, 91, 116, 0.82);
+  background: linear-gradient(170deg, rgba(17, 35, 53, 0.92) 0%, rgba(13, 29, 45, 0.88) 100%);
+  box-shadow: inset 0 1px 0 rgba(149, 183, 214, 0.12);
+}
+
+.nook-surface-soft {
+  border: 1px solid rgba(57, 84, 109, 0.72);
+  background: rgba(13, 27, 42, 0.82);
+}
+
+.nook-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(59, 90, 116, 0.88);
+  background: rgba(14, 30, 45, 0.95);
+  padding: 0.32rem 0.72rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: #91a8bd;
+}
+
+.nook-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(64, 93, 120, 0.75);
+  background: rgba(14, 30, 46, 0.9);
+  padding: 0.24rem 0.72rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #e9f3ff;
+  color: #c0d4e8;
+}
+
+.nook-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(83, 120, 151, 0.8) transparent;
+}
+
+.nook-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.nook-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(83, 120, 151, 0.8);
+}
+
+.nook-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nook-editor h2 {
+  margin: 0.6rem 0 0.45rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #eff6ff;
 }
 
 .nook-editor h3 {
+  margin: 0.85rem 0 0.38rem;
   font-size: 1.2rem;
-  line-height: 1.3;
-  font-weight: 600;
-  margin: 0.85rem 0 0.35rem;
-  color: #d9e8f8;
+  line-height: 1.35;
+  font-weight: 650;
+  color: #dcecff;
 }
 
 .nook-editor p {
-  margin: 0.35rem 0;
+  margin: 0.42rem 0;
 }
 
 .nook-editor ul,
 .nook-editor ol {
-  padding-left: 1.4rem;
-  margin: 0.35rem 0;
+  margin: 0.45rem 0;
+  padding-left: 1.35rem;
 }
 
 .nook-editor ul {
@@ -172,19 +272,19 @@
 }
 
 .nook-editor blockquote {
-  margin: 0.75rem 0;
+  margin: 0.9rem 0;
+  border-left: 3px solid #44cfb0;
   padding-left: 1rem;
-  border-left: 3px solid #38d8ad;
-  color: #a8bed4;
+  color: #a3bbd1;
 }
 
 .nook-editor pre {
-  margin: 0.75rem 0;
-  padding: 0.9rem 1rem;
-  border-radius: 1rem;
-  background: #0a121a;
-  color: #deecfb;
+  margin: 0.95rem 0;
   overflow-x: auto;
+  border-radius: 1rem;
+  background: #08121d;
+  padding: 0.92rem 1rem;
+  color: #dbebfb;
 }
 
 .nook-editor code {
@@ -193,78 +293,77 @@
 
 .nook-editor p code,
 .nook-editor li code {
-  padding: 0.15rem 0.4rem;
-  border-radius: 0.45rem;
-  background: #152637;
-  color: #7fe1c8;
+  border-radius: 0.4rem;
+  background: #1a2c3f;
+  padding: 0.14rem 0.38rem;
+  color: #86e2cb;
 }
 
 .nook-editor hr {
-  margin: 1rem 0;
+  margin: 1.1rem 0;
   border: 0;
-  border-top: 1px solid #2a3a4a;
+  border-top: 1px solid #30475f;
 }
 
 .nook-editor img {
   display: block;
+  margin: 1rem 0;
   width: 100%;
   max-width: 100%;
-  margin: 1rem 0;
-  border: 1px solid #2a3a4a;
-  border-radius: 1.25rem;
-  background: #0a121a;
+  border-radius: 1.1rem;
+  border: 1px solid #314a63;
+  background: #08121d;
   object-fit: cover;
 }
 
 .nook-editor p.is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  color: #7a8ea3;
+  pointer-events: none;
   float: left;
   height: 0;
-  pointer-events: none;
+  color: #6f869b;
+  content: attr(data-placeholder);
 }
 
-
 .nook-snippet {
-  margin: 0.9rem 0;
+  margin: 0.95rem 0;
   overflow: hidden;
-  border: 1px solid #2a3a4a;
-  border-radius: 0.9rem;
-  background: #09111a;
+  border-radius: 0.92rem;
+  border: 1px solid #2f455d;
+  background: #08111b;
 }
 
 .nook-snippet-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.45rem 0.65rem;
-  border-bottom: 1px solid #2a3a4a;
-  background: #102030;
+  border-bottom: 1px solid #2f455d;
+  background: #112233;
+  padding: 0.45rem 0.7rem;
 }
 
 .nook-snippet-lang {
-  font-size: 0.67rem;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #82e4cc;
+  color: #82e4cd;
 }
 
 .nook-snippet-copy {
-  border: 1px solid #314256;
-  border-radius: 0.5rem;
-  padding: 0.22rem 0.6rem;
-  font-size: 0.74rem;
-  color: #d6e8f8;
-  background: #18283a;
   cursor: pointer;
+  border-radius: 0.5rem;
+  border: 1px solid #355068;
+  background: #1a2c40;
+  padding: 0.22rem 0.62rem;
+  font-size: 0.72rem;
+  color: #d7e8f8;
 }
 
 .nook-snippet-copy:hover {
-  background: #22334a;
+  background: #23384e;
 }
 
 .nook-snippet-copy:focus-visible {
-  outline: 2px solid #35d8ad;
+  outline: 2px solid #44cfb0;
   outline-offset: 2px;
 }
 
@@ -272,7 +371,7 @@
   margin: 0;
   border-radius: 0;
   border: 0;
-  background: #09111a;
+  background: #08111b;
 }
 
 .nook-snippet code {
@@ -280,23 +379,21 @@
 }
 
 .nook-wiki-link {
-  color: #45dfbe;
-  text-decoration: none;
-  font-weight: 600;
   border-bottom: 1px dashed #45dfbe;
+  color: #45dfbe;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .nook-wiki-link:hover {
-  color: #87efd7;
-  border-bottom-color: #87efd7;
+  border-bottom-color: #8af1d8;
+  color: #8af1d8;
 }
 
 .nook-wiki-missing {
-  color: #fda4af;
-  background: #3b1220;
-  border: 1px dashed #7d2a3d;
   border-radius: 0.4rem;
+  border: 1px dashed #7f3043;
+  background: #3a1423;
   padding: 0.05rem 0.35rem;
+  color: #ffa8b4;
 }
-
-
