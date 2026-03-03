@@ -1,10 +1,10 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import {
-  ArrowRight,
   BookOpenText,
-  KeyRound,
-  NotebookTabs,
+  LogIn,
+  RefreshCcw,
   ShieldCheck,
+  Sparkles,
   UserRoundPlus,
 } from "lucide-react";
 import { AuthForms } from "@/components/auth/auth-forms";
@@ -18,94 +18,82 @@ export default async function AuthPage() {
     redirect("/app");
   }
 
-  const journey = [
-    {
-      title: "Вход за 1 шаг",
-      description: "Почта и пароль на одном экране. Без лишних переходов между страницами.",
-      icon: KeyRound,
-      tone: "bg-emerald-100 text-emerald-700",
-    },
-    {
-      title: "Заявка на регистрацию",
-      description: "Новый доступ отправляется в модерацию и подтверждается через почту.",
-      icon: UserRoundPlus,
-      tone: "bg-sky-100 text-sky-700",
-    },
-    {
-      title: "Быстрое восстановление",
-      description: "Если пароль забыт, ссылка для сброса приходит сразу и ведет в безопасную форму.",
-      icon: ShieldCheck,
-      tone: "bg-amber-100 text-amber-700",
-    },
-  ];
-
   return (
     <div className="min-h-screen px-3 py-4 text-slate-900 sm:px-6 lg:px-8">
       <main className="mx-auto grid w-full max-w-[1480px] gap-4 lg:grid-cols-[1.1fr_minmax(440px,0.9fr)]">
-        <section className="nook-shell rounded-[32px] p-6 lg:p-9 xl:p-10">
+        <section className="nook-shell relative overflow-hidden rounded-[32px] p-6 lg:p-9 xl:p-10">
+          <div className="nook-auth-glow nook-auth-glow-primary" />
+          <div className="nook-auth-glow nook-auth-glow-secondary" />
+
           <KnowledgeLogo subtitle="Защищенная база команды" />
 
-          <div className="mt-9 space-y-5">
+          <div className="relative z-10 mt-9 space-y-5">
             <span className="nook-kicker">
-              <BookOpenText className="size-3.5" />
-              Auth control center
+              <Sparkles className="size-3.5" />
+              Fast access
             </span>
             <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl lg:text-[3.45rem] lg:leading-[1.05]">
-              Авторизация и регистрация в одном понятном потоке.
+              Вход и регистрация без лишнего текста.
             </h1>
-            <p className="max-w-2xl text-base leading-8 text-slate-600 sm:text-lg sm:leading-9">
-              Выберите режим справа: вход, заявка на регистрацию или восстановление пароля. Каждое
-              действие выполняется на месте, поэтому путь до рабочей области короче и удобнее.
+            <p className="max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
+              Просто выберите режим справа и продолжайте работу.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 xl:grid-cols-3">
-            {journey.map((item) => (
-              <article
-                key={item.title}
-                className="rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.045)]"
-              >
-                <div className={`flex size-11 items-center justify-center rounded-xl ${item.tone}`}>
-                  <item.icon className="size-5" />
+          <div className="relative z-10 mt-9 grid gap-4 lg:grid-cols-[1fr_232px]">
+            <article className="nook-auth-stage">
+              <div className="nook-auth-stage-ring nook-auth-float-slow" />
+              <div className="nook-auth-stage-ring nook-auth-float-fast" />
+
+              <div className="nook-auth-panel nook-auth-reveal-1">
+                <div className="flex items-center justify-between">
+                  <span className="nook-chip">Контур Знаний</span>
+                  <BookOpenText className="size-4 text-sky-600" />
                 </div>
-                <h2 className="mt-4 text-lg font-semibold text-slate-900">{item.title}</h2>
-                <p className="mt-2 text-sm leading-7 text-slate-600">{item.description}</p>
+
+                <div className="mt-5 space-y-3">
+                  <div className="h-2 rounded-full bg-slate-200/90" />
+                  <div className="h-2 w-10/12 rounded-full bg-slate-200/90" />
+                  <div className="h-2 w-7/12 rounded-full bg-slate-200/90" />
+                </div>
+
+                <div className="mt-6 flex items-center gap-2.5">
+                  <div className="size-2.5 rounded-full bg-emerald-400" />
+                  <p className="text-xs font-medium text-slate-600">online workspace</p>
+                </div>
+              </div>
+
+              <div className="nook-auth-floating-chip nook-auth-reveal-2">
+                <LogIn className="size-3.5 text-emerald-600" />
+                Вход
+              </div>
+              <div className="nook-auth-floating-chip nook-auth-floating-chip-right nook-auth-reveal-3">
+                <UserRoundPlus className="size-3.5 text-sky-600" />
+                Регистрация
+              </div>
+              <div className="nook-auth-floating-chip nook-auth-floating-chip-bottom nook-auth-reveal-4">
+                <RefreshCcw className="size-3.5 text-amber-600" />
+                Сброс пароля
+              </div>
+            </article>
+
+            <div className="space-y-4">
+              <article className="nook-auth-mini-card nook-auth-reveal-2">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
+                  <LogIn className="size-4" />
+                </div>
+                <h2 className="mt-3 text-sm font-semibold text-slate-900">Мгновенный вход</h2>
+                <p className="mt-1 text-xs leading-6 text-slate-600">Минимум действий, максимум фокуса.</p>
               </article>
-            ))}
-          </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-            <article className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                <NotebookTabs className="size-4 text-sky-700" />
-                Что меняется после входа
-              </div>
-              <ul className="mt-3 space-y-2.5 text-sm leading-7 text-slate-600">
-                <li className="flex items-start gap-2.5">
-                  <ArrowRight className="mt-1 size-4 text-sky-600" />
-                  Сразу попадаете в рабочую область со статьями и разделами.
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <ArrowRight className="mt-1 size-4 text-sky-600" />
-                  Для новых пользователей по умолчанию открыт только режим просмотра.
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <ArrowRight className="mt-1 size-4 text-sky-600" />
-                  Права на создание и редактирование администратор выдает отдельно.
-                </li>
-              </ul>
-            </article>
-
-            <article className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                <ShieldCheck className="size-4 text-emerald-700" />
-                Безопасность
-              </div>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                Почта подтверждается отдельно, а каждый запрос на регистрацию проходит
-                админ-модерацию. Это уменьшает шум и защищает приватную базу.
-              </p>
-            </article>
+              <article className="nook-auth-mini-card nook-auth-reveal-3">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                  <ShieldCheck className="size-4" />
+                </div>
+                <h2 className="mt-3 text-sm font-semibold text-slate-900">Защищенный доступ</h2>
+                <p className="mt-1 text-xs leading-6 text-slate-600">Почта + модерация + контроль прав.</p>
+              </article>
+            </div>
           </div>
         </section>
 

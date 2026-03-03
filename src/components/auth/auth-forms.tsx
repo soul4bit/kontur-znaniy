@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   type ComponentProps,
@@ -83,21 +83,20 @@ const modeOptions: ModeOption[] = [
 const modeMeta: Record<AuthMode, ModeMeta> = {
   "sign-in": {
     badge: "быстрый вход",
-    title: "Вход в рабочую область",
-    description: "Введите почту и пароль. После проверки вы сразу перейдете в статьи.",
+    title: "Вход в систему",
+    description: "Почта и пароль. Больше ничего.",
     icon: KeyRound,
   },
   "sign-up": {
     badge: "новый доступ",
-    title: "Запрос на регистрацию",
-    description:
-      "Оставьте данные для заявки. После модерации придет письмо с подтверждением аккаунта.",
+    title: "Регистрация",
+    description: "Заполните форму и отправьте заявку.",
     icon: UserPlus,
   },
   reset: {
     badge: "восстановление",
     title: "Сброс пароля",
-    description: "Отправим ссылку на почту и откроем защищенную форму смены пароля.",
+    description: "Пришлем ссылку для восстановления доступа.",
     icon: ShieldCheck,
   },
 };
@@ -494,7 +493,7 @@ export function AuthForms() {
   }
 
   return (
-    <div className="w-full rounded-[32px] border border-slate-200 bg-white/95 p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6 lg:h-full lg:overflow-y-auto nook-scroll">
+    <div className="nook-auth-reveal-1 w-full rounded-[32px] border border-slate-200 bg-white/95 p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6 lg:h-full lg:overflow-y-auto nook-scroll">
       <div className="space-y-4 border-b border-slate-200 pb-6">
         <div className="grid gap-2 sm:grid-cols-3">
           {modeOptions.map((option) => (
@@ -691,18 +690,6 @@ export function AuthForms() {
 
         {mode === "sign-up" ? (
           <>
-            <div className="grid gap-2 sm:grid-cols-3">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                1. Данные
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                2. Модерация
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                3. Подтверждение
-              </div>
-            </div>
-
             <form className="space-y-4" onSubmit={handleSignUp}>
               <BotTrap
                 value={guardState["sign-up"].website}
