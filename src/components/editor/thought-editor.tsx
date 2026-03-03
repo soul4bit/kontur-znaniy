@@ -75,6 +75,9 @@ const copy = {
   previewTitle: "Предпросмотр в реальном времени",
   previewDescription:
     "Превью обновляется сразу во время набора, чтобы вы видели итоговый вид статьи до сохранения.",
+  previewMode: "Предпросмотр без сохранения",
+  previewToggle: "Предпросмотр",
+  backToEditing: "Вернуться к редактированию",
   previewSummaryFallback: "Добавьте короткое описание, и оно появится в карточке статьи.",
   previewBodyFallback: "Начните писать, и здесь сразу появится живой предпросмотр контента.",
 } as const;
@@ -250,6 +253,7 @@ export function ThoughtEditor({
   const [hasPreviewContent, setHasPreviewContent] = useState(
     hasMeaningfulContent(article?.contentText ?? "")
   );
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const availableCategories = useMemo(
     () => topicCategories[topic] ?? [],
     [topic, topicCategories]
@@ -304,6 +308,7 @@ export function ThoughtEditor({
     setFeedback(null);
     setPreviewHtml(article?.contentHtml ?? emptyHtml);
     setHasPreviewContent(hasMeaningfulContent(article?.contentText ?? ""));
+    setIsPreviewMode(false);
 
     if (!editor) {
       return;
@@ -399,6 +404,7 @@ export function ThoughtEditor({
     setPreviewHtml(emptyHtml);
     setStats({ chars: 0, paragraphs: 0 });
     setHasPreviewContent(false);
+    setIsPreviewMode(false);
     editor?.commands.setContent(emptyHtml);
     router.replace(
       `/app?topic=${encodeURIComponent(defaultTopic)}&category=${encodeURIComponent(
@@ -482,162 +488,194 @@ export function ThoughtEditor({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="article-title" className="text-sm font-medium text-slate-700">
-            {copy.titleLabel}
-          </label>
-          <Input
-            id="article-title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder={copy.titlePlaceholder}
-            className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
+      {!isPreviewMode ? (
+        <>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label htmlFor="article-title" className="text-sm font-medium text-slate-700">
+                {copy.titleLabel}
+              </label>
+              <Input
+                id="article-title"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder={copy.titlePlaceholder}
+                className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
+              />
+            </div>
+
+            <div className="nook-surface-soft rounded-[18px] px-4 py-2.5 text-sm leading-6 text-slate-700">
+              <p className="font-semibold text-slate-900">{copy.draft}</p>
+              <p className="mt-2">
+                {stats.paragraphs} {copy.blocks}
+              </p>
+              <p>
+                {stats.chars} {copy.chars}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label htmlFor="article-topic" className="text-sm font-medium text-slate-700">
+                {copy.topicLabel}
+              </label>
+              <select
+                id="article-topic"
+                value={topic}
+                onChange={(event) => setTopic(event.target.value as ArticleTopic)}
+                className="h-11 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus-visible:border-sky-300 focus-visible:ring-2 focus-visible:ring-sky-200"
+              >
+                {topics.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="article-category" className="text-sm font-medium text-slate-700">
+                {copy.categoryLabel}
+              </label>
+              <Input
+                id="article-category"
+                list="article-category-list"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                placeholder={copy.categoryPlaceholder}
+                className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
+              />
+              <datalist id="article-category-list">
+                {availableCategories.map((item) => (
+                  <option key={item} value={item} />
+                ))}
+              </datalist>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="article-summary" className="text-sm font-medium text-slate-700">
+              {copy.summaryLabel}
+            </label>
+            <Textarea
+              id="article-summary"
+              value={summary}
+              onChange={(event) => setSummary(event.target.value)}
+              placeholder={copy.summaryPlaceholder}
+              rows={3}
+              className="min-h-12 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
+            />
+          </div>
+
+          <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white/95 p-2 backdrop-blur">
+            <EditorButton
+              active={editor.isActive("bold")}
+              onClick={() => editor.chain().focus().toggleBold().run()}
+            >
+              <Bold />
+              {copy.bold}
+            </EditorButton>
+            <EditorButton
+              active={editor.isActive("heading", { level: 2 })}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            >
+              <Heading2 />
+              H2
+            </EditorButton>
+            <EditorButton
+              active={editor.isActive("heading", { level: 3 })}
+              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+            >
+              <Heading3 />
+              H3
+            </EditorButton>
+            <EditorButton
+              active={editor.isActive("bulletList")}
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+            >
+              <List />
+              {copy.list}
+            </EditorButton>
+            <EditorButton
+              active={editor.isActive("orderedList")}
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            >
+              <ListOrdered />
+              {copy.ordered}
+            </EditorButton>
+            <EditorButton
+              active={editor.isActive("blockquote")}
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            >
+              <Quote />
+              {copy.quote}
+            </EditorButton>
+            <EditorButton
+              active={editor.isActive("codeBlock")}
+              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            >
+              <Code2 />
+              {copy.code}
+            </EditorButton>
+            <EditorButton onClick={() => imageInputRef.current?.click()}>
+              <ImageUp />
+              {isUploadingImage ? copy.uploadingImage : copy.image}
+            </EditorButton>
+            <EditorButton onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+              <Minus />
+              {copy.divider}
+            </EditorButton>
+            <EditorButton onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}>
+              <Type />
+              {copy.reset}
+            </EditorButton>
+          </div>
+
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            className="hidden"
+            onChange={handleImageChange}
           />
-        </div>
 
-        <div className="nook-surface-soft rounded-[18px] px-4 py-2.5 text-sm leading-6 text-slate-700">
-          <p className="font-semibold text-slate-900">{copy.draft}</p>
-          <p className="mt-2">
-            {stats.paragraphs} {copy.blocks}
-          </p>
-          <p>
-            {stats.chars} {copy.chars}
-          </p>
-        </div>
-      </div>
+          <EditorContent editor={editor} />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="article-topic" className="text-sm font-medium text-slate-700">
-            {copy.topicLabel}
-          </label>
-          <select
-            id="article-topic"
-            value={topic}
-            onChange={(event) => setTopic(event.target.value as ArticleTopic)}
-            className="h-11 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus-visible:border-sky-300 focus-visible:ring-2 focus-visible:ring-sky-200"
-          >
-            {topics.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </div>
+          {showStandalonePreview ? (
+            <div className="rounded-[22px] border border-slate-300 bg-white p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                {copy.previewTitle}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{copy.previewDescription}</p>
 
-        <div className="space-y-2">
-          <label htmlFor="article-category" className="text-sm font-medium text-slate-700">
-            {copy.categoryLabel}
-          </label>
-          <Input
-            id="article-category"
-            list="article-category-list"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            placeholder={copy.categoryPlaceholder}
-            className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
-          />
-          <datalist id="article-category-list">
-            {availableCategories.map((item) => (
-              <option key={item} value={item} />
-            ))}
-          </datalist>
-        </div>
-      </div>
+              <div className="mt-4 rounded-[16px] border border-slate-300 bg-slate-50 px-4 py-4">
+                <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+                  {title.trim() || copy.emptyTitle}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {summary.trim() || copy.previewSummaryFallback}
+                </p>
+              </div>
 
-      <div className="space-y-2">
-        <label htmlFor="article-summary" className="text-sm font-medium text-slate-700">
-          {copy.summaryLabel}
-        </label>
-        <Textarea
-          id="article-summary"
-          value={summary}
-          onChange={(event) => setSummary(event.target.value)}
-          placeholder={copy.summaryPlaceholder}
-          rows={3}
-          className="min-h-12 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
-        />
-      </div>
-
-      <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white/95 p-2 backdrop-blur">
-        <EditorButton
-          active={editor.isActive("bold")}
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          <Bold />
-          {copy.bold}
-        </EditorButton>
-        <EditorButton
-          active={editor.isActive("heading", { level: 2 })}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        >
-          <Heading2 />
-          H2
-        </EditorButton>
-        <EditorButton
-          active={editor.isActive("heading", { level: 3 })}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        >
-          <Heading3 />
-          H3
-        </EditorButton>
-        <EditorButton
-          active={editor.isActive("bulletList")}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        >
-          <List />
-          {copy.list}
-        </EditorButton>
-        <EditorButton
-          active={editor.isActive("orderedList")}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        >
-          <ListOrdered />
-          {copy.ordered}
-        </EditorButton>
-        <EditorButton
-          active={editor.isActive("blockquote")}
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        >
-          <Quote />
-          {copy.quote}
-        </EditorButton>
-        <EditorButton
-          active={editor.isActive("codeBlock")}
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        >
-          <Code2 />
-          {copy.code}
-        </EditorButton>
-        <EditorButton onClick={() => imageInputRef.current?.click()}>
-          <ImageUp />
-          {isUploadingImage ? copy.uploadingImage : copy.image}
-        </EditorButton>
-        <EditorButton onClick={() => editor.chain().focus().setHorizontalRule().run()}>
-          <Minus />
-          {copy.divider}
-        </EditorButton>
-        <EditorButton onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}>
-          <Type />
-          {copy.reset}
-        </EditorButton>
-      </div>
-
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
-        className="hidden"
-        onChange={handleImageChange}
-      />
-
-      <EditorContent editor={editor} />
-
-      {showStandalonePreview ? (
+              <div className="mt-4 rounded-[16px] border border-slate-300 bg-white p-4">
+                {hasPreviewContent ? (
+                  <ArticleContent
+                    html={previewHtml}
+                    wikiLinks={wikiLinks}
+                    className="nook-editor-light max-w-none space-y-4 text-sm leading-7 text-slate-700"
+                  />
+                ) : (
+                  <p className="text-sm leading-7 text-slate-500">{copy.previewBodyFallback}</p>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </>
+      ) : (
         <div className="rounded-[22px] border border-slate-300 bg-white p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-            {copy.previewTitle}
+            {copy.previewMode}
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">{copy.previewDescription}</p>
 
@@ -662,7 +700,7 @@ export function ThoughtEditor({
             )}
           </div>
         </div>
-      ) : null}
+      )}
 
       {feedback ? (
         <div
@@ -678,6 +716,18 @@ export function ThoughtEditor({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
+        {!showStandalonePreview ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-2xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+            onClick={() => setIsPreviewMode((currentValue) => !currentValue)}
+            disabled={isSaving || isDeleting || isUploadingImage}
+          >
+            {isPreviewMode ? copy.backToEditing : copy.previewToggle}
+          </Button>
+        ) : null}
+
         <Button
           type="button"
           className="rounded-2xl px-5"
