@@ -123,7 +123,7 @@ export function WorkspacePanels({
   return (
     <>
       <main className="order-1 space-y-4 lg:order-2">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="nook-surface rounded-2xl p-5 sm:p-6">
           {selectedArticle || livePreview.title || livePreview.summary || livePreview.hasContent ? (
             <>
               <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -145,13 +145,13 @@ export function WorkspacePanels({
                 )}
               </div>
 
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900">
+              <h2 className="mt-4 text-[clamp(1.65rem,3vw,2.05rem)] font-semibold tracking-tight text-slate-900">
                 {previewTitle}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">{previewSummary}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-[15px]">{previewSummary}</p>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-slate-200/90 bg-slate-50/80 px-4 py-3">
                   <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-slate-500">
                     <UserRound className="size-3.5" />
                     {copy.author}
@@ -162,7 +162,7 @@ export function WorkspacePanels({
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="rounded-xl border border-slate-200/90 bg-slate-50/80 px-4 py-3">
                   <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-slate-500">
                     <PenSquare className="size-3.5" />
                     {copy.lastEditor}
@@ -174,7 +174,7 @@ export function WorkspacePanels({
                 </div>
               </div>
 
-              <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
+              <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50/30 p-4">
                 <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
                   <BookOpenText className="size-4 text-sky-700" />
                   {copy.reading}
@@ -191,7 +191,7 @@ export function WorkspacePanels({
               </div>
             </>
           ) : (
-            <div className="flex min-h-[380px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-8 text-center">
+            <div className="flex min-h-[380px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/80 px-8 text-center">
               <div className="flex size-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">
                 <SearchSlash className="size-6" />
               </div>
@@ -202,8 +202,8 @@ export function WorkspacePanels({
         </section>
       </main>
 
-      <aside className="order-3 space-y-4">
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <aside className="order-3 space-y-3 sm:space-y-4">
+        <section className="nook-surface rounded-2xl p-4">
           <div className="flex items-center gap-3">
             <UserAvatar
               image={userImage}
@@ -218,22 +218,22 @@ export function WorkspacePanels({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="nook-surface rounded-2xl p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
             {copy.snapshot}
           </p>
           <div className="mt-3 grid gap-2">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-2">
               <p className="text-[11px] uppercase tracking-[0.1em] text-slate-500">
                 {copy.allArticles}
               </p>
               <p className="mt-1 text-xl font-semibold text-slate-900">{totalArticles}</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-2">
               <p className="text-[11px] uppercase tracking-[0.1em] text-slate-500">Категория</p>
               <p className="mt-1 text-sm font-semibold text-slate-900">{previewCategory}</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-2">
               <p className="text-[11px] uppercase tracking-[0.1em] text-slate-500">
                 {copy.lastUpdate}
               </p>
@@ -244,7 +244,7 @@ export function WorkspacePanels({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="nook-surface rounded-2xl p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
             {copy.editor}
           </p>

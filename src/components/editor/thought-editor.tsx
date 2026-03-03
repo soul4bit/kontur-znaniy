@@ -159,8 +159,8 @@ function EditorButton({ active = false, onClick, children }: EditorButtonProps) 
       size="sm"
       variant="outline"
       className={cn(
-        "rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100",
-        active && "border-sky-300 bg-sky-50 text-sky-700 hover:bg-sky-100"
+        "h-8 rounded-lg border-slate-300 bg-white text-[13px] text-slate-700 hover:bg-slate-100",
+        active && "border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100"
       )}
       onClick={onClick}
     >
@@ -291,7 +291,7 @@ export function ThoughtEditor({
     editorProps: {
       attributes: {
         class:
-          "nook-editor nook-editor-light min-h-80 rounded-[22px] border border-slate-300 bg-white px-5 py-4 text-[15px] leading-7 text-slate-800 focus-visible:outline-none",
+          "nook-editor nook-editor-light min-h-80 rounded-[22px] border border-slate-300 bg-white px-5 py-4 text-[15px] leading-7 text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] focus-visible:outline-none",
       },
     },
   });
@@ -481,8 +481,8 @@ export function ThoughtEditor({
   if (!editor) return null;
 
   return (
-    <div className="space-y-5">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
+    <div className="space-y-4">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
         <div className="space-y-2">
           <label htmlFor="article-title" className="text-sm font-medium text-slate-700">
             {copy.titleLabel}
@@ -492,11 +492,11 @@ export function ThoughtEditor({
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder={copy.titlePlaceholder}
-            className="h-12 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400"
+            className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
           />
         </div>
 
-        <div className="rounded-[18px] border border-slate-300 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+        <div className="nook-surface-soft rounded-[18px] px-4 py-2.5 text-sm leading-6 text-slate-700">
           <p className="font-semibold text-slate-900">{copy.draft}</p>
           <p className="mt-2">
             {stats.paragraphs} {copy.blocks}
@@ -507,7 +507,7 @@ export function ThoughtEditor({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[220px_220px]">
+      <div className="grid gap-3 lg:grid-cols-[220px_220px]">
         <div className="space-y-2">
           <label htmlFor="article-topic" className="text-sm font-medium text-slate-700">
             {copy.topicLabel}
@@ -516,7 +516,7 @@ export function ThoughtEditor({
             id="article-topic"
             value={topic}
             onChange={(event) => setTopic(event.target.value as ArticleTopic)}
-            className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus-visible:border-sky-300 focus-visible:ring-2 focus-visible:ring-sky-200"
+            className="h-11 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus-visible:border-sky-300 focus-visible:ring-2 focus-visible:ring-sky-200"
           >
             {topics.map((item) => (
               <option key={item} value={item}>
@@ -536,7 +536,7 @@ export function ThoughtEditor({
             value={category}
             onChange={(event) => setCategory(event.target.value)}
             placeholder={copy.categoryPlaceholder}
-            className="h-12 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400"
+            className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
           />
           <datalist id="article-category-list">
             {availableCategories.map((item) => (
@@ -556,11 +556,11 @@ export function ThoughtEditor({
           onChange={(event) => setSummary(event.target.value)}
           placeholder={copy.summaryPlaceholder}
           rows={3}
-          className="min-h-12 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400"
+          className="min-h-12 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
         />
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white/95 p-2 backdrop-blur">
         <EditorButton
           active={editor.isActive("bold")}
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -669,8 +669,8 @@ export function ThoughtEditor({
           className={cn(
             "rounded-[18px] border px-4 py-3 text-sm leading-6",
             feedback.tone === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-rose-200 bg-rose-50 text-rose-700"
+              ? "border-emerald-200 bg-emerald-50/90 text-emerald-800"
+              : "border-rose-200 bg-rose-50/90 text-rose-700"
           )}
         >
           {feedback.text}
@@ -730,7 +730,7 @@ export function ThoughtEditor({
         ) : null}
       </div>
 
-      <div className="rounded-[18px] border border-slate-300 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
+      <div className="nook-surface-soft rounded-[18px] p-4 text-sm leading-7 text-slate-600">
         {copy.footer}
       </div>
     </div>

@@ -177,8 +177,8 @@ export default async function AppPage({ searchParams }: AppPageProps) {
     }));
 
   return (
-    <div className="min-h-screen bg-[#edf1f4] text-slate-900">
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div className="min-h-screen bg-transparent text-slate-900">
+      <header className="sticky top-0 z-30 border-b border-slate-200/90 bg-white/88 shadow-[0_1px_0_rgba(148,163,184,0.18)] backdrop-blur-lg">
         <div className="mx-auto flex max-w-[1700px] flex-wrap items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3 lg:px-8">
           <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
             <KnowledgeLogo
@@ -203,12 +203,12 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 name="q"
                 defaultValue={searchQuery}
                 placeholder={copy.searchPlaceholder}
-                className="h-10 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200"
+                className="h-10 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 sm:h-11"
               />
             </div>
             <button
               type="submit"
-              className="h-10 rounded-xl bg-sky-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-sky-700"
+              className="h-10 rounded-xl bg-[#0f7aaf] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#0d6997] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 sm:h-11"
             >
               {copy.searchButton}
             </button>
@@ -274,9 +274,9 @@ export default async function AppPage({ searchParams }: AppPageProps) {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1700px] gap-3 px-3 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:grid-cols-[300px_minmax(0,1fr)_430px] lg:px-8">
-        <aside className="order-2 space-y-4 lg:order-1">
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mx-auto grid max-w-[1700px] gap-4 px-3 py-3 sm:gap-5 sm:px-6 sm:py-4 lg:grid-cols-[300px_minmax(0,1fr)_430px] lg:px-8">
+        <aside className="order-2 space-y-3 sm:space-y-4 lg:order-1">
+          <section className="nook-surface rounded-2xl p-4">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                 {copy.sections}
@@ -293,7 +293,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
             ) : null}
           </section>
 
-          <nav className="max-h-[calc(100vh-190px)] space-y-2.5 overflow-y-auto pr-1 sm:space-y-3">
+          <nav className="nook-scroll max-h-[calc(100vh-190px)] space-y-2 overflow-y-auto pr-1 sm:space-y-3">
             {articleTopics.map((topic) => {
               const Icon = topicIcons[topic.name];
               const isActive = topic.name === selectedTopic;
@@ -305,19 +305,21 @@ export default async function AppPage({ searchParams }: AppPageProps) {
               return (
                 <article
                   key={topic.name}
-                  className={`rounded-2xl border bg-white shadow-sm ${
-                    isActive ? "border-sky-300" : "border-slate-200"
+                  className={`nook-surface rounded-2xl transition-[border-color,box-shadow] ${
+                    isActive
+                      ? "border-sky-300/90"
+                      : "border-slate-200 hover:border-slate-300 hover:shadow-[0_12px_26px_rgba(15,23,42,0.07)]"
                   }`}
                 >
                   <Link
                     href={buildAppHref(topic.name, {
                       query: searchQuery || undefined,
                     })}
-                    className="flex items-start gap-3 px-4 py-4"
+                    className="flex items-start gap-3 px-4 py-3.5"
                   >
                     <div
                       className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl ${
-                        isActive ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-500"
+                        isActive ? "bg-sky-100 text-sky-800" : "bg-slate-100 text-slate-500"
                       }`}
                     >
                       <Icon className="size-4" />
@@ -332,7 +334,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                   </Link>
 
                   {isActive ? (
-                    <div className="border-t border-slate-200 px-3 py-3">
+                    <div className="border-t border-slate-200/90 px-3 py-3">
                       {nestedCategories.length > 0 ? (
                         <div className="space-y-4">
                           {nestedCategories.map((categoryName) => {
@@ -348,10 +350,10 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                     category: categoryName,
                                     query: searchQuery || undefined,
                                   })}
-                                  className={`flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] ${
+                                  className={`flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
                                     isCategoryActive
-                                      ? "bg-sky-100 text-sky-700"
-                                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                      ? "border-sky-200 bg-sky-50 text-sky-800"
+                                      : "border-transparent bg-slate-100 text-slate-600 hover:border-slate-200 hover:bg-slate-50"
                                   }`}
                                 >
                                   <span>{categoryName}</span>
@@ -371,10 +373,10 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                             category: categoryName,
                                             query: searchQuery || undefined,
                                           })}
-                                          className={`block rounded-xl border px-3 py-3 transition-colors ${
+                                          className={`block rounded-xl border px-3 py-3 transition-all ${
                                             isSelected
-                                              ? "border-sky-300 bg-sky-50"
-                                              : "border-slate-200 bg-white hover:bg-slate-50"
+                                              ? "border-sky-300 bg-sky-50 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.32)]"
+                                              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                                           }`}
                                         >
                                           <div className="flex items-start justify-between gap-3">
