@@ -56,11 +56,11 @@ export default async function AuthPage() {
               >
                 <path
                   className="nook-devops-route-base"
-                  d="M 60 300 L 240 300 L 385 240 L 525 300 L 705 300 L 850 235 L 940 235"
+                  d="M 60 300 L 940 300"
                 />
                 <path
                   className="nook-devops-route-glow"
-                  d="M 60 300 L 240 300 L 385 240 L 525 300 L 705 300 L 850 235 L 940 235"
+                  d="M 60 300 L 940 300"
                 />
               </svg>
               <div className="nook-devops-traveler" />
