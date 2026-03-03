@@ -55,6 +55,7 @@ type AppPageProps = {
     topic?: string;
     category?: string;
     draft?: string;
+    edit?: string;
     q?: string;
   }>;
 };
@@ -64,6 +65,7 @@ function buildAppHref(
   options?: {
     articleId?: string;
     draft?: boolean;
+    edit?: boolean;
     category?: string;
     query?: string;
   }
@@ -80,6 +82,10 @@ function buildAppHref(
 
   if (options?.draft) {
     params.set("draft", "1");
+  }
+
+  if (options?.edit) {
+    params.set("edit", "1");
   }
 
   if (options?.query?.trim()) {
@@ -102,6 +108,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
   const requestedCategory = params?.category?.trim() || null;
   const requestedArticleId = params?.article;
   const draftMode = params?.draft === "1";
+  const editModeRequested = params?.edit === "1";
   const searchQuery = params?.q?.trim().slice(0, 180) ?? "";
   const allArticles = await listArticles();
   const articles = searchQuery ? await searchArticles(searchQuery) : allArticles;
@@ -148,6 +155,22 @@ export default async function AppPage({ searchParams }: AppPageProps) {
       : draftMode
         ? null
         : requestedArticle;
+  const isEditMode = Boolean(selectedArticle && editModeRequested);
+  const selectedArticleHref = selectedArticle
+    ? buildAppHref(selectedArticle.topic, {
+        articleId: selectedArticle.id,
+        category: selectedArticle.category,
+        query: searchQuery || undefined,
+      })
+    : null;
+  const editArticleHref = selectedArticle
+    ? buildAppHref(selectedArticle.topic, {
+        articleId: selectedArticle.id,
+        category: selectedArticle.category,
+        query: searchQuery || undefined,
+        edit: true,
+      })
+    : null;
 
   const displayName = session.user.name?.trim() || session.user.email;
   const isAdmin = isAdminSession(session);
@@ -418,7 +441,9 @@ export default async function AppPage({ searchParams }: AppPageProps) {
           lastUpdatedAt={lastUpdatedAt}
           isAdmin={isAdmin}
           currentUserId={session.user.id}
-          displayName={displayName}
+          isEditMode={isEditMode}
+          editArticleHref={editArticleHref}
+          closeEditorHref={selectedArticleHref}
           wikiLinks={wikiLinks}
         />
       </div>
