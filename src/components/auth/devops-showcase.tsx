@@ -19,6 +19,7 @@ type DevopsShowcaseProps = {
   badge?: string;
   chips?: readonly string[];
   footer?: ReactNode;
+  minimal?: boolean;
 };
 
 const defaultChips = ["Runbooks", "Postmortem", "IaC", "CI/CD"] as const;
@@ -30,6 +31,7 @@ export function DevopsShowcase({
   badge = "DevOps Knowledge Flow",
   chips = defaultChips,
   footer,
+  minimal = false,
 }: DevopsShowcaseProps) {
   const isReset = tone === "reset";
 
@@ -48,32 +50,36 @@ export function DevopsShowcase({
         </div>
       </div>
 
-      <div className="nook-devops-stage">
+      <div className={`nook-devops-stage ${minimal ? "min-h-[19rem]" : ""}`}>
         <div className="nook-devops-grid" />
         <div className="nook-devops-nebula nook-devops-nebula-a" />
         <div className="nook-devops-nebula nook-devops-nebula-b" />
         <div className="nook-devops-scan" />
-        <div className="nook-devops-orbit nook-devops-orbit-a" />
-        <div className="nook-devops-orbit nook-devops-orbit-b" />
+        {!minimal ? <div className="nook-devops-orbit nook-devops-orbit-a" /> : null}
+        {!minimal ? <div className="nook-devops-orbit nook-devops-orbit-b" /> : null}
 
-        <div className="nook-devops-log">
-          <p className="nook-devops-log-line nook-devops-log-line-1">git push main</p>
-          <p className="nook-devops-log-line nook-devops-log-line-2">pipeline: lint + tests</p>
-          <p className="nook-devops-log-line nook-devops-log-line-3">artifact: wiki-build</p>
-          <p className="nook-devops-log-line nook-devops-log-line-4">
-            {isReset ? "security: reset verified" : "deploy: knowledge updated"}
-          </p>
-        </div>
+        {!minimal ? (
+          <div className="nook-devops-log">
+            <p className="nook-devops-log-line nook-devops-log-line-1">git push main</p>
+            <p className="nook-devops-log-line nook-devops-log-line-2">pipeline: lint + tests</p>
+            <p className="nook-devops-log-line nook-devops-log-line-3">artifact: wiki-build</p>
+            <p className="nook-devops-log-line nook-devops-log-line-4">
+              {isReset ? "security: reset verified" : "deploy: knowledge updated"}
+            </p>
+          </div>
+        ) : null}
 
-        <div className="nook-devops-status-strip">
-          <span className="nook-devops-status-chip">
-            <span className="nook-devops-status-dot" />
-            CI green
-          </span>
-          <span className="nook-devops-status-chip nook-devops-status-chip-alt">
-            {isReset ? "auth hardening" : "docs live"}
-          </span>
-        </div>
+        {!minimal ? (
+          <div className="nook-devops-status-strip">
+            <span className="nook-devops-status-chip">
+              <span className="nook-devops-status-dot" />
+              CI green
+            </span>
+            <span className="nook-devops-status-chip nook-devops-status-chip-alt">
+              {isReset ? "auth hardening" : "docs live"}
+            </span>
+          </div>
+        ) : null}
 
         <div className="nook-devops-core">
           {isReset ? <KeyRound className="size-6 text-[#fde68a]" /> : <ShieldCheck className="size-6 text-[#fde68a]" />}
@@ -124,15 +130,21 @@ export function DevopsShowcase({
           <span className="nook-devops-step nook-devops-step-5">monitor</span>
         </div>
 
-        <div className="nook-devops-float nook-devops-float-left">
-          <CloudCog className="size-4 text-[#7cd9f3]" />
-        </div>
-        <div className="nook-devops-float nook-devops-float-right">
-          <ServerCog className="size-4 text-[#9cd7f4]" />
-        </div>
-        <div className="nook-devops-float nook-devops-float-bottom">
-          <Activity className="size-4 text-[#86efac]" />
-        </div>
+        {!minimal ? (
+          <div className="nook-devops-float nook-devops-float-left">
+            <CloudCog className="size-4 text-[#7cd9f3]" />
+          </div>
+        ) : null}
+        {!minimal ? (
+          <div className="nook-devops-float nook-devops-float-right">
+            <ServerCog className="size-4 text-[#9cd7f4]" />
+          </div>
+        ) : null}
+        {!minimal ? (
+          <div className="nook-devops-float nook-devops-float-bottom">
+            <Activity className="size-4 text-[#86efac]" />
+          </div>
+        ) : null}
       </div>
 
       {footer ? (

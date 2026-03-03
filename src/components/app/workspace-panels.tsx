@@ -7,25 +7,25 @@ import { ThoughtEditor } from "@/components/editor/thought-editor";
 import { type ArticleTopic } from "@/lib/content/devops-library";
 
 const copy = {
-  snapshot: "РЎРѕСЃС‚РѕСЏРЅРёРµ",
-  allArticles: "Р’СЃРµРіРѕ СЃС‚Р°С‚РµР№",
-  lastUpdate: "РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ",
-  emptyValue: "РџРѕРєР° РЅРµС‚ РґР°РЅРЅС‹С…",
-  updated: "РћР±РЅРѕРІР»РµРЅРѕ",
-  created: "РЎРѕР·РґР°РЅРѕ",
-  author: "РђРІС‚РѕСЂ",
-  lastEditor: "РџРѕСЃР»РµРґРЅРёР№ СЂРµРґР°РєС‚РѕСЂ",
-  reading: "РџСЂРѕСЃРјРѕС‚СЂ СЃС‚Р°С‚СЊРё",
-  editor: "Р РµРґР°РєС‚РѕСЂ",
-  editArticle: "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ СЃС‚Р°С‚СЊРё",
-  newNote: "РЎРѕР·РґР°РЅРёРµ СЃС‚Р°С‚СЊРё",
+  snapshot: "Состояние",
+  allArticles: "Всего статей",
+  lastUpdate: "Последнее обновление",
+  emptyValue: "Пока нет данных",
+  updated: "Обновлено",
+  created: "Создано",
+  author: "Автор",
+  lastEditor: "Последний редактор",
+  reading: "Просмотр статьи",
+  editor: "Редактор",
+  editArticle: "Редактирование статьи",
+  newNote: "Создание статьи",
   editorText:
-    "РР·РјРµРЅРµРЅРёСЏ СЃРѕС…СЂР°РЅСЏСЋС‚СЃСЏ РІ PostgreSQL Рё СЃСЂР°Р·Сѓ РѕС‚РѕР±СЂР°Р¶Р°СЋС‚СЃСЏ РІ СЃС‚СЂСѓРєС‚СѓСЂРµ СЂР°Р·РґРµР»РѕРІ.",
-  editButton: "Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ",
-  closeEditor: "Рљ СЃС‚Р°С‚СЊРµ",
-  noAccessEmptyTitle: "РџСѓСЃС‚РѕР№ СЂР°Р·РґРµР»",
+    "Изменения сохраняются в PostgreSQL и сразу отображаются в структуре разделов.",
+  editButton: "Редактировать",
+  closeEditor: "К статье",
+  noAccessEmptyTitle: "Пустой раздел",
   noAccessEmptyText:
-    "Р’ СЌС‚РѕР№ РєР°С‚РµРіРѕСЂРёРё РїРѕРєР° РЅРµС‚ СЃС‚Р°С‚РµР№. РЈ РІР°СЃ РїСЂР°РІР° С‚РѕР»СЊРєРѕ РЅР° РїСЂРѕСЃРјРѕС‚СЂ, РѕР±СЂР°С‚РёС‚РµСЃСЊ Рє Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂСѓ РґР»СЏ РґРѕСЃС‚СѓРїР° Рє СЃРѕР·РґР°РЅРёСЋ.",
+    "В этой категории пока нет статей. У вас права только на просмотр, обратитесь к администратору для доступа к созданию.",
 } as const;
 
 type EditorArticle = Parameters<typeof ThoughtEditor>[0]["article"];
@@ -213,7 +213,7 @@ export function WorkspacePanels({
                 <p className="mt-1 text-xl font-semibold text-[#e4eef6]">{totalArticles}</p>
               </div>
               <div className="rounded-xl border border-[#2f4a61] bg-[#13283a]/88 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-[#8ea9bd]">РљР°С‚РµРіРѕСЂРёСЏ</p>
+                <p className="text-[11px] uppercase tracking-[0.1em] text-[#8ea9bd]">Категория</p>
                 <p className="mt-1 text-sm font-semibold text-[#e4eef6]">{selectedCategory}</p>
               </div>
               <div className="rounded-xl border border-[#2f4a61] bg-[#13283a]/88 px-3 py-2">

@@ -25,33 +25,10 @@ export default async function AuthPage() {
 
           <div className="relative z-10 mt-8 lg:mt-6">
             <DevopsShowcase
+              minimal
               title="Единая база знаний по DevOps"
               description="Документация, runbook и статьи в одном месте. Доступы настраиваются по ролям, а материалы быстро обновляются и легко находятся через поиск."
-              footer={
-                <>
-                  <article className="rounded-2xl border border-[#324e67] bg-[#0f1d2d]/76 p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#84b6d2]">
-                      Что внутри
-                    </p>
-                    <ul className="mt-2 space-y-1.5 text-sm text-[#acc4d6]">
-                      <li>Runbook и операционные инструкции</li>
-                      <li>Архитектурные схемы и интеграции</li>
-                      <li>База знаний для onboarding</li>
-                    </ul>
-                  </article>
-
-                  <article className="rounded-2xl border border-[#324e67] bg-[#0f1d2d]/76 p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#84b6d2]">
-                      Рабочий поток
-                    </p>
-                    <ul className="mt-2 space-y-1.5 text-sm text-[#acc4d6]">
-                      <li>Завели материал в wiki</li>
-                      <li>Обновили по итогам инцидента</li>
-                      <li>Нашли за секунды через поиск</li>
-                    </ul>
-                  </article>
-                </>
-              }
+              chips={["Runbook", "IaC", "CI/CD"]}
             />
           </div>
         </section>
