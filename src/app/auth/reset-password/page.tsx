@@ -1,5 +1,5 @@
-import { ArrowRight, KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
-import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+﻿import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { DevopsShowcase } from "@/components/auth/devops-showcase";
 import { KnowledgeLogo } from "@/components/brand/knowledge-logo";
 
 type ResetPasswordPageProps = {
@@ -25,60 +25,36 @@ export default async function ResetPasswordPage({
             subtitleClassName="text-[#7db0cc]"
           />
 
-          <div className="mt-9 space-y-5">
-            <span className="nook-kicker">
-              <LockKeyhole className="size-3.5" />
-              Password reset
-            </span>
-            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-[#e8f4fd] sm:text-5xl lg:text-[3.35rem] lg:leading-[1.07]">
-              Обновите пароль и вернитесь к работе.
-            </h1>
-            <p className="max-w-2xl text-base leading-8 text-[#9dc0d7] sm:text-lg sm:leading-9">
-              Ссылка из письма открывает защищенную форму смены пароля. После сохранения вы сразу
-              сможете войти в Контур Знаний с новыми данными.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            <article className="rounded-2xl border border-[#2f5774] bg-[#102941]/80 p-5 shadow-[0_10px_24px_rgba(2,8,16,0.35)]">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-[#153853] text-[#8fd9f2]">
-                <KeyRound className="size-5" />
-              </div>
-              <h2 className="mt-4 text-lg font-semibold text-[#e4f2fb]">Одноразовая ссылка</h2>
-              <p className="mt-2 text-sm leading-7 text-[#94b8cf]">
-                Ссылка действует ограниченное время и защищает восстановление от повторного
-                использования.
-              </p>
-            </article>
-
-            <article className="rounded-2xl border border-[#2f5774] bg-[#102941]/80 p-5 shadow-[0_10px_24px_rgba(2,8,16,0.35)]">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-[#113b42] text-[#7de5d2]">
-                <ShieldCheck className="size-5" />
-              </div>
-              <h2 className="mt-4 text-lg font-semibold text-[#e4f2fb]">Безопасный возврат</h2>
-              <p className="mt-2 text-sm leading-7 text-[#94b8cf]">
-                После смены пароля вы возвращаетесь к стандартному входу без дополнительной
-                настройки.
-              </p>
-            </article>
-          </div>
-
-          <div className="mt-8 rounded-2xl border border-[#2f5774] bg-[#102941]/80 p-5">
-            <h2 className="text-sm font-semibold text-[#d9ebf8]">Как проходит восстановление</h2>
-            <ul className="mt-3 space-y-2 text-sm leading-7 text-[#98bbd1]">
-              <li className="flex items-start gap-2.5">
-                <ArrowRight className="mt-1 size-4 text-[#67d2f2]" />
-                Открываете ссылку из письма и задаете новый пароль.
-              </li>
-              <li className="flex items-start gap-2.5">
-                <ArrowRight className="mt-1 size-4 text-[#67d2f2]" />
-                Система проверяет требования к паролю и сохраняет изменения.
-              </li>
-              <li className="flex items-start gap-2.5">
-                <ArrowRight className="mt-1 size-4 text-[#67d2f2]" />
-                Возвращаетесь на экран входа и продолжаете работу.
-              </li>
-            </ul>
+          <div className="mt-8">
+            <DevopsShowcase
+              tone="reset"
+              badge="Access Recovery"
+              title="Обновите пароль и вернитесь к работе"
+              description="Ссылка из письма открывает защищенную форму смены пароля. После сохранения вы сразу сможете войти в Контур Знаний с новыми данными."
+              chips={["Password reset", "Mail token", "Security checks", "Audit trail"]}
+              footer={
+                <>
+                  <article className="rounded-2xl border border-[#324e67] bg-[#0f1d2d]/76 p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#84b6d2]">
+                      Одноразовая ссылка
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[#acc4d6]">
+                      Ссылка имеет ограниченный срок действия и защищает восстановление от повторного использования.
+                    </p>
+                  </article>
+                  <article className="rounded-2xl border border-[#324e67] bg-[#0f1d2d]/76 p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#84b6d2]">
+                      Как проходит процесс
+                    </p>
+                    <ul className="mt-2 space-y-1.5 text-sm text-[#acc4d6]">
+                      <li>Открываете ссылку из письма</li>
+                      <li>Вводите и подтверждаете новый пароль</li>
+                      <li>Возвращаетесь к обычному входу</li>
+                    </ul>
+                  </article>
+                </>
+              }
+            />
           </div>
         </section>
 

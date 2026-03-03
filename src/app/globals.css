@@ -1327,14 +1327,18 @@
 }
 
 .nook-surface {
-  border: 1px solid #d8e2ec;
-  background: #ffffff;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.045);
+  border: 1px solid #2f4c64;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(56, 189, 248, 0.1), transparent 46%),
+    linear-gradient(180deg, rgba(17, 34, 51, 0.96) 0%, rgba(13, 29, 44, 0.95) 100%);
+  box-shadow:
+    0 16px 30px rgba(2, 8, 16, 0.34),
+    inset 0 1px 0 rgba(186, 230, 253, 0.08);
 }
 
 .nook-surface-soft {
-  border: 1px solid #dfe7ef;
-  background: #f7fafd;
+  border: 1px solid #395b75;
+  background: rgba(16, 35, 52, 0.82);
 }
 
 .nook-kicker {
@@ -1472,41 +1476,41 @@
 }
 
 .nook-editor-light h2 {
-  color: #0f172a;
+  color: #eff6ff;
 }
 
 .nook-editor-light h3 {
-  color: #1e293b;
+  color: #dcecff;
 }
 
 .nook-editor-light p,
 .nook-editor-light li {
-  color: #334155;
+  color: #b8cad8;
 }
 
 .nook-editor-light blockquote {
-  border-left-color: #0ea5e9;
-  color: #475569;
+  border-left-color: #44cfb0;
+  color: #a3bbd1;
 }
 
 .nook-editor-light pre {
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #08121d;
+  color: #dbebfb;
 }
 
 .nook-editor-light p code,
 .nook-editor-light li code {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #1a2c3f;
+  color: #86e2cb;
 }
 
 .nook-editor-light hr {
-  border-top-color: #d1d5db;
+  border-top-color: #30475f;
 }
 
 .nook-editor-light img {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: #314a63;
+  background: #08121d;
 }
 
 .nook-snippet {
@@ -1564,23 +1568,23 @@
 }
 
 .nook-wiki-link {
-  border-bottom: 1px dashed #0284c7;
-  color: #0284c7;
+  border-bottom: 1px dashed #5fc8ea;
+  color: #7ddcf8;
   font-weight: 600;
   text-decoration: none;
 }
 
 .nook-wiki-link:hover {
-  border-bottom-color: #0ea5e9;
-  color: #0ea5e9;
+  border-bottom-color: #9ee9ff;
+  color: #b4f1ff;
 }
 
 .nook-wiki-missing {
   border-radius: 0.4rem;
-  border: 1px dashed #7f3043;
-  background: #3a1423;
+  border: 1px dashed #a95069;
+  background: rgba(78, 28, 44, 0.62);
   padding: 0.05rem 0.35rem;
-  color: #ffa8b4;
+  color: #ffb9c7;
 }
 
 @media (prefers-reduced-motion: reduce) {

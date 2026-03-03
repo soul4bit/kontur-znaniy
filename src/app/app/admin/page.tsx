@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -53,19 +53,19 @@ function getNoticeTone(value: string | undefined): NoticeTone {
 
 function getNoticeClassName(tone: NoticeTone) {
   if (tone === "success") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-800";
+    return "border-emerald-400/40 bg-emerald-500/10 text-emerald-200";
   }
 
   if (tone === "error") {
-    return "border-rose-200 bg-rose-50 text-rose-700";
+    return "border-rose-400/45 bg-rose-500/10 text-rose-200";
   }
 
-  return "border-sky-200 bg-sky-50 text-sky-700";
+  return "border-sky-400/40 bg-sky-500/10 text-sky-200";
 }
 
 function formatDateTime(value: string | null) {
   if (!value) {
-    return "Нет данных";
+    return "РќРµС‚ РґР°РЅРЅС‹С…";
   }
 
   return new Date(value).toLocaleString("ru-RU", {
@@ -90,22 +90,22 @@ function getAdminActionError(error: unknown) {
       : "unknown_error";
 
   if (message.includes("YOU_CANNOT_REMOVE_YOURSELF")) {
-    return "Нельзя удалить собственный аккаунт администратора.";
+    return "РќРµР»СЊР·СЏ СѓРґР°Р»РёС‚СЊ СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№ Р°РєРєР°СѓРЅС‚ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°.";
   }
 
   if (message.includes("YOU_CANNOT_BAN_YOURSELF")) {
-    return "Нельзя заблокировать самого себя.";
+    return "РќРµР»СЊР·СЏ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ СЃР°РјРѕРіРѕ СЃРµР±СЏ.";
   }
 
   if (message.includes("YOU_ARE_NOT_ALLOWED")) {
-    return "Недостаточно прав для этого действия.";
+    return "РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїСЂР°РІ РґР»СЏ СЌС‚РѕРіРѕ РґРµР№СЃС‚РІРёСЏ.";
   }
 
   if (message.includes("User not found") || message.includes("USER_NOT_FOUND")) {
-    return "Пользователь не найден.";
+    return "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РЅР°Р№РґРµРЅ.";
   }
 
-  return "Не удалось выполнить админ-действие. Проверьте серверные логи.";
+  return "РќРµ СѓРґР°Р»РѕСЃСЊ РІС‹РїРѕР»РЅРёС‚СЊ Р°РґРјРёРЅ-РґРµР№СЃС‚РІРёРµ. РџСЂРѕРІРµСЂСЊС‚Рµ СЃРµСЂРІРµСЂРЅС‹Рµ Р»РѕРіРё.";
 }
 
 async function reviewPendingRequestAction(formData: FormData) {
@@ -127,7 +127,7 @@ async function reviewPendingRequestAction(formData: FormData) {
   const decision = rawDecision === "approve" || rawDecision === "reject" ? rawDecision : null;
 
   if (!requestId || !decision) {
-    redirect(buildAdminHref("Некорректные параметры заявки.", "error"));
+    redirect(buildAdminHref("РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ Р·Р°СЏРІРєРё.", "error"));
   }
 
   let notice = "";
@@ -141,19 +141,19 @@ async function reviewPendingRequestAction(formData: FormData) {
     });
 
     if (result.status === "not_found") {
-      notice = "Заявка уже обработана или не найдена.";
+      notice = "Р—Р°СЏРІРєР° СѓР¶Рµ РѕР±СЂР°Р±РѕС‚Р°РЅР° РёР»Рё РЅРµ РЅР°Р№РґРµРЅР°.";
       tone = "info";
     } else {
       const notificationPart = result.notificationSent
-        ? " Пользователь получил письмо с решением."
-        : " Письмо отправить не удалось, проверьте SMTP.";
-      const actionText = decision === "approve" ? "Заявка одобрена." : "Заявка отклонена.";
+        ? " РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РїРѕР»СѓС‡РёР» РїРёСЃСЊРјРѕ СЃ СЂРµС€РµРЅРёРµРј."
+        : " РџРёСЃСЊРјРѕ РѕС‚РїСЂР°РІРёС‚СЊ РЅРµ СѓРґР°Р»РѕСЃСЊ, РїСЂРѕРІРµСЂСЊС‚Рµ SMTP.";
+      const actionText = decision === "approve" ? "Р—Р°СЏРІРєР° РѕРґРѕР±СЂРµРЅР°." : "Р—Р°СЏРІРєР° РѕС‚РєР»РѕРЅРµРЅР°.";
       notice = `${actionText}${notificationPart}`;
       tone = "success";
     }
   } catch (error) {
     console.error("[admin:pending:review:error]", error);
-    notice = "Не удалось обработать заявку.";
+    notice = "РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ Р·Р°СЏРІРєСѓ.";
     tone = "error";
   }
 
@@ -180,14 +180,14 @@ async function manageUserAction(formData: FormData) {
   const action = typeof rawAction === "string" ? rawAction.trim() : "";
 
   if (!userId || !action) {
-    redirect(buildAdminHref("Некорректные параметры пользователя.", "error"));
+    redirect(buildAdminHref("РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ.", "error"));
   }
 
   if (
     userId === session.user.id &&
     (action === "delete" || action === "demote" || action === "ban")
   ) {
-    redirect(buildAdminHref("Это действие нельзя применять к своему аккаунту.", "error"));
+    redirect(buildAdminHref("Р­С‚Рѕ РґРµР№СЃС‚РІРёРµ РЅРµР»СЊР·СЏ РїСЂРёРјРµРЅСЏС‚СЊ Рє СЃРІРѕРµРјСѓ Р°РєРєР°СѓРЅС‚Сѓ.", "error"));
   }
 
   let notice = "";
@@ -197,38 +197,38 @@ async function manageUserAction(formData: FormData) {
     switch (action) {
       case "promote":
         await adminSetUserRole(userId, "admin");
-        notice = "Пользователь получил роль admin.";
+        notice = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РїРѕР»СѓС‡РёР» СЂРѕР»СЊ admin.";
         break;
       case "demote":
         await adminSetUserRole(userId, "user");
-        notice = "Права администратора сняты.";
+        notice = "РџСЂР°РІР° Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° СЃРЅСЏС‚С‹.";
         break;
       case "ban":
-        await adminBanUser(userId, "Заблокирован администратором через панель управления.");
-        notice = "Пользователь заблокирован.";
+        await adminBanUser(userId, "Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРѕРј С‡РµСЂРµР· РїР°РЅРµР»СЊ СѓРїСЂР°РІР»РµРЅРёСЏ.");
+        notice = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ.";
         break;
       case "unban":
         await adminUnbanUser(userId);
-        notice = "Пользователь разблокирован.";
+        notice = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅ.";
         break;
       case "revoke_sessions":
         await adminRevokeUserSessions(userId);
-        notice = "Все сессии пользователя завершены.";
+        notice = "Р’СЃРµ СЃРµСЃСЃРёРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Р·Р°РІРµСЂС€РµРЅС‹.";
         break;
       case "delete":
         await adminRemoveUser(userId);
-        notice = "Аккаунт пользователя удален.";
+        notice = "РђРєРєР°СѓРЅС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ СѓРґР°Р»РµРЅ.";
         break;
       case "grant_articles":
         await adminSetArticlesAccess(userId, true, session.user.id);
-        notice = "Пользователю выдан доступ к созданию и редактированию статей.";
+        notice = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЋ РІС‹РґР°РЅ РґРѕСЃС‚СѓРї Рє СЃРѕР·РґР°РЅРёСЋ Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЋ СЃС‚Р°С‚РµР№.";
         break;
       case "revoke_articles":
         await adminSetArticlesAccess(userId, false, session.user.id);
-        notice = "Доступ к созданию и редактированию статей отключен.";
+        notice = "Р”РѕСЃС‚СѓРї Рє СЃРѕР·РґР°РЅРёСЋ Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЋ СЃС‚Р°С‚РµР№ РѕС‚РєР»СЋС‡РµРЅ.";
         break;
       default:
-        notice = "Неизвестное действие.";
+        notice = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ.";
         tone = "error";
     }
   } catch (error) {
@@ -259,30 +259,30 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
   const { users, total } = await listAdminUsers(500);
 
   return (
-    <div className="min-h-screen bg-[#edf1f4] px-3 py-4 text-slate-900 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-transparent px-3 py-4 text-slate-100 sm:px-6 lg:px-8">
       <main className="mx-auto max-w-[1520px]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-              Администрирование
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8ea9bd]">
+              РђРґРјРёРЅРёСЃС‚СЂРёСЂРѕРІР°РЅРёРµ
             </p>
-            <h1 className="mt-3 text-[clamp(1.9rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-slate-900">
-              Управление доступом и пользователями
+            <h1 className="mt-3 text-[clamp(1.9rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-[#e8f0f7]">
+              РЈРїСЂР°РІР»РµРЅРёРµ РґРѕСЃС‚СѓРїРѕРј Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё
             </h1>
-            <p className="mt-3 max-w-4xl text-[15px] leading-7 text-slate-600">
-              Здесь можно модерировать заявки на регистрацию, управлять ролями, блокировками,
-              активными сессиями и удалением аккаунтов.
+            <p className="mt-3 max-w-4xl text-[15px] leading-7 text-[#9fb5c6]">
+              Р—РґРµСЃСЊ РјРѕР¶РЅРѕ РјРѕРґРµСЂРёСЂРѕРІР°С‚СЊ Р·Р°СЏРІРєРё РЅР° СЂРµРіРёСЃС‚СЂР°С†РёСЋ, СѓРїСЂР°РІР»СЏС‚СЊ СЂРѕР»СЏРјРё, Р±Р»РѕРєРёСЂРѕРІРєР°РјРё,
+              Р°РєС‚РёРІРЅС‹РјРё СЃРµСЃСЃРёСЏРјРё Рё СѓРґР°Р»РµРЅРёРµРј Р°РєРєР°СѓРЅС‚РѕРІ.
             </p>
           </div>
 
           <Button
             asChild
             variant="outline"
-            className="rounded-2xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+            className="rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
           >
             <Link href="/app">
               <ArrowLeft className="size-4" />
-              Назад к статьям
+              РќР°Р·Р°Рґ Рє СЃС‚Р°С‚СЊСЏРј
             </Link>
           </Button>
         </div>
@@ -293,18 +293,18 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
           </div>
         ) : null}
 
-        <section className="mt-6 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs text-slate-700">
-            <Clock3 className="size-3.5 text-sky-700" />
-            Заявок в очереди: {pendingRequests.length}
+        <section className="mt-6 rounded-[24px] border border-[#2f4a61] bg-[#102031] p-4 shadow-[0_12px_26px_rgba(2,8,16,0.3)] sm:p-5 lg:p-6">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#3a556c] bg-[#152a3d] px-3 py-1 text-xs text-[#a9c0d1]">
+            <Clock3 className="size-3.5 text-[#7cd9f3]" />
+            Р—Р°СЏРІРѕРє РІ РѕС‡РµСЂРµРґРё: {pendingRequests.length}
           </div>
 
           {pendingRequests.length === 0 ? (
-            <div className="rounded-[20px] border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center">
-              <ShieldAlert className="mx-auto size-10 text-slate-500" />
-              <h2 className="mt-4 text-xl font-semibold text-slate-900">Открытых заявок нет</h2>
-              <p className="mt-2 text-sm leading-7 text-slate-600">
-                Когда появятся новые регистрации, они отобразятся в этом списке.
+            <div className="rounded-[20px] border border-dashed border-[#3a566f] bg-[#13283a] px-5 py-10 text-center">
+              <ShieldAlert className="mx-auto size-10 text-[#7d9bb2]" />
+              <h2 className="mt-4 text-xl font-semibold text-[#e5eef6]">РћС‚РєСЂС‹С‚С‹С… Р·Р°СЏРІРѕРє РЅРµС‚</h2>
+              <p className="mt-2 text-sm leading-7 text-[#9ab1c3]">
+                РљРѕРіРґР° РїРѕСЏРІСЏС‚СЃСЏ РЅРѕРІС‹Рµ СЂРµРіРёСЃС‚СЂР°С†РёРё, РѕРЅРё РѕС‚РѕР±СЂР°Р·СЏС‚СЃСЏ РІ СЌС‚РѕРј СЃРїРёСЃРєРµ.
               </p>
             </div>
           ) : (
@@ -312,33 +312,33 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
               {pendingRequests.map((request) => (
                 <article
                   key={request.id}
-                  className="rounded-[20px] border border-slate-200 bg-slate-50 p-4 sm:p-5"
+                  className="rounded-[20px] border border-[#2f4a61] bg-[#13283a] p-4 sm:p-5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <h2 className="text-[1.05rem] font-semibold leading-snug text-slate-900">
+                      <h2 className="text-[1.05rem] font-semibold leading-snug text-[#e5eef6]">
                         {request.name}
                       </h2>
-                      <p className="mt-1 inline-flex items-center gap-2 text-sm text-slate-700">
-                        <Mail className="size-4 text-sky-700" />
+                      <p className="mt-1 inline-flex items-center gap-2 text-sm text-[#b7cad9]">
+                        <Mail className="size-4 text-[#7cd9f3]" />
                         {request.email}
                       </p>
                     </div>
-                    <p className="text-xs tabular-nums text-slate-500">
+                    <p className="text-xs tabular-nums text-[#8ea9bd]">
                       {formatDateTime(request.requestedAt)}
                     </p>
                   </div>
 
                   <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                    <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">IP</p>
-                      <p className="mt-1 text-slate-700">{request.requestIp}</p>
+                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">IP</p>
+                      <p className="mt-1 text-[#b7cad9]">{request.requestIp}</p>
                     </div>
-                    <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">
+                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">
                         User-Agent
                       </p>
-                      <p className="mt-1 break-all text-slate-700">{request.userAgent}</p>
+                      <p className="mt-1 break-all text-[#b7cad9]">{request.userAgent}</p>
                     </div>
                   </div>
 
@@ -351,7 +351,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         className="rounded-xl"
                       >
                         <CheckCircle2 className="size-4" />
-                        Одобрить
+                        РћРґРѕР±СЂРёС‚СЊ
                       </Button>
                     </form>
 
@@ -360,7 +360,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                       <input type="hidden" name="decision" value="reject" />
                       <Button type="submit" variant="destructive" className="rounded-xl">
                         <XCircle className="size-4" />
-                        Отклонить
+                        РћС‚РєР»РѕРЅРёС‚СЊ
                       </Button>
                     </form>
                   </div>
@@ -370,10 +370,10 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
           )}
         </section>
 
-        <section className="mt-6 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs text-slate-700">
-            <UserCog className="size-3.5 text-sky-700" />
-            Пользователей: {total}
+        <section className="mt-6 rounded-[24px] border border-[#2f4a61] bg-[#102031] p-4 shadow-[0_12px_26px_rgba(2,8,16,0.3)] sm:p-5 lg:p-6">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#3a556c] bg-[#152a3d] px-3 py-1 text-xs text-[#a9c0d1]">
+            <UserCog className="size-3.5 text-[#7cd9f3]" />
+            РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№: {total}
           </div>
 
           <div className="space-y-4">
@@ -384,55 +384,55 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
               return (
                 <article
                   key={user.id}
-                  className="rounded-[20px] border border-slate-200 bg-slate-50 p-4 sm:p-5"
+                  className="rounded-[20px] border border-[#2f4a61] bg-[#13283a] p-4 sm:p-5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                       <UserAvatar
                         image={user.image}
                         name={user.name}
-                        className="size-12 rounded-xl border border-slate-300 bg-white"
-                        fallbackClassName="text-sky-700"
+                        className="size-12 rounded-xl border border-[#3a556c] bg-[#152a3d]"
+                        fallbackClassName="text-[#8fd4f0]"
                       />
                       <div>
-                        <p className="text-[1.05rem] font-semibold leading-snug text-slate-900">
+                        <p className="text-[1.05rem] font-semibold leading-snug text-[#e5eef6]">
                           {user.name}
                         </p>
-                        <p className="text-sm text-slate-600">{user.email}</p>
+                        <p className="text-sm text-[#9fb5c6]">{user.email}</p>
                         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                          <span className="rounded-full border border-slate-300 bg-white px-2.5 py-1 text-slate-700">
+                          <span className="rounded-full border border-[#3a556c] bg-[#152a3d] px-2.5 py-1 text-[#b7cad9]">
                             role: {user.role}
                           </span>
                           <span
                             className={`rounded-full border px-2.5 py-1 ${
                               user.canManageArticles
-                                ? "border-indigo-200 bg-indigo-50 text-indigo-700"
-                                : "border-slate-300 bg-white text-slate-600"
+                                ? "border-[#3a6d84] bg-[#16364f] text-[#9edff7]"
+                                : "border-[#3a556c] bg-[#152a3d] text-[#9fb5c6]"
                             }`}
                           >
-                            статьи: {user.canManageArticles ? "редактор" : "только просмотр"}
+                            СЃС‚Р°С‚СЊРё: {user.canManageArticles ? "СЂРµРґР°РєС‚РѕСЂ" : "С‚РѕР»СЊРєРѕ РїСЂРѕСЃРјРѕС‚СЂ"}
                           </span>
                           <span
                             className={`rounded-full border px-2.5 py-1 ${
                               user.emailVerified
-                                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                                : "border-amber-200 bg-amber-50 text-amber-800"
+                                ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
+                                : "border-amber-400/40 bg-amber-500/10 text-amber-200"
                             }`}
                           >
-                            {user.emailVerified ? "email подтвержден" : "email не подтвержден"}
+                            {user.emailVerified ? "email РїРѕРґС‚РІРµСЂР¶РґРµРЅ" : "email РЅРµ РїРѕРґС‚РІРµСЂР¶РґРµРЅ"}
                           </span>
                           {user.banned ? (
-                            <span className="rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-rose-700">
-                              заблокирован
+                            <span className="rounded-full border border-rose-400/45 bg-rose-500/10 px-2.5 py-1 text-rose-200">
+                              Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ
                             </span>
                           ) : (
-                            <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-sky-700">
-                              активен
+                            <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-sky-200">
+                              Р°РєС‚РёРІРµРЅ
                             </span>
                           )}
                           {isCurrentUser ? (
-                            <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-sky-700">
-                              вы
+                            <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-sky-200">
+                              РІС‹
                             </span>
                           ) : null}
                         </div>
@@ -441,33 +441,33 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                   </div>
 
                   <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Создан</p>
-                      <p className="mt-1 tabular-nums text-slate-700">{formatDateTime(user.createdAt)}</p>
+                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">РЎРѕР·РґР°РЅ</p>
+                      <p className="mt-1 tabular-nums text-[#b7cad9]">{formatDateTime(user.createdAt)}</p>
                     </div>
-                    <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">
-                        Последний актив
+                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">
+                        РџРѕСЃР»РµРґРЅРёР№ Р°РєС‚РёРІ
                       </p>
-                      <p className="mt-1 tabular-nums text-slate-700">
+                      <p className="mt-1 tabular-nums text-[#b7cad9]">
                         {formatDateTime(user.lastActiveAt)}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">
-                        Активных сессий
+                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">
+                        РђРєС‚РёРІРЅС‹С… СЃРµСЃСЃРёР№
                       </p>
-                      <p className="mt-1 tabular-nums text-slate-700">{user.activeSessions}</p>
+                      <p className="mt-1 tabular-nums text-[#b7cad9]">{user.activeSessions}</p>
                     </div>
-                    <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">ID</p>
-                      <p className="mt-1 break-all text-slate-700">{user.id}</p>
+                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">ID</p>
+                      <p className="mt-1 break-all text-[#b7cad9]">{user.id}</p>
                     </div>
                   </div>
 
                   {user.banned && user.banReason ? (
-                    <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                      Причина блокировки: {user.banReason}
+                    <div className="mt-3 rounded-xl border border-rose-400/45 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+                      РџСЂРёС‡РёРЅР° Р±Р»РѕРєРёСЂРѕРІРєРё: {user.banReason}
                     </div>
                   ) : null}
 
@@ -479,11 +479,11 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
                           disabled={isCurrentUser}
                         >
                           <ShieldOff className="size-4" />
-                          Снять admin
+                          РЎРЅСЏС‚СЊ admin
                         </Button>
                       </form>
                     ) : (
@@ -493,10 +493,10 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
                         >
                           <ShieldCheck className="size-4" />
-                          Сделать admin
+                          РЎРґРµР»Р°С‚СЊ admin
                         </Button>
                       </form>
                     )}
@@ -508,10 +508,10 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
                         >
                           <Edit3 className="size-4" />
-                          Запретить статьи
+                          Р—Р°РїСЂРµС‚РёС‚СЊ СЃС‚Р°С‚СЊРё
                         </Button>
                       </form>
                     ) : (
@@ -521,10 +521,10 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
                         >
                           <Edit3 className="size-4" />
-                          Разрешить статьи
+                          Р Р°Р·СЂРµС€РёС‚СЊ СЃС‚Р°С‚СЊРё
                         </Button>
                       </form>
                     )}
@@ -536,10 +536,10 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
                         >
                           <CheckCircle2 className="size-4" />
-                          Разблокировать
+                          Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ
                         </Button>
                       </form>
                     ) : (
@@ -549,11 +549,11 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
                           disabled={isCurrentUser}
                         >
                           <Ban className="size-4" />
-                          Заблокировать
+                          Р—Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ
                         </Button>
                       </form>
                     )}
@@ -564,10 +564,10 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                       <Button
                         type="submit"
                         variant="outline"
-                        className="rounded-xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                        className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
                       >
                         <RefreshCcw className="size-4" />
-                        Завершить сессии
+                        Р—Р°РІРµСЂС€РёС‚СЊ СЃРµСЃСЃРёРё
                       </Button>
                     </form>
 
@@ -581,7 +581,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         disabled={isCurrentUser}
                       >
                         <Trash2 className="size-4" />
-                        Удалить аккаунт
+                        РЈРґР°Р»РёС‚СЊ Р°РєРєР°СѓРЅС‚
                       </Button>
                     </form>
                   </div>
@@ -590,11 +590,11 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
             })}
 
             {users.length === 0 ? (
-              <div className="rounded-[20px] border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center">
-                <UserRound className="mx-auto size-10 text-slate-500" />
-                <h2 className="mt-4 text-xl font-semibold text-slate-900">Пользователи не найдены</h2>
-                <p className="mt-2 text-sm leading-7 text-slate-600">
-                  Пока в системе нет зарегистрированных пользователей.
+              <div className="rounded-[20px] border border-dashed border-[#3a566f] bg-[#13283a] px-5 py-10 text-center">
+                <UserRound className="mx-auto size-10 text-[#7d9bb2]" />
+                <h2 className="mt-4 text-xl font-semibold text-[#e5eef6]">РџРѕР»СЊР·РѕРІР°С‚РµР»Рё РЅРµ РЅР°Р№РґРµРЅС‹</h2>
+                <p className="mt-2 text-sm leading-7 text-[#9ab1c3]">
+                  РџРѕРєР° РІ СЃРёСЃС‚РµРјРµ РЅРµС‚ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№.
                 </p>
               </div>
             ) : null}

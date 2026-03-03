@@ -162,8 +162,8 @@ function EditorButton({ active = false, onClick, children }: EditorButtonProps) 
       size="sm"
       variant="outline"
       className={cn(
-        "h-8 rounded-lg border-slate-300 bg-white text-[13px] text-slate-700 hover:bg-slate-100",
-        active && "border-sky-300 bg-sky-50 text-sky-800 hover:bg-sky-100"
+        "h-8 rounded-lg border-[#375a74] bg-[#132b40] text-[13px] text-[#c6dceb] hover:bg-[#18354f]",
+        active && "border-[#62cdef] bg-[#173c58] text-[#e6f7ff] hover:bg-[#1b4464]"
       )}
       onClick={onClick}
     >
@@ -295,7 +295,7 @@ export function ThoughtEditor({
     editorProps: {
       attributes: {
         class:
-          "nook-editor nook-editor-light min-h-80 rounded-[22px] border border-slate-300 bg-white px-5 py-4 text-[15px] leading-7 text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] focus-visible:outline-none",
+          "nook-editor min-h-80 rounded-[22px] border border-[#34546e] bg-[#0f2234] px-5 py-4 text-[15px] leading-7 text-[#d6e5f1] shadow-[inset_0_1px_0_rgba(186,230,253,0.08)] focus-visible:outline-none",
       },
     },
   });
@@ -487,12 +487,12 @@ export function ThoughtEditor({
   if (!editor) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {!isPreviewMode ? (
         <>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="article-title" className="text-sm font-medium text-slate-700">
+              <label htmlFor="article-title" className="text-sm font-medium text-[#bad2e3]">
                 {copy.titleLabel}
               </label>
               <Input
@@ -500,12 +500,12 @@ export function ThoughtEditor({
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder={copy.titlePlaceholder}
-                className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
+                className="h-11 rounded-2xl border-[#385870] bg-[#152d43] text-[#e4f0f9] placeholder:text-[#7f9eb5] focus-visible:ring-2 focus-visible:ring-[#5fd4f2]/35"
               />
             </div>
 
-            <div className="nook-surface-soft rounded-[18px] px-4 py-2.5 text-sm leading-6 text-slate-700">
-              <p className="font-semibold text-slate-900">{copy.draft}</p>
+            <div className="nook-surface-soft rounded-[18px] px-4 py-2.5 text-sm leading-6 text-[#a8bed0]">
+              <p className="font-semibold text-[#e3eef7]">{copy.draft}</p>
               <p className="mt-2">
                 {stats.paragraphs} {copy.blocks}
               </p>
@@ -517,14 +517,14 @@ export function ThoughtEditor({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="article-topic" className="text-sm font-medium text-slate-700">
+              <label htmlFor="article-topic" className="text-sm font-medium text-[#bad2e3]">
                 {copy.topicLabel}
               </label>
               <select
                 id="article-topic"
                 value={topic}
                 onChange={(event) => setTopic(event.target.value as ArticleTopic)}
-                className="h-11 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus-visible:border-sky-300 focus-visible:ring-2 focus-visible:ring-sky-200"
+                className="h-11 w-full rounded-2xl border border-[#385870] bg-[#152d43] px-4 text-sm text-[#e4f0f9] outline-none focus-visible:border-[#59d3f2] focus-visible:ring-2 focus-visible:ring-[#59d3f2]/30"
               >
                 {topics.map((item) => (
                   <option key={item} value={item}>
@@ -535,7 +535,7 @@ export function ThoughtEditor({
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="article-category" className="text-sm font-medium text-slate-700">
+              <label htmlFor="article-category" className="text-sm font-medium text-[#bad2e3]">
                 {copy.categoryLabel}
               </label>
               <Input
@@ -544,7 +544,7 @@ export function ThoughtEditor({
                 value={category}
                 onChange={(event) => setCategory(event.target.value)}
                 placeholder={copy.categoryPlaceholder}
-                className="h-11 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
+                className="h-11 rounded-2xl border-[#385870] bg-[#152d43] text-[#e4f0f9] placeholder:text-[#7f9eb5] focus-visible:ring-2 focus-visible:ring-[#59d3f2]/30"
               />
               <datalist id="article-category-list">
                 {availableCategories.map((item) => (
@@ -555,7 +555,7 @@ export function ThoughtEditor({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="article-summary" className="text-sm font-medium text-slate-700">
+            <label htmlFor="article-summary" className="text-sm font-medium text-[#bad2e3]">
               {copy.summaryLabel}
             </label>
             <Textarea
@@ -564,11 +564,11 @@ export function ThoughtEditor({
               onChange={(event) => setSummary(event.target.value)}
               placeholder={copy.summaryPlaceholder}
               rows={3}
-              className="min-h-12 rounded-2xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-sky-200"
+              className="min-h-12 rounded-2xl border-[#385870] bg-[#152d43] text-[#e4f0f9] placeholder:text-[#7f9eb5] focus-visible:ring-2 focus-visible:ring-[#59d3f2]/30"
             />
           </div>
 
-          <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white/95 p-2 backdrop-blur">
+          <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-[#35546d] bg-[#0f2133]/95 p-2 backdrop-blur">
             <EditorButton
               active={editor.isActive("bold")}
               onClick={() => editor.chain().focus().toggleBold().run()}
@@ -643,60 +643,60 @@ export function ThoughtEditor({
           <EditorContent editor={editor} />
 
           {showStandalonePreview ? (
-            <div className="rounded-[22px] border border-slate-300 bg-white p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+            <div className="rounded-[22px] border border-[#2f4d65] bg-[#102337] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8eacc0]">
                 {copy.previewTitle}
               </p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{copy.previewDescription}</p>
+              <p className="mt-2 text-sm leading-6 text-[#9eb6c8]">{copy.previewDescription}</p>
 
-              <div className="mt-4 rounded-[16px] border border-slate-300 bg-slate-50 px-4 py-4">
-                <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+              <div className="mt-4 rounded-[16px] border border-[#35566f] bg-[#132a3e] px-4 py-4">
+                <h3 className="text-xl font-semibold tracking-tight text-[#e4eff8]">
                   {title.trim() || copy.emptyTitle}
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-[#9eb6c8]">
                   {summary.trim() || copy.previewSummaryFallback}
                 </p>
               </div>
 
-              <div className="mt-4 rounded-[16px] border border-slate-300 bg-white p-4">
+              <div className="mt-4 rounded-[16px] border border-[#35566f] bg-[#11273a] p-4">
                 {hasPreviewContent ? (
                   <ArticleContent
                     html={previewHtml}
                     wikiLinks={wikiLinks}
-                    className="nook-editor-light max-w-none space-y-4 text-sm leading-7 text-slate-700"
+                    className="max-w-none space-y-4 text-sm leading-7 text-[#b9ccda]"
                   />
                 ) : (
-                  <p className="text-sm leading-7 text-slate-500">{copy.previewBodyFallback}</p>
+                  <p className="text-sm leading-7 text-[#96b0c3]">{copy.previewBodyFallback}</p>
                 )}
               </div>
             </div>
           ) : null}
         </>
       ) : (
-        <div className="rounded-[22px] border border-slate-300 bg-white p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+        <div className="rounded-[22px] border border-[#2f4d65] bg-[#102337] p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8eacc0]">
             {copy.previewMode}
           </p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{copy.previewDescription}</p>
+          <p className="mt-2 text-sm leading-6 text-[#9eb6c8]">{copy.previewDescription}</p>
 
-          <div className="mt-4 rounded-[16px] border border-slate-300 bg-slate-50 px-4 py-4">
-            <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+          <div className="mt-4 rounded-[16px] border border-[#35566f] bg-[#132a3e] px-4 py-4">
+            <h3 className="text-xl font-semibold tracking-tight text-[#e4eff8]">
               {title.trim() || copy.emptyTitle}
             </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-sm leading-6 text-[#9eb6c8]">
               {summary.trim() || copy.previewSummaryFallback}
             </p>
           </div>
 
-          <div className="mt-4 rounded-[16px] border border-slate-300 bg-white p-4">
+          <div className="mt-4 rounded-[16px] border border-[#35566f] bg-[#11273a] p-4">
             {hasPreviewContent ? (
               <ArticleContent
                 html={previewHtml}
                 wikiLinks={wikiLinks}
-                className="nook-editor-light max-w-none space-y-4 text-sm leading-7 text-slate-700"
+                className="max-w-none space-y-4 text-sm leading-7 text-[#b9ccda]"
               />
             ) : (
-              <p className="text-sm leading-7 text-slate-500">{copy.previewBodyFallback}</p>
+              <p className="text-sm leading-7 text-[#96b0c3]">{copy.previewBodyFallback}</p>
             )}
           </div>
         </div>
@@ -707,8 +707,8 @@ export function ThoughtEditor({
           className={cn(
             "rounded-[18px] border px-4 py-3 text-sm leading-6",
             feedback.tone === "success"
-              ? "border-emerald-200 bg-emerald-50/90 text-emerald-800"
-              : "border-rose-200 bg-rose-50/90 text-rose-700"
+              ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
+              : "border-rose-400/45 bg-rose-500/10 text-rose-200"
           )}
         >
           {feedback.text}
@@ -720,7 +720,7 @@ export function ThoughtEditor({
           <Button
             type="button"
             variant="outline"
-            className="rounded-2xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+            className="rounded-2xl border-[#3a5870] bg-[#152d43] text-[#d3e4f0] hover:bg-[#1a3550]"
             onClick={() => setIsPreviewMode((currentValue) => !currentValue)}
             disabled={isSaving || isDeleting || isUploadingImage}
           >
@@ -750,7 +750,7 @@ export function ThoughtEditor({
         <Button
           type="button"
           variant="outline"
-          className="rounded-2xl border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+          className="rounded-2xl border-[#3a5870] bg-[#152d43] text-[#d3e4f0] hover:bg-[#1a3550]"
           onClick={handleNewDraft}
           disabled={isSaving || isDeleting || isUploadingImage}
         >
@@ -761,7 +761,7 @@ export function ThoughtEditor({
           <Button
             type="button"
             variant="outline"
-            className="rounded-2xl border-rose-300 bg-white text-rose-700 hover:bg-rose-50"
+            className="rounded-2xl border-rose-400/45 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
             onClick={handleDelete}
             disabled={isSaving || isDeleting || isUploadingImage}
           >
@@ -780,7 +780,7 @@ export function ThoughtEditor({
         ) : null}
       </div>
 
-      <div className="nook-surface-soft rounded-[18px] p-4 text-sm leading-7 text-slate-600">
+      <div className="nook-surface-soft rounded-[18px] p-4 text-sm leading-7 text-[#9db5c7]">
         {copy.footer}
       </div>
     </div>

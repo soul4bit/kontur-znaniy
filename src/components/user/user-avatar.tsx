@@ -38,7 +38,7 @@ export function UserAvatar({
   return (
     <div
       className={cn(
-        "relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white",
+        "relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#36566f] bg-[#152c41]",
         className
       )}
     >
@@ -57,7 +57,7 @@ export function UserAvatar({
       ) : (
         <span
           className={cn(
-            "text-sm font-semibold uppercase tracking-[0.16em] text-[#3b82a4]",
+            "text-sm font-semibold uppercase tracking-[0.16em] text-[#9ad6ee]",
             fallbackClassName
           )}
         >

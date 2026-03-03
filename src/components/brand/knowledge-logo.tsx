@@ -20,7 +20,7 @@ export function KnowledgeLogo({
     <div className={cn("flex items-center gap-3", className)}>
       <div
         className={cn(
-          "flex h-12 w-16 items-center justify-center rounded-[14px] border border-slate-300 bg-slate-100 shadow-[0_8px_20px_rgba(15,23,42,0.08)]",
+          "flex h-12 w-16 items-center justify-center rounded-[14px] border border-[#37556e] bg-[#13293d] shadow-[0_10px_22px_rgba(2,8,16,0.34)]",
           markClassName
         )}
       >
@@ -36,13 +36,13 @@ export function KnowledgeLogo({
       <div>
         <p
           className={cn(
-            "text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-600",
+            "text-[11px] font-semibold uppercase tracking-[0.24em] text-[#c7e5f6]",
             titleClassName
           )}
         >
           Контур Знаний
         </p>
-        <p className={cn("text-sm text-slate-500/95", subtitleClassName)}>{subtitle}</p>
+        <p className={cn("text-sm text-[#96b4c8]", subtitleClassName)}>{subtitle}</p>
       </div>
     </div>
   );

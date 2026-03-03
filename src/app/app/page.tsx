@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   ArrowUpRight,
@@ -203,15 +203,15 @@ export default async function AppPage({ searchParams }: AppPageProps) {
     }));
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-900">
-      <header className="sticky top-0 z-30 border-b border-slate-200/90 bg-white/88 shadow-[0_1px_0_rgba(148,163,184,0.18)] backdrop-blur-lg">
+    <div className="min-h-screen bg-transparent text-slate-100">
+      <header className="sticky top-0 z-30 border-b border-[#2a4156] bg-[#0f1f30]/92 shadow-[0_1px_0_rgba(71,103,128,0.35)] backdrop-blur-lg">
         <div className="mx-auto flex max-w-[1700px] flex-wrap items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3 lg:px-8">
           <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
             <KnowledgeLogo
               subtitle="Командная база знаний"
-              titleClassName="text-slate-700"
-              subtitleClassName="text-slate-500"
-              markClassName="border-slate-300 bg-slate-100 shadow-none"
+              titleClassName="text-[#dce8f2]"
+              subtitleClassName="text-[#8ea9bd]"
+              markClassName="border-[#3a5469] bg-[#14293b] shadow-none"
             />
           </Link>
 
@@ -223,13 +223,13 @@ export default async function AppPage({ searchParams }: AppPageProps) {
             <input type="hidden" name="topic" value={selectedTopic} />
             <input type="hidden" name="category" value={selectedCategory} />
             <div className="relative w-full">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#88a7bc]" />
               <input
                 type="search"
                 name="q"
                 defaultValue={searchQuery}
                 placeholder={copy.searchPlaceholder}
-                className="h-10 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 sm:h-11"
+                className="h-10 w-full rounded-xl border border-[#35526a] bg-[#12283a] pl-9 pr-3 text-sm text-[#d5e6f3] placeholder:text-[#7f9db4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/45 sm:h-11"
               />
             </div>
             <button
@@ -241,7 +241,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
             {hasSearchQuery ? (
               <Link
                 href={buildAppHref(selectedTopic, { category: selectedCategory })}
-                className="hidden text-sm font-semibold text-sky-700 hover:underline md:inline"
+                className="hidden text-sm font-semibold text-[#8ed9f5] hover:text-[#b8edff] hover:underline md:inline"
               >
                 {copy.clearSearch}
               </Link>
@@ -269,7 +269,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 asChild
                 size="sm"
                 variant="outline"
-                className="hidden h-9 rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-100 md:inline-flex"
+                className="hidden h-9 rounded-lg border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247] md:inline-flex"
               >
                 <Link href="/app/admin">
                   <ShieldCheck className="size-4" />
@@ -278,7 +278,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
               </Button>
             ) : null}
 
-            <SignOutButton className="h-9 rounded-lg border-slate-300 bg-white px-2.5 text-slate-700 hover:bg-slate-100 sm:px-3" />
+            <SignOutButton className="h-9 rounded-lg border-[#3a556c] bg-[#152a3d] px-2.5 text-[#c9dcea] hover:bg-[#1a3247] sm:px-3" />
 
             <Link
               href="/app/account"
@@ -288,8 +288,8 @@ export default async function AppPage({ searchParams }: AppPageProps) {
               <UserAvatar
                 image={session.user.image}
                 name={displayName}
-                className="size-9 rounded-lg border border-slate-300 bg-slate-100"
-                fallbackClassName="text-sky-700"
+                className="size-9 rounded-lg border border-[#3a556c] bg-[#152a3d]"
+                fallbackClassName="text-[#8fd4f0]"
               />
             </Link>
           </div>
@@ -300,16 +300,16 @@ export default async function AppPage({ searchParams }: AppPageProps) {
         <aside className="order-2 space-y-3 sm:space-y-4 lg:order-1">
           <section className="nook-surface rounded-2xl p-4">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8ea9bd]">
                 {copy.sections}
               </p>
-              <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">
+              <span className="rounded-full bg-[#182e41] px-2 py-1 text-xs text-[#a9c0d1]">
                 {hasSearchQuery ? `${visibleArticlesCount}/${totalArticles}` : totalArticles} {" "}
                 {copy.articlesSuffix}
               </span>
             </div>
             {hasSearchQuery ? (
-              <div className="rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-800">
+              <div className="rounded-xl border border-[#3b6f8f] bg-[#142d41] px-3 py-2 text-xs text-[#9ccbe3]">
                 {copy.searchResult}: {visibleArticlesCount}
               </div>
             ) : null}
@@ -330,7 +330,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                   className={`nook-surface rounded-2xl transition-[border-color,box-shadow] ${
                     isActive
                       ? "border-sky-300/90"
-                      : "border-slate-200 hover:border-slate-300 hover:shadow-[0_12px_26px_rgba(15,23,42,0.07)]"
+                      : "border-[#2f4a61] hover:border-[#3f637f] hover:shadow-[0_12px_26px_rgba(2,8,16,0.35)]"
                   }`}
                 >
                   <Link
@@ -341,22 +341,22 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                   >
                     <div
                       className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl ${
-                        isActive ? "bg-sky-100 text-sky-800" : "bg-slate-100 text-slate-500"
+                        isActive ? "bg-[#163c58] text-[#8fd3ee]" : "bg-[#182c3d] text-[#99b1c2]"
                       }`}
                     >
                       <Icon className="size-4" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h2 className="text-sm font-semibold text-slate-900">{topic.name}</h2>
-                        <span className="text-xs text-slate-500">{nestedArticles.length}</span>
+                        <h2 className="text-sm font-semibold text-[#e4eef6]">{topic.name}</h2>
+                        <span className="text-xs text-[#8ea9bd]">{nestedArticles.length}</span>
                       </div>
-                      <p className="mt-1 text-xs leading-5 text-slate-600">{topic.summary}</p>
+                      <p className="mt-1 text-xs leading-5 text-[#9cb2c3]">{topic.summary}</p>
                     </div>
                   </Link>
 
                   {isActive ? (
-                    <div className="border-t border-slate-200/90 px-3 py-3">
+                    <div className="border-t border-[#2d455a] px-3 py-3">
                       {nestedCategories.length > 0 ? (
                         <div className="space-y-4">
                           {nestedCategories.map((categoryName) => {
@@ -374,8 +374,8 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                   })}
                                   className={`flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
                                     isCategoryActive
-                                      ? "border-sky-200 bg-sky-50 text-sky-800"
-                                      : "border-transparent bg-slate-100 text-slate-600 hover:border-slate-200 hover:bg-slate-50"
+                                      ? "border-[#57c3e7] bg-[#173550] text-[#d8effb]"
+                                      : "border-transparent bg-[#182d3f] text-[#a2b9ca] hover:border-[#3d5d78] hover:bg-[#1b3247]"
                                   }`}
                                 >
                                   <span>{categoryName}</span>
@@ -397,27 +397,27 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                           })}
                                           className={`block rounded-xl border px-3 py-3 transition-all ${
                                             isSelected
-                                              ? "border-sky-300 bg-sky-50 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.32)]"
-                                              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                                              ? "border-[#62cdef] bg-[#16354f] shadow-[inset_0_0_0_1px_rgba(125,211,252,0.28)]"
+                                              : "border-[#2f4a61] bg-[#102031] hover:border-[#3e637f] hover:bg-[#172c40]"
                                           }`}
                                         >
                                           <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0">
-                                              <p className="truncate text-sm font-semibold text-slate-900">
+                                              <p className="truncate text-sm font-semibold text-[#e4eef6]">
                                                 {article.title}
                                               </p>
-                                              <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600">
+                                              <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#9cb2c3]">
                                                 {article.summary}
                                               </p>
                                             </div>
-                                            <ArrowUpRight className="mt-0.5 size-3.5 shrink-0 text-slate-400" />
+                                            <ArrowUpRight className="mt-0.5 size-3.5 shrink-0 text-[#88a7bc]" />
                                           </div>
                                         </Link>
                                       );
                                     })}
                                   </div>
                                 ) : (
-                                  <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-500">
+                                  <div className="rounded-xl border border-dashed border-[#3a566f] bg-[#13283a] px-3 py-3 text-xs leading-5 text-[#97b0c2]">
                                     В этой категории пока нет статей.
                                   </div>
                                 )}
@@ -426,7 +426,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                           })}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-500">
+                        <div className="rounded-xl border border-dashed border-[#3a566f] bg-[#13283a] px-3 py-3 text-xs leading-5 text-[#97b0c2]">
                           {copy.noArticlesInSection}
                         </div>
                       )}
