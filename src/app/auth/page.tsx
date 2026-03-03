@@ -1,13 +1,11 @@
 import { redirect } from "next/navigation";
 import {
-  Cloud,
-  Database,
-  GitBranch,
-  Layers3,
-  Rocket,
-  Server,
+  CheckCircle2,
+  Clock3,
+  KeyRound,
+  Mail,
   ShieldCheck,
-  TerminalSquare,
+  UserPlus,
 } from "lucide-react";
 import { AuthForms } from "@/components/auth/auth-forms";
 import { KnowledgeLogo } from "@/components/brand/knowledge-logo";
@@ -44,8 +42,18 @@ export default async function AuthPage() {
               <div className="nook-devops-orbit nook-devops-orbit-a" />
               <div className="nook-devops-orbit nook-devops-orbit-b" />
 
+              <div className="nook-registration-card nook-auth-reveal-2">
+                <div className="nook-registration-card-title-row">
+                  <UserPlus className="size-3.5 text-cyan-300" />
+                  <span className="nook-registration-card-title">registration form</span>
+                </div>
+                <span className="nook-registration-card-line" />
+                <span className="nook-registration-card-line" />
+                <span className="nook-registration-card-line nook-registration-card-line-short" />
+              </div>
+
               <div className="nook-devops-core nook-auth-reveal-2">
-                <TerminalSquare className="size-7 text-sky-300" />
+                <CheckCircle2 className="size-7 text-sky-300" />
               </div>
 
               <svg
@@ -68,59 +76,59 @@ export default async function AuthPage() {
 
               <div className="nook-devops-pipeline">
                 <div className="nook-devops-node nook-devops-node-1">
-                  <GitBranch className="size-5" />
+                  <UserPlus className="size-5" />
                 </div>
                 <div className="nook-devops-node nook-devops-node-2">
-                  <TerminalSquare className="size-5" />
+                  <Clock3 className="size-5" />
                 </div>
                 <div className="nook-devops-node nook-devops-node-3">
                   <ShieldCheck className="size-5" />
                 </div>
                 <div className="nook-devops-node nook-devops-node-4">
-                  <Database className="size-5" />
+                  <Mail className="size-5" />
                 </div>
                 <div className="nook-devops-node nook-devops-node-5">
-                  <Rocket className="size-5" />
+                  <KeyRound className="size-5" />
                 </div>
               </div>
 
               <div className="nook-devops-steps nook-auth-reveal-2">
-                <span className="nook-devops-step nook-devops-step-1">commit</span>
-                <span className="nook-devops-step nook-devops-step-2">build</span>
-                <span className="nook-devops-step nook-devops-step-3">scan</span>
-                <span className="nook-devops-step nook-devops-step-4">deploy</span>
-                <span className="nook-devops-step nook-devops-step-5">release</span>
+                <span className="nook-devops-step nook-devops-step-1">request</span>
+                <span className="nook-devops-step nook-devops-step-2">review</span>
+                <span className="nook-devops-step nook-devops-step-3">approval</span>
+                <span className="nook-devops-step nook-devops-step-4">verify</span>
+                <span className="nook-devops-step nook-devops-step-5">access</span>
               </div>
 
               <div className="nook-devops-log nook-auth-reveal-3">
-                <p className="nook-devops-log-line nook-devops-log-line-1">git push origin main</p>
-                <p className="nook-devops-log-line nook-devops-log-line-2">build passed • 87s</p>
-                <p className="nook-devops-log-line nook-devops-log-line-3">security scan clean</p>
-                <p className="nook-devops-log-line nook-devops-log-line-4">deploy production done</p>
+                <p className="nook-devops-log-line nook-devops-log-line-1">registration form submitted</p>
+                <p className="nook-devops-log-line nook-devops-log-line-2">waiting for admin review</p>
+                <p className="nook-devops-log-line nook-devops-log-line-3">verification email dispatched</p>
+                <p className="nook-devops-log-line nook-devops-log-line-4">account access unlocked</p>
               </div>
 
               <div className="nook-devops-status-strip nook-auth-reveal-3">
                 <div className="nook-devops-status-chip">
                   <span className="nook-devops-status-dot" />
-                  CI green
+                  FORM SUBMITTED
                 </div>
                 <div className="nook-devops-status-chip nook-devops-status-chip-alt">
-                  <Layers3 className="size-3.5 text-cyan-300" />
-                  CD live
+                  <CheckCircle2 className="size-3.5 text-cyan-300" />
+                  AWAITING VERIFICATION
                 </div>
               </div>
 
               <div className="nook-devops-float nook-devops-float-left nook-auth-reveal-3">
-                <Cloud className="size-5 text-cyan-300" />
+                <UserPlus className="size-5 text-cyan-300" />
               </div>
               <div className="nook-devops-float nook-devops-float-right nook-auth-reveal-4">
-                <Server className="size-5 text-emerald-300" />
+                <Mail className="size-5 text-emerald-300" />
               </div>
               <div className="nook-devops-float nook-devops-float-bottom nook-auth-reveal-2">
                 <ShieldCheck className="size-5 text-amber-300" />
               </div>
               <div className="nook-devops-float nook-devops-float-top nook-auth-reveal-4">
-                <Layers3 className="size-5 text-cyan-300" />
+                <KeyRound className="size-5 text-cyan-300" />
               </div>
             </article>
           </div>

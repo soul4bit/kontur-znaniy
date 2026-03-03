@@ -537,11 +537,12 @@
   width: min(100%, 46rem);
   min-height: 26rem;
   border-radius: 1.65rem;
-  border: 1px solid rgba(82, 124, 156, 0.72);
+  border: 1px solid rgba(91, 139, 173, 0.72);
   background:
     radial-gradient(circle at 17% 18%, rgba(56, 189, 248, 0.22), transparent 44%),
+    radial-gradient(circle at 48% 75%, rgba(16, 185, 129, 0.16), transparent 46%),
     radial-gradient(circle at 88% 84%, rgba(45, 212, 191, 0.2), transparent 46%),
-    linear-gradient(145deg, #0a1628 0%, #0d2238 54%, #0d2e35 100%);
+    linear-gradient(145deg, #091427 0%, #0d2238 54%, #0d3038 100%);
   box-shadow:
     0 24px 56px rgba(2, 8, 16, 0.5),
     inset 0 1px 0 rgba(148, 163, 184, 0.28);
@@ -630,6 +631,51 @@
   animation: nook-devops-orbit-spin 9s linear infinite reverse;
 }
 
+.nook-registration-card {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  z-index: 3;
+  display: flex;
+  width: min(13.2rem, 40%);
+  transform: translate(-50%, -50%);
+  flex-direction: column;
+  gap: 0.42rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(125, 211, 252, 0.42);
+  background: rgba(7, 26, 42, 0.8);
+  box-shadow:
+    0 12px 26px rgba(2, 8, 16, 0.5),
+    inset 0 1px 0 rgba(186, 230, 253, 0.14);
+  padding: 0.55rem 0.62rem;
+}
+
+.nook-registration-card-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+}
+
+.nook-registration-card-title {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #a5d8ef;
+}
+
+.nook-registration-card-line {
+  display: block;
+  height: 0.34rem;
+  width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(125, 211, 252, 0.56), rgba(45, 212, 191, 0.28));
+}
+
+.nook-registration-card-line-short {
+  width: 72%;
+}
+
 .nook-devops-core {
   position: absolute;
   left: 50%;
@@ -642,11 +688,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 1.15rem;
-  border: 1px solid rgba(125, 211, 252, 0.5);
-  background: rgba(13, 29, 47, 0.7);
+  border: 1px solid rgba(253, 224, 71, 0.44);
+  background: rgba(34, 35, 16, 0.52);
   box-shadow:
     0 12px 24px rgba(8, 19, 32, 0.6),
-    inset 0 1px 0 rgba(186, 230, 253, 0.28);
+    inset 0 1px 0 rgba(254, 240, 138, 0.2);
 }
 
 .nook-devops-route {
@@ -743,26 +789,41 @@
 .nook-devops-node-1 {
   left: 6%;
   animation-delay: 0.2s;
+  border-color: rgba(56, 189, 248, 0.62);
+  background: rgba(6, 32, 52, 0.9);
+  color: #8bd8f8;
 }
 
 .nook-devops-node-2 {
   left: 28%;
   animation-delay: 0.8s;
+  border-color: rgba(251, 191, 36, 0.56);
+  background: rgba(54, 34, 12, 0.88);
+  color: #fde68a;
 }
 
 .nook-devops-node-3 {
   left: 50%;
   animation-delay: 1.4s;
+  border-color: rgba(74, 222, 128, 0.56);
+  background: rgba(12, 42, 26, 0.84);
+  color: #86efac;
 }
 
 .nook-devops-node-4 {
   left: 72%;
   animation-delay: 2s;
+  border-color: rgba(125, 211, 252, 0.62);
+  background: rgba(9, 33, 57, 0.9);
+  color: #bae6fd;
 }
 
 .nook-devops-node-5 {
   left: 94%;
   animation-delay: 2.6s;
+  border-color: rgba(45, 212, 191, 0.58);
+  background: rgba(7, 42, 36, 0.86);
+  color: #99f6e4;
 }
 
 .nook-devops-steps {
@@ -795,26 +856,36 @@
 .nook-devops-step-1 {
   left: 6%;
   animation-delay: 0.2s;
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #9ed9f6;
 }
 
 .nook-devops-step-2 {
   left: 28%;
   animation-delay: 0.8s;
+  border-color: rgba(251, 191, 36, 0.46);
+  color: #f9dfa2;
 }
 
 .nook-devops-step-3 {
   left: 50%;
   animation-delay: 1.4s;
+  border-color: rgba(74, 222, 128, 0.44);
+  color: #a4e6bc;
 }
 
 .nook-devops-step-4 {
   left: 72%;
   animation-delay: 2s;
+  border-color: rgba(56, 189, 248, 0.46);
+  color: #b8def6;
 }
 
 .nook-devops-step-5 {
   left: 94%;
   animation-delay: 2.6s;
+  border-color: rgba(45, 212, 191, 0.48);
+  color: #b5f2e9;
 }
 
 .nook-devops-log {
@@ -829,7 +900,18 @@
   box-shadow:
     0 10px 24px rgba(2, 8, 16, 0.46),
     inset 0 1px 0 rgba(186, 230, 253, 0.14);
-  padding: 0.5rem 0.65rem;
+  padding: 0.65rem 0.7rem 0.56rem;
+}
+
+.nook-devops-log::before {
+  content: "registration events";
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #79bbdb;
 }
 
 .nook-devops-log-line {
@@ -883,7 +965,7 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #cfe8ff;
+  color: #d2ebfc;
 }
 
 .nook-devops-status-dot {
@@ -896,6 +978,8 @@
 }
 
 .nook-devops-status-chip-alt {
+  border-color: rgba(110, 231, 183, 0.38);
+  background: rgba(11, 44, 38, 0.68);
   color: #bbf7d0;
 }
 
