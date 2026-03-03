@@ -31,7 +31,7 @@ export function ResetForm({
   return (
     <div className="space-y-5">
       <div className="nook-panel-soft rounded-xl p-4 text-sm leading-6 text-muted-foreground">
-        Введите email аккаунта. Если адрес найден, пришлем ссылку и вернем вас к жизни без паники.
+        Введите email аккаунта. Если адрес есть в системе, мы отправим ссылку для сброса пароля.
       </div>
 
       <form className="space-y-4" onSubmit={onSubmit}>
@@ -50,7 +50,7 @@ export function ResetForm({
 
         <Button type="submit" className="h-11 w-full" disabled={isPending}>
           <Mail className="size-4" />
-          {isPending ? "Отправляем письмо..." : "Вернуть доступ"}
+          {isPending ? "Отправляем письмо..." : "Отправить ссылку"}
         </Button>
       </form>
 

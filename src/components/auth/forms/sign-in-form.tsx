@@ -58,7 +58,7 @@ export function SignInForm({
               className="text-xs font-semibold text-primary hover:text-primary/80"
               onClick={onForgotPassword}
             >
-              Я забыл пароль
+              Забыли пароль?
             </button>
           </div>
 
@@ -74,25 +74,25 @@ export function SignInForm({
         </div>
 
         <Button type="submit" className="h-11 w-full" disabled={isPending}>
-          {isPending ? "Проверяем доступ..." : "Войти и навести порядок"}
+          {isPending ? "Проверяем доступ..." : "Войти"}
           <ArrowRight className="size-4" />
         </Button>
       </form>
 
       <div className="nook-panel-soft rounded-xl p-4">
-        <p className="text-sm font-medium text-foreground">Первый раз здесь?</p>
+        <p className="text-sm font-medium text-foreground">Нет аккаунта?</p>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          Отправьте заявку и получите доступ после одобрения. Вики любит порядок и админов.
+          Отправьте заявку на доступ. После одобрения подтвердите email и войдите.
         </p>
         <Button type="button" variant="outline" className="mt-3 w-full" onClick={onOpenSignUp}>
           <UserPlus className="size-4" />
-          Запросить доступ
+          Перейти к регистрации
         </Button>
       </div>
 
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <KeyRound className="size-3.5" />
-        Внутри: anti-bot, rate limit и журнал попыток. Да, мы серьезные.
+        Защита формы: anti-bot, rate limit и журнал попыток.
       </div>
     </div>
   );

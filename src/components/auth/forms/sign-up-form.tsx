@@ -75,10 +75,10 @@ export function SignUpForm({
 
         <TextField
           id="signup-name"
-          label="Как вас звать"
+          label="Имя"
           value={name}
           onChange={(event) => onNameChange(getFieldValue(event))}
-          placeholder="Например: Дежурный по продакшену"
+          placeholder="Как к вам обращаться"
           autoComplete="name"
           required
         />
@@ -117,7 +117,7 @@ export function SignUpForm({
 
         <div className="nook-panel-soft rounded-xl p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">
-            Мини-чеклист пароля
+            Требования к паролю
           </p>
           <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
             {passwordChecks.map((check) => (
@@ -135,7 +135,7 @@ export function SignUpForm({
 
         <Button type="submit" className="h-11 w-full" disabled={isPending}>
           <UserPlus className="size-4" />
-          {isPending ? "Отправляем заявку..." : "Вступить в клуб адекватных заметок"}
+          {isPending ? "Отправляем заявку..." : "Отправить заявку"}
         </Button>
       </form>
 

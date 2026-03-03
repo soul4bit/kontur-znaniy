@@ -139,7 +139,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
         <header className="nook-shell sticky top-3 z-30 rounded-3xl p-3 sm:p-4">
           <div className="flex flex-wrap items-center gap-3">
             <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
-              <KnowledgeLogo subtitle="командная база знаний без занудства" />
+              <KnowledgeLogo subtitle="командная база «Контур Знаний»" />
             </Link>
 
             <form

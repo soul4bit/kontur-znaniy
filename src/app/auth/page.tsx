@@ -33,7 +33,7 @@ export default async function AuthPage() {
     <div className="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
       <main className="mx-auto grid w-full max-w-[1240px] gap-5 lg:grid-cols-[1fr_minmax(430px,0.95fr)]">
         <section className="nook-shell rounded-3xl p-6 sm:p-8">
-          <KnowledgeLogo subtitle="DevOps-вики, но с характером" />
+          <KnowledgeLogo subtitle="Контур Знаний для DevOps-команды" />
 
           <div className="mt-8 space-y-4">
             <span className="nook-kicker">не скучная документация</span>
@@ -43,8 +43,8 @@ export default async function AuthPage() {
               Сделай вики, в которую хочется заходить.
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-              Nook хранит DevOps-практики в нормальной структуре: статьи, wiki-ссылки, поиск и история
-              решений. Меньше хаоса, больше времени на реальную работу.
+              Контур Знаний хранит DevOps-практики в нормальной структуре: статьи, wiki-ссылки, поиск и
+              история решений. Меньше хаоса, больше времени на реальную работу.
             </p>
           </div>
 

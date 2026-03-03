@@ -9,13 +9,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border-2 border-border bg-primary text-primary-foreground shadow-[4px_4px_0_var(--border)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_var(--border)]",
+          "border border-border bg-primary text-primary-foreground shadow-[0_6px_14px_rgba(36,28,48,0.18)] hover:brightness-105",
         destructive:
-          "border-2 border-border bg-destructive text-white shadow-[4px_4px_0_var(--border)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_var(--border)] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "border border-border bg-destructive text-white shadow-[0_6px_14px_rgba(36,28,48,0.18)] hover:brightness-105 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border-2 border-border bg-card text-card-foreground hover:bg-accent",
+          "border border-border bg-card text-card-foreground hover:bg-accent",
         secondary:
-          "border-2 border-border bg-secondary text-secondary-foreground shadow-[4px_4px_0_var(--border)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_var(--border)]",
+          "border border-border bg-secondary text-secondary-foreground shadow-[0_6px_14px_rgba(36,28,48,0.15)] hover:brightness-105",
         ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },

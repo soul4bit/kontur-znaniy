@@ -48,38 +48,38 @@
 
 :root {
   --radius: 0.92rem;
-  --background: #fff7ea;
-  --foreground: #161318;
-  --card: #fffdf7;
-  --card-foreground: #161318;
-  --popover: #fffdf7;
-  --popover-foreground: #161318;
-  --primary: #00a9ff;
+  --background: #f8f4ee;
+  --foreground: #211c28;
+  --card: #fffdf9;
+  --card-foreground: #211c28;
+  --popover: #fffdf9;
+  --popover-foreground: #211c28;
+  --primary: #2ca6d6;
   --primary-foreground: #03131c;
-  --secondary: #ffe7b8;
-  --secondary-foreground: #161318;
-  --muted: #fff1d7;
-  --muted-foreground: #5f5867;
-  --accent: #ffc34d;
-  --accent-foreground: #161318;
+  --secondary: #f5e4be;
+  --secondary-foreground: #211c28;
+  --muted: #f4ebdb;
+  --muted-foreground: #645d72;
+  --accent: #f3be64;
+  --accent-foreground: #211c28;
   --destructive: #e5485d;
-  --border: #1f1a24;
-  --input: #1f1a24;
-  --ring: #00a9ff;
+  --border: #3a3244;
+  --input: #3a3244;
+  --ring: #2ca6d6;
   --success: #17b26a;
-  --chart-1: #00a9ff;
+  --chart-1: #2ca6d6;
   --chart-2: #17b26a;
   --chart-3: #ff8a4c;
   --chart-4: #ffe162;
   --chart-5: #f0709c;
-  --sidebar: #fff7ea;
-  --sidebar-foreground: #161318;
-  --sidebar-primary: #00a9ff;
+  --sidebar: #f8f4ee;
+  --sidebar-foreground: #211c28;
+  --sidebar-primary: #2ca6d6;
   --sidebar-primary-foreground: #03131c;
-  --sidebar-accent: #ffe7b8;
-  --sidebar-accent-foreground: #161318;
-  --sidebar-border: #1f1a24;
-  --sidebar-ring: #00a9ff;
+  --sidebar-accent: #f5e4be;
+  --sidebar-accent-foreground: #211c28;
+  --sidebar-border: #3a3244;
+  --sidebar-ring: #2ca6d6;
 }
 
 .dark {
@@ -130,10 +130,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(circle at 10% 8%, rgba(0, 169, 255, 0.18), transparent 36%),
-      radial-gradient(circle at 88% 16%, rgba(255, 138, 76, 0.22), transparent 32%),
-      radial-gradient(circle at 18% 86%, rgba(23, 178, 106, 0.16), transparent 30%),
-      linear-gradient(180deg, #fff7ea 0%, #fff2d9 54%, #ffefd1 100%);
+      radial-gradient(circle at 10% 8%, rgba(44, 166, 214, 0.14), transparent 40%),
+      radial-gradient(circle at 88% 16%, rgba(243, 190, 100, 0.17), transparent 36%),
+      radial-gradient(circle at 18% 86%, rgba(23, 178, 106, 0.1), transparent 34%),
+      linear-gradient(180deg, #f8f4ee 0%, #f7f1e5 54%, #f6efe0 100%);
   }
 
   body::before {
@@ -144,7 +144,7 @@
     background-image:
       radial-gradient(rgba(22, 19, 24, 0.11) 0.75px, transparent 0.75px);
     background-size: 18px 18px;
-    opacity: 0.4;
+    opacity: 0.16;
     z-index: -1;
   }
 
@@ -155,21 +155,21 @@
 }
 
 .nook-shell {
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: calc(var(--radius) + 8px);
   background: var(--card);
-  box-shadow: 8px 8px 0 #1f1a24;
+  box-shadow: 0 16px 36px rgba(36, 28, 48, 0.18);
 }
 
 .nook-panel {
-  border: 2px solid var(--border);
+  border: 1px solid color-mix(in oklab, var(--border) 88%, white 12%);
   border-radius: calc(var(--radius) + 4px);
   background: color-mix(in oklab, var(--card) 92%, #fff5e0 8%);
-  box-shadow: 4px 4px 0 #1f1a24;
+  box-shadow: 0 8px 22px rgba(36, 28, 48, 0.14);
 }
 
 .nook-panel-soft {
-  border: 2px solid var(--border);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, white 20%);
   border-radius: var(--radius);
   background: color-mix(in oklab, var(--muted) 86%, white 14%);
 }
@@ -179,7 +179,7 @@
   align-items: center;
   gap: 0.4rem;
   border-radius: 999px;
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   background: #ffe162;
   padding: 0.28rem 0.72rem;
   font-size: 0.68rem;
@@ -193,7 +193,7 @@
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   background: #fff;
   padding: 0.22rem 0.62rem;
   font-size: 0.72rem;

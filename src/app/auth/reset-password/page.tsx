@@ -16,10 +16,10 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
     <div className="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
       <main className="mx-auto grid w-full max-w-[1240px] gap-5 lg:grid-cols-[1fr_minmax(430px,0.95fr)]">
         <section className="nook-shell rounded-3xl p-6 sm:p-8">
-          <KnowledgeLogo subtitle="вернем доступ без нервов" />
+          <KnowledgeLogo subtitle="Контур Знаний: восстановление доступа" />
 
           <div className="mt-8 space-y-4">
-            <span className="nook-kicker">recovery mode</span>
+            <span className="nook-kicker">восстановление доступа</span>
             <h1 className="max-w-xl text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
               Обновите пароль и снова в бой
             </h1>

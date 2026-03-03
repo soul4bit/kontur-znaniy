@@ -26,20 +26,20 @@ import {
 const modeMeta = {
   "sign-in": {
     badge: "пуск в боевой режим",
-    title: "Залетай в базу знаний",
-    description: "Email + пароль и погнали чинить прод осознанно.",
+    title: "Вход в Контур Знаний",
+    description: "Email и пароль. Без лишних шагов.",
     label: "Вход",
   },
   "sign-up": {
     badge: "новичок в отряде",
     title: "Запросить доступ",
-    description: "Регистрация идет через модерацию, чтобы в вики не было хаоса.",
+    description: "Регистрация проходит через модерацию, чтобы сохранить порядок в базе.",
     label: "Регистрация",
   },
   reset: {
     badge: "операция: вернуть доступ",
     title: "Сбросить пароль",
-    description: "Пришлем ссылку и вернем тебя обратно в строй.",
+    description: "Отправим ссылку на почту для безопасного восстановления доступа.",
     label: "Сброс",
   },
 } as const;
@@ -433,7 +433,7 @@ export function AuthForms() {
 
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <ShieldCheck className="size-3.5 text-primary" />
-        У нас строгий фейс-контроль: заявки проходят через Telegram-модерацию.
+        Заявки на регистрацию проходят через Telegram-модерацию.
       </div>
     </div>
   );
