@@ -9,14 +9,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border border-[#136d99] bg-primary text-primary-foreground shadow-[0_8px_18px_rgba(15,122,175,0.24)] hover:bg-[#0d688f]",
+          "border border-[#38c7eb] bg-[#1aa9cf] text-[#052235] shadow-[0_10px_22px_rgba(26,169,207,0.34)] hover:bg-[#1698bb]",
         destructive:
-          "border border-rose-300 bg-destructive text-white shadow-[0_8px_18px_rgba(220,77,104,0.25)] hover:bg-[#c83a55] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "border border-rose-400 bg-destructive text-white shadow-[0_8px_18px_rgba(220,77,104,0.28)] hover:bg-[#c83a55] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border border-slate-300 bg-white text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:bg-slate-50",
+          "border border-[#345a78] bg-[#0f253c] text-[#c9dff0] shadow-[inset_0_1px_0_rgba(186,230,253,0.12)] hover:bg-[#13304b]",
         secondary:
-          "border border-slate-200 bg-secondary text-secondary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] hover:bg-slate-100",
-        ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+          "border border-[#2f5674] bg-[#112a42] text-[#d6e8f6] shadow-[inset_0_1px_0_rgba(186,230,253,0.1)] hover:bg-[#16344f]",
+        ghost: "text-[#b8d2e8] hover:bg-[#143049] hover:text-[#e2f2ff]",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

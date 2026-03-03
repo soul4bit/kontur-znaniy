@@ -20,7 +20,7 @@ export default async function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen px-3 py-4 text-slate-900 sm:px-6 lg:px-8">
+    <div className="min-h-screen px-3 py-4 text-slate-100 sm:px-6 lg:px-8">
       <main className="mx-auto grid w-full max-w-[1480px] gap-4 lg:grid-cols-[1.1fr_minmax(440px,0.9fr)]">
         <section className="nook-shell relative overflow-hidden rounded-[32px] p-6 lg:p-9 xl:p-10">
           <div className="nook-auth-glow nook-auth-glow-primary" />
@@ -29,7 +29,9 @@ export default async function AuthPage() {
           <KnowledgeLogo
             subtitle="Приватная база знаний команды"
             className="relative z-10"
-            markClassName="border-slate-200 bg-white"
+            markClassName="border-[#3a6585] bg-[#102942]"
+            titleClassName="text-[#a6d8ee]"
+            subtitleClassName="text-[#7db0cc]"
           />
 
           <div className="relative z-10 mt-8 flex min-h-[540px] items-center justify-center lg:mt-4">
