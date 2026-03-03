@@ -256,10 +256,10 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
               Администрирование
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
+            <h1 className="mt-3 text-[clamp(1.9rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-slate-900">
               Управление доступом и пользователями
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+            <p className="mt-3 max-w-4xl text-[15px] leading-7 text-slate-600">
               Здесь можно модерировать заявки на регистрацию, управлять ролями, блокировками,
               активными сессиями и удалением аккаунтов.
             </p>
@@ -283,7 +283,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
           </div>
         ) : null}
 
-        <section className="mt-6 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <section className="mt-6 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs text-slate-700">
             <Clock3 className="size-3.5 text-sky-700" />
             Заявок в очереди: {pendingRequests.length}
@@ -306,13 +306,17 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{request.name}</h2>
+                      <h2 className="text-[1.05rem] font-semibold leading-snug text-slate-900">
+                        {request.name}
+                      </h2>
                       <p className="mt-1 inline-flex items-center gap-2 text-sm text-slate-700">
                         <Mail className="size-4 text-sky-700" />
                         {request.email}
                       </p>
                     </div>
-                    <p className="text-xs text-slate-500">{formatDateTime(request.requestedAt)}</p>
+                    <p className="text-xs tabular-nums text-slate-500">
+                      {formatDateTime(request.requestedAt)}
+                    </p>
                   </div>
 
                   <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
@@ -356,7 +360,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
           )}
         </section>
 
-        <section className="mt-6 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <section className="mt-6 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs text-slate-700">
             <UserCog className="size-3.5 text-sky-700" />
             Пользователей: {total}
@@ -381,7 +385,9 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         fallbackClassName="text-sky-700"
                       />
                       <div>
-                        <p className="text-lg font-semibold text-slate-900">{user.name}</p>
+                        <p className="text-[1.05rem] font-semibold leading-snug text-slate-900">
+                          {user.name}
+                        </p>
                         <p className="text-sm text-slate-600">{user.email}</p>
                         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                           <span className="rounded-full border border-slate-300 bg-white px-2.5 py-1 text-slate-700">
@@ -418,19 +424,21 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                   <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
                     <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
                       <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Создан</p>
-                      <p className="mt-1 text-slate-700">{formatDateTime(user.createdAt)}</p>
+                      <p className="mt-1 tabular-nums text-slate-700">{formatDateTime(user.createdAt)}</p>
                     </div>
                     <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
                       <p className="text-xs uppercase tracking-[0.12em] text-slate-500">
                         Последний актив
                       </p>
-                      <p className="mt-1 text-slate-700">{formatDateTime(user.lastActiveAt)}</p>
+                      <p className="mt-1 tabular-nums text-slate-700">
+                        {formatDateTime(user.lastActiveAt)}
+                      </p>
                     </div>
                     <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
                       <p className="text-xs uppercase tracking-[0.12em] text-slate-500">
                         Активных сессий
                       </p>
-                      <p className="mt-1 text-slate-700">{user.activeSessions}</p>
+                      <p className="mt-1 tabular-nums text-slate-700">{user.activeSessions}</p>
                     </div>
                     <div className="rounded-xl border border-slate-300 bg-white px-3 py-2">
                       <p className="text-xs uppercase tracking-[0.12em] text-slate-500">ID</p>
