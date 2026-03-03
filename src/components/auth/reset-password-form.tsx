@@ -175,15 +175,15 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
   return (
     <div className="w-full rounded-[32px] border border-[#2f5774] bg-[#0d2237]/95 p-5 shadow-[0_18px_44px_rgba(3,9,18,0.45)] backdrop-blur sm:p-6 lg:h-full lg:overflow-y-auto nook-scroll">
       <div className="space-y-4 border-b border-[#2f5774] pb-6">
-        <div className="rounded-2xl border border-[#315977] bg-[#102a42]/80 p-4">
+        <div className="rounded-2xl border border-[#628aa7] bg-[#28546f]/80 p-4">
           <span className="nook-kicker">безопасная смена пароля</span>
           <div className="mt-3 flex items-start gap-3">
-            <div className="mt-0.5 flex size-10 items-center justify-center rounded-xl bg-[#14344f] text-[#cde7f7] shadow-[inset_0_1px_0_rgba(186,230,253,0.14)]">
+            <div className="mt-0.5 flex size-10 items-center justify-center rounded-xl bg-[#2a5876] text-[#cde7f7] shadow-[inset_0_1px_0_rgba(186,230,253,0.14)]">
               <KeyRound className="size-4" />
             </div>
             <div className="space-y-1">
               <h2 className="text-xl font-semibold tracking-tight text-[#e5f2fd]">Новый пароль</h2>
-              <p className="text-sm leading-6 text-[#95b8cf]">
+              <p className="text-sm leading-6 text-[#d2e5f2]">
                 Задайте новый пароль для аккаунта и вернитесь к обычному входу.
               </p>
             </div>
@@ -205,7 +205,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
             <Button
               asChild
               variant="outline"
-              className="h-11 w-full rounded-xl border-[#3e6887] bg-[#13324b] text-[#c8e5f6] hover:bg-[#183b58]"
+              className="h-11 w-full rounded-xl border-[#3e6887] bg-[#2b5a78] text-[#c8e5f6] hover:bg-[#346887]"
             >
               <Link href="/auth?mode=reset">Вернуться к форме сброса</Link>
             </Button>
@@ -228,7 +228,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                 Новый пароль
               </label>
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#7db0cc]" />
+                <KeyRound className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#bdd7e8]" />
                 <Input
                   id="reset-password"
                   name="password"
@@ -237,13 +237,13 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="Минимум 10 символов"
-                  className="h-12 rounded-xl border-[#345b79] bg-[#112b44] pl-11 pr-12 text-slate-100 placeholder:text-[#7ca1bd]"
+                  className="h-12 rounded-xl border-[#628cac] bg-[#112b44] pl-11 pr-12 text-slate-100 placeholder:text-[#b9d1e0]"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[#b8d2e8] hover:bg-[#1d3d58]"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[#b8d2e8] hover:bg-[#346887]"
                   aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -256,7 +256,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                 Повторите пароль
               </label>
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#7db0cc]" />
+                <KeyRound className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#bdd7e8]" />
                 <Input
                   id="reset-password-confirm"
                   name="confirmPassword"
@@ -265,13 +265,13 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   placeholder="Повторите пароль"
-                  className="h-12 rounded-xl border-[#345b79] bg-[#112b44] pl-11 pr-12 text-slate-100 placeholder:text-[#7ca1bd]"
+                  className="h-12 rounded-xl border-[#628cac] bg-[#112b44] pl-11 pr-12 text-slate-100 placeholder:text-[#b9d1e0]"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((current) => !current)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[#b8d2e8] hover:bg-[#1d3d58]"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[#b8d2e8] hover:bg-[#346887]"
                   aria-label={showConfirmPassword ? "Скрыть пароль" : "Показать пароль"}
                 >
                   {showConfirmPassword ? (
@@ -283,7 +283,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#315977] bg-[#102a42]/80 p-4">
+            <div className="rounded-2xl border border-[#628aa7] bg-[#28546f]/80 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8db0c9]">
                 Требования к паролю
               </p>
@@ -316,7 +316,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
               asChild
               type="button"
               variant="ghost"
-              className="w-full rounded-xl text-[#9ec0d7] hover:bg-[#15344f] hover:text-[#e7f4fe]"
+              className="w-full rounded-xl text-[#9ec0d7] hover:bg-[#2f5f7d] hover:text-[#e7f4fe]"
             >
               <Link href="/auth">
                 <ArrowLeft className="size-4" />

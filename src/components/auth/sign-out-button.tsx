@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -31,7 +31,7 @@ export function SignOutButton({ className }: SignOutButtonProps) {
       type="button"
       variant="outline"
       className={cn(
-        "rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]",
+        "rounded-2xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]",
         className
       )}
       onClick={handleSignOut}

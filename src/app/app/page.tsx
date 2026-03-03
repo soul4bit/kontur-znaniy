@@ -204,14 +204,14 @@ export default async function AppPage({ searchParams }: AppPageProps) {
 
   return (
     <div className="min-h-screen bg-transparent text-slate-100">
-      <header className="sticky top-0 z-30 border-b border-[#2a4156] bg-[#0f1f30]/92 shadow-[0_1px_0_rgba(71,103,128,0.35)] backdrop-blur-lg">
+      <header className="sticky top-0 z-30 border-b border-[#507391] bg-[#1a3a54]/92 shadow-[0_1px_0_rgba(71,103,128,0.35)] backdrop-blur-lg">
         <div className="mx-auto flex max-w-[1700px] flex-wrap items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3 lg:px-8">
           <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
             <KnowledgeLogo
               subtitle="Командная база знаний"
               titleClassName="text-[#dce8f2]"
-              subtitleClassName="text-[#8ea9bd]"
-              markClassName="border-[#3a5469] bg-[#14293b] shadow-none"
+              subtitleClassName="text-[#c4d9e8]"
+              markClassName="border-[#3a5469] bg-[#224a66] shadow-none"
             />
           </Link>
 
@@ -229,7 +229,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 name="q"
                 defaultValue={searchQuery}
                 placeholder={copy.searchPlaceholder}
-                className="h-10 w-full rounded-xl border border-[#35526a] bg-[#12283a] pl-9 pr-3 text-sm text-[#d5e6f3] placeholder:text-[#7f9db4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/45 sm:h-11"
+                className="h-10 w-full rounded-xl border border-[#5a82a1] bg-[#234a67] pl-9 pr-3 text-sm text-[#d5e6f3] placeholder:text-[#b7cfde] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/45 sm:h-11"
               />
             </div>
             <button
@@ -269,7 +269,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 asChild
                 size="sm"
                 variant="outline"
-                className="hidden h-9 rounded-lg border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247] md:inline-flex"
+                className="hidden h-9 rounded-lg border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876] md:inline-flex"
               >
                 <Link href="/app/admin">
                   <ShieldCheck className="size-4" />
@@ -278,7 +278,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
               </Button>
             ) : null}
 
-            <SignOutButton className="h-9 rounded-lg border-[#3a556c] bg-[#152a3d] px-2.5 text-[#c9dcea] hover:bg-[#1a3247] sm:px-3" />
+            <SignOutButton className="h-9 rounded-lg border-[#5a7f9b] bg-[#234761] px-2.5 text-[#e6f0f8] hover:bg-[#2d5876] sm:px-3" />
 
             <Link
               href="/app/account"
@@ -288,7 +288,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
               <UserAvatar
                 image={session.user.image}
                 name={displayName}
-                className="size-9 rounded-lg border border-[#3a556c] bg-[#152a3d]"
+                className="size-9 rounded-lg border border-[#5a7f9b] bg-[#234761]"
                 fallbackClassName="text-[#8fd4f0]"
               />
             </Link>
@@ -300,16 +300,16 @@ export default async function AppPage({ searchParams }: AppPageProps) {
         <aside className="order-2 space-y-3 sm:space-y-4 lg:order-1">
           <section className="nook-surface rounded-2xl p-4">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8ea9bd]">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#c4d9e8]">
                 {copy.sections}
               </p>
-              <span className="rounded-full bg-[#182e41] px-2 py-1 text-xs text-[#a9c0d1]">
+              <span className="rounded-full bg-[#28536f] px-2 py-1 text-xs text-[#d4e4ee]">
                 {hasSearchQuery ? `${visibleArticlesCount}/${totalArticles}` : totalArticles} {" "}
                 {copy.articlesSuffix}
               </span>
             </div>
             {hasSearchQuery ? (
-              <div className="rounded-xl border border-[#3b6f8f] bg-[#142d41] px-3 py-2 text-xs text-[#9ccbe3]">
+              <div className="rounded-xl border border-[#3b6f8f] bg-[#28536f] px-3 py-2 text-xs text-[#9ccbe3]">
                 {copy.searchResult}: {visibleArticlesCount}
               </div>
             ) : null}
@@ -330,7 +330,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                   className={`nook-surface rounded-2xl transition-[border-color,box-shadow] ${
                     isActive
                       ? "border-sky-300/90"
-                      : "border-[#2f4a61] hover:border-[#3f637f] hover:shadow-[0_12px_26px_rgba(2,8,16,0.35)]"
+                      : "border-[#4d708b] hover:border-[#6c8ea8] hover:shadow-[0_12px_26px_rgba(2,8,16,0.35)]"
                   }`}
                 >
                   <Link
@@ -341,7 +341,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                   >
                     <div
                       className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl ${
-                        isActive ? "bg-[#163c58] text-[#8fd3ee]" : "bg-[#182c3d] text-[#99b1c2]"
+                        isActive ? "bg-[#163c58] text-[#8fd3ee]" : "bg-[#2a536f] text-[#99b1c2]"
                       }`}
                     >
                       <Icon className="size-4" />
@@ -349,9 +349,9 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <h2 className="text-sm font-semibold text-[#e4eef6]">{topic.name}</h2>
-                        <span className="text-xs text-[#8ea9bd]">{nestedArticles.length}</span>
+                        <span className="text-xs text-[#c4d9e8]">{nestedArticles.length}</span>
                       </div>
-                      <p className="mt-1 text-xs leading-5 text-[#9cb2c3]">{topic.summary}</p>
+                      <p className="mt-1 text-xs leading-5 text-[#d0e1ec]">{topic.summary}</p>
                     </div>
                   </Link>
 
@@ -375,7 +375,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                   className={`flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
                                     isCategoryActive
                                       ? "border-[#57c3e7] bg-[#173550] text-[#d8effb]"
-                                      : "border-transparent bg-[#182d3f] text-[#a2b9ca] hover:border-[#3d5d78] hover:bg-[#1b3247]"
+                                      : "border-transparent bg-[#2c5672] text-[#a2b9ca] hover:border-[#6a8ba6] hover:bg-[#2d5876]"
                                   }`}
                                 >
                                   <span>{categoryName}</span>
@@ -397,8 +397,8 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                           })}
                                           className={`block rounded-xl border px-3 py-3 transition-all ${
                                             isSelected
-                                              ? "border-[#62cdef] bg-[#16354f] shadow-[inset_0_0_0_1px_rgba(125,211,252,0.28)]"
-                                              : "border-[#2f4a61] bg-[#102031] hover:border-[#3e637f] hover:bg-[#172c40]"
+                                              ? "border-[#62cdef] bg-[#2b5975] shadow-[inset_0_0_0_1px_rgba(125,211,252,0.28)]"
+                                              : "border-[#4d708b] bg-[#1a3852] hover:border-[#6c8da8] hover:bg-[#2f5b78]"
                                           }`}
                                         >
                                           <div className="flex items-start justify-between gap-3">
@@ -406,7 +406,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                               <p className="truncate text-sm font-semibold text-[#e4eef6]">
                                                 {article.title}
                                               </p>
-                                              <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#9cb2c3]">
+                                              <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#d0e1ec]">
                                                 {article.summary}
                                               </p>
                                             </div>
@@ -417,7 +417,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                                     })}
                                   </div>
                                 ) : (
-                                  <div className="rounded-xl border border-dashed border-[#3a566f] bg-[#13283a] px-3 py-3 text-xs leading-5 text-[#97b0c2]">
+                                  <div className="rounded-xl border border-dashed border-[#5b819e] bg-[#1f405b] px-3 py-3 text-xs leading-5 text-[#cde0ec]">
                                     В этой категории пока нет статей.
                                   </div>
                                 )}
@@ -426,7 +426,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                           })}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-[#3a566f] bg-[#13283a] px-3 py-3 text-xs leading-5 text-[#97b0c2]">
+                        <div className="rounded-xl border border-dashed border-[#5b819e] bg-[#1f405b] px-3 py-3 text-xs leading-5 text-[#cde0ec]">
                           {copy.noArticlesInSection}
                         </div>
                       )}

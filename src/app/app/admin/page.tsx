@@ -263,13 +263,13 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
       <main className="mx-auto max-w-[1520px]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8ea9bd]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4d9e8]">
               Администрирование
             </p>
             <h1 className="mt-3 text-[clamp(1.9rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-[#e8f0f7]">
               Управление доступом и пользователями
             </h1>
-            <p className="mt-3 max-w-4xl text-[15px] leading-7 text-[#9fb5c6]">
+            <p className="mt-3 max-w-4xl text-[15px] leading-7 text-[#d2e3ef]">
               Здесь можно модерировать заявки на регистрацию, управлять ролями, блокировками,
               активными сессиями и удалением аккаунтов.
             </p>
@@ -278,7 +278,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
           <Button
             asChild
             variant="outline"
-            className="rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+            className="rounded-2xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
           >
             <Link href="/app">
               <ArrowLeft className="size-4" />
@@ -293,14 +293,14 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
           </div>
         ) : null}
 
-        <section className="mt-6 rounded-[24px] border border-[#2f4a61] bg-[#102031] p-4 shadow-[0_12px_26px_rgba(2,8,16,0.3)] sm:p-5 lg:p-6">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#3a556c] bg-[#152a3d] px-3 py-1 text-xs text-[#a9c0d1]">
+        <section className="mt-6 rounded-[24px] border border-[#4d708b] bg-[#1a3852] p-4 shadow-[0_12px_26px_rgba(2,8,16,0.3)] sm:p-5 lg:p-6">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#5a7f9b] bg-[#234761] px-3 py-1 text-xs text-[#d4e4ee]">
             <Clock3 className="size-3.5 text-[#7cd9f3]" />
             Заявок в очереди: {pendingRequests.length}
           </div>
 
           {pendingRequests.length === 0 ? (
-            <div className="rounded-[20px] border border-dashed border-[#3a566f] bg-[#13283a] px-5 py-10 text-center">
+            <div className="rounded-[20px] border border-dashed border-[#5b819e] bg-[#1f405b] px-5 py-10 text-center">
               <ShieldAlert className="mx-auto size-10 text-[#7d9bb2]" />
               <h2 className="mt-4 text-xl font-semibold text-[#e5eef6]">Открытых заявок нет</h2>
               <p className="mt-2 text-sm leading-7 text-[#9ab1c3]">
@@ -312,33 +312,33 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
               {pendingRequests.map((request) => (
                 <article
                   key={request.id}
-                  className="rounded-[20px] border border-[#2f4a61] bg-[#13283a] p-4 sm:p-5"
+                  className="rounded-[20px] border border-[#4d708b] bg-[#1f405b] p-4 sm:p-5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <h2 className="text-[1.05rem] font-semibold leading-snug text-[#e5eef6]">
                         {request.name}
                       </h2>
-                      <p className="mt-1 inline-flex items-center gap-2 text-sm text-[#b7cad9]">
+                      <p className="mt-1 inline-flex items-center gap-2 text-sm text-[#dbe8f1]">
                         <Mail className="size-4 text-[#7cd9f3]" />
                         {request.email}
                       </p>
                     </div>
-                    <p className="text-xs tabular-nums text-[#8ea9bd]">
+                    <p className="text-xs tabular-nums text-[#c4d9e8]">
                       {formatDateTime(request.requestedAt)}
                     </p>
                   </div>
 
                   <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">IP</p>
-                      <p className="mt-1 text-[#b7cad9]">{request.requestIp}</p>
+                    <div className="rounded-xl border border-[#5a7f9b] bg-[#234761] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#c4d9e8]">IP</p>
+                      <p className="mt-1 text-[#dbe8f1]">{request.requestIp}</p>
                     </div>
-                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">
+                    <div className="rounded-xl border border-[#5a7f9b] bg-[#234761] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#c4d9e8]">
                         User-Agent
                       </p>
-                      <p className="mt-1 break-all text-[#b7cad9]">{request.userAgent}</p>
+                      <p className="mt-1 break-all text-[#dbe8f1]">{request.userAgent}</p>
                     </div>
                   </div>
 
@@ -370,8 +370,8 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
           )}
         </section>
 
-        <section className="mt-6 rounded-[24px] border border-[#2f4a61] bg-[#102031] p-4 shadow-[0_12px_26px_rgba(2,8,16,0.3)] sm:p-5 lg:p-6">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#3a556c] bg-[#152a3d] px-3 py-1 text-xs text-[#a9c0d1]">
+        <section className="mt-6 rounded-[24px] border border-[#4d708b] bg-[#1a3852] p-4 shadow-[0_12px_26px_rgba(2,8,16,0.3)] sm:p-5 lg:p-6">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#5a7f9b] bg-[#234761] px-3 py-1 text-xs text-[#d4e4ee]">
             <UserCog className="size-3.5 text-[#7cd9f3]" />
             Пользователей: {total}
           </div>
@@ -384,30 +384,30 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
               return (
                 <article
                   key={user.id}
-                  className="rounded-[20px] border border-[#2f4a61] bg-[#13283a] p-4 sm:p-5"
+                  className="rounded-[20px] border border-[#4d708b] bg-[#1f405b] p-4 sm:p-5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                       <UserAvatar
                         image={user.image}
                         name={user.name}
-                        className="size-12 rounded-xl border border-[#3a556c] bg-[#152a3d]"
+                        className="size-12 rounded-xl border border-[#5a7f9b] bg-[#234761]"
                         fallbackClassName="text-[#8fd4f0]"
                       />
                       <div>
                         <p className="text-[1.05rem] font-semibold leading-snug text-[#e5eef6]">
                           {user.name}
                         </p>
-                        <p className="text-sm text-[#9fb5c6]">{user.email}</p>
+                        <p className="text-sm text-[#d2e3ef]">{user.email}</p>
                         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                          <span className="rounded-full border border-[#3a556c] bg-[#152a3d] px-2.5 py-1 text-[#b7cad9]">
+                          <span className="rounded-full border border-[#5a7f9b] bg-[#234761] px-2.5 py-1 text-[#dbe8f1]">
                             role: {user.role}
                           </span>
                           <span
                             className={`rounded-full border px-2.5 py-1 ${
                               user.canManageArticles
                                 ? "border-[#3a6d84] bg-[#16364f] text-[#9edff7]"
-                                : "border-[#3a556c] bg-[#152a3d] text-[#9fb5c6]"
+                                : "border-[#5a7f9b] bg-[#234761] text-[#d2e3ef]"
                             }`}
                           >
                             статьи: {user.canManageArticles ? "редактор" : "только просмотр"}
@@ -441,27 +441,27 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                   </div>
 
                   <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">Создан</p>
-                      <p className="mt-1 tabular-nums text-[#b7cad9]">{formatDateTime(user.createdAt)}</p>
+                    <div className="rounded-xl border border-[#5a7f9b] bg-[#234761] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#c4d9e8]">Создан</p>
+                      <p className="mt-1 tabular-nums text-[#dbe8f1]">{formatDateTime(user.createdAt)}</p>
                     </div>
-                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">
+                    <div className="rounded-xl border border-[#5a7f9b] bg-[#234761] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#c4d9e8]">
                         Последний актив
                       </p>
-                      <p className="mt-1 tabular-nums text-[#b7cad9]">
+                      <p className="mt-1 tabular-nums text-[#dbe8f1]">
                         {formatDateTime(user.lastActiveAt)}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">
+                    <div className="rounded-xl border border-[#5a7f9b] bg-[#234761] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#c4d9e8]">
                         Активных сессий
                       </p>
-                      <p className="mt-1 tabular-nums text-[#b7cad9]">{user.activeSessions}</p>
+                      <p className="mt-1 tabular-nums text-[#dbe8f1]">{user.activeSessions}</p>
                     </div>
-                    <div className="rounded-xl border border-[#3a556c] bg-[#152a3d] px-3 py-2">
-                      <p className="text-xs uppercase tracking-[0.12em] text-[#8ea9bd]">ID</p>
-                      <p className="mt-1 break-all text-[#b7cad9]">{user.id}</p>
+                    <div className="rounded-xl border border-[#5a7f9b] bg-[#234761] px-3 py-2">
+                      <p className="text-xs uppercase tracking-[0.12em] text-[#c4d9e8]">ID</p>
+                      <p className="mt-1 break-all text-[#dbe8f1]">{user.id}</p>
                     </div>
                   </div>
 
@@ -479,7 +479,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                          className="rounded-xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                           disabled={isCurrentUser}
                         >
                           <ShieldOff className="size-4" />
@@ -493,7 +493,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                          className="rounded-xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                         >
                           <ShieldCheck className="size-4" />
                           Сделать admin
@@ -508,7 +508,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                          className="rounded-xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                         >
                           <Edit3 className="size-4" />
                           Запретить статьи
@@ -521,7 +521,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                          className="rounded-xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                         >
                           <Edit3 className="size-4" />
                           Разрешить статьи
@@ -536,7 +536,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                          className="rounded-xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                         >
                           <CheckCircle2 className="size-4" />
                           Разблокировать
@@ -549,7 +549,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                         <Button
                           type="submit"
                           variant="outline"
-                          className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                          className="rounded-xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                           disabled={isCurrentUser}
                         >
                           <Ban className="size-4" />
@@ -564,7 +564,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
                       <Button
                         type="submit"
                         variant="outline"
-                        className="rounded-xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                        className="rounded-xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                       >
                         <RefreshCcw className="size-4" />
                         Завершить сессии
@@ -590,7 +590,7 @@ export default async function AdminRegistrationPage({ searchParams }: AdminPageP
             })}
 
             {users.length === 0 ? (
-              <div className="rounded-[20px] border border-dashed border-[#3a566f] bg-[#13283a] px-5 py-10 text-center">
+              <div className="rounded-[20px] border border-dashed border-[#5b819e] bg-[#1f405b] px-5 py-10 text-center">
                 <UserRound className="mx-auto size-10 text-[#7d9bb2]" />
                 <h2 className="mt-4 text-xl font-semibold text-[#e5eef6]">Пользователи не найдены</h2>
                 <p className="mt-2 text-sm leading-7 text-[#9ab1c3]">

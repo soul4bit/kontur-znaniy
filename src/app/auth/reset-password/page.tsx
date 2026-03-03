@@ -1,4 +1,4 @@
-﻿import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { DevopsShowcase } from "@/components/auth/devops-showcase";
 import { KnowledgeLogo } from "@/components/brand/knowledge-logo";
 
@@ -20,9 +20,9 @@ export default async function ResetPasswordPage({
         <section className="nook-shell rounded-[32px] p-6 lg:p-9 xl:p-10">
           <KnowledgeLogo
             subtitle="Безопасное восстановление доступа"
-            markClassName="border-[#3a6585] bg-[#102942]"
+            markClassName="border-[#6f98b4] bg-[#2b5873]"
             titleClassName="text-[#a6d8ee]"
-            subtitleClassName="text-[#7db0cc]"
+            subtitleClassName="text-[#bdd7e8]"
           />
 
           <div className="mt-8">

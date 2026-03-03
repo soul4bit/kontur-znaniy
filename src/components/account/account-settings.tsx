@@ -276,10 +276,10 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-      <section className="rounded-2xl border border-[#2f4a61] bg-[#102031] p-6 shadow-[0_12px_26px_rgba(2,8,16,0.3)]">
+      <section className="rounded-2xl border border-[#4d708b] bg-[#1a3852] p-6 shadow-[0_12px_26px_rgba(2,8,16,0.3)]">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8ea9bd]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4d9e8]">
               Профиль
             </p>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-[#e6eff6]">
@@ -293,7 +293,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
           <Button
             asChild
             variant="outline"
-            className="rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+            className="rounded-2xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
           >
             <Link href="/app">
               <ArrowLeft className="size-4" />К заметкам
@@ -301,18 +301,18 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
           </Button>
         </div>
 
-        <div className="mt-8 rounded-[20px] border border-[#2f4a61] bg-[#13283a] p-5">
+        <div className="mt-8 rounded-[20px] border border-[#4d708b] bg-[#1f405b] p-5">
           <div className="flex items-center gap-4">
             <UserAvatar
               image={previewImage}
               name={user.name || user.email}
-              className="size-20 rounded-[20px] border border-[#3a556c] bg-[#152a3d]"
+              className="size-20 rounded-[20px] border border-[#5a7f9b] bg-[#234761]"
               fallbackClassName="text-xl text-[#93d4ef]"
             />
             <div>
               <p className="text-xl font-semibold text-[#e6eff6]">{user.name || "Без имени"}</p>
-              <p className="mt-1 text-sm text-[#93adbf]">{user.email}</p>
-              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#3a556c] bg-[#152a3d] px-3 py-1 text-xs text-[#a9c0d1]">
+              <p className="mt-1 text-sm text-[#c8dcea]">{user.email}</p>
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#5a7f9b] bg-[#234761] px-3 py-1 text-xs text-[#d4e4ee]">
                 <ShieldCheck className="size-3.5 text-[#7cd9f3]" />
                 {user.emailVerified ? "Почта подтверждена" : "Почта не подтверждена"}
               </div>
@@ -327,9 +327,9 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
             <label htmlFor="avatar" className="text-sm font-medium text-[#b9cddd]">
               Аватар
             </label>
-            <div className="rounded-[20px] border border-[#2f4a61] bg-[#13283a] p-4">
+            <div className="rounded-[20px] border border-[#4d708b] bg-[#1f405b] p-4">
               <div className="flex flex-wrap items-center gap-3">
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-[#3a556c] bg-[#152a3d] px-4 py-2 text-sm text-[#c9dcea] hover:bg-[#1a3247]">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-[#5a7f9b] bg-[#234761] px-4 py-2 text-sm text-[#e6f0f8] hover:bg-[#2d5876]">
                   <ImagePlus className="size-4" />
                   Выбрать изображение
                   <input
@@ -345,7 +345,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#c9dcea] hover:bg-[#1a3247]"
+                  className="rounded-2xl border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876]"
                   onClick={() => {
                     setSelectedFile(null);
                     setRemoveAvatar(true);
@@ -358,9 +358,9 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                 </Button>
               </div>
 
-              <p className="mt-3 text-sm text-[#93adbf]">JPG, PNG, WEBP или GIF. Максимум 2 МБ.</p>
+              <p className="mt-3 text-sm text-[#c8dcea]">JPG, PNG, WEBP или GIF. Максимум 2 МБ.</p>
               {selectedFile ? (
-                <p className="mt-2 text-xs text-[#93adbf]">Выбран файл: {selectedFile.name}</p>
+                <p className="mt-2 text-xs text-[#c8dcea]">Выбран файл: {selectedFile.name}</p>
               ) : null}
             </div>
           </div>
@@ -385,8 +385,8 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
         </form>
       </section>
 
-      <section className="rounded-2xl border border-[#2f4a61] bg-[#102031] p-6 shadow-[0_12px_26px_rgba(2,8,16,0.3)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8ea9bd]">
+      <section className="rounded-2xl border border-[#4d708b] bg-[#1a3852] p-6 shadow-[0_12px_26px_rgba(2,8,16,0.3)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4d9e8]">
           Безопасность
         </p>
         <h2 className="mt-3 text-2xl font-semibold tracking-tight text-[#e6eff6]">
@@ -397,7 +397,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
           сессии автоматически завершаются.
         </p>
 
-        <div className="mt-5 rounded-[18px] border border-[#2f4a61] bg-[#13283a] px-4 py-3 text-sm leading-7 text-[#9db4c5]">
+        <div className="mt-5 rounded-[18px] border border-[#4d708b] bg-[#1f405b] px-4 py-3 text-sm leading-7 text-[#9db4c5]">
           {passwordCooldownText}
         </div>
 
@@ -418,7 +418,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                   currentPassword: event.target.value,
                 }))
               }
-              className="h-12 rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#e1ecf5] placeholder:text-[#7f9cb2]"
+              className="h-12 rounded-2xl border-[#5a7f9b] bg-[#234761] text-[#e1ecf5] placeholder:text-[#7f9cb2]"
               placeholder="Введите текущий пароль"
             />
           </div>
@@ -437,7 +437,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                   newPassword: event.target.value,
                 }))
               }
-              className="h-12 rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#e1ecf5] placeholder:text-[#7f9cb2]"
+              className="h-12 rounded-2xl border-[#5a7f9b] bg-[#234761] text-[#e1ecf5] placeholder:text-[#7f9cb2]"
               placeholder="Минимум 8 символов"
             />
           </div>
@@ -456,7 +456,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
                   confirmPassword: event.target.value,
                 }))
               }
-              className="h-12 rounded-2xl border-[#3a556c] bg-[#152a3d] text-[#e1ecf5] placeholder:text-[#7f9cb2]"
+              className="h-12 rounded-2xl border-[#5a7f9b] bg-[#234761] text-[#e1ecf5] placeholder:text-[#7f9cb2]"
               placeholder="Повторите новый пароль"
             />
           </div>
@@ -480,7 +480,7 @@ export function AccountSettings({ user, passwordStatus }: AccountSettingsProps) 
           </Button>
         </form>
 
-        <div className="mt-8 rounded-[18px] border border-[#2f4a61] bg-[#13283a] p-4 text-sm leading-7 text-[#9db4c5]">
+        <div className="mt-8 rounded-[18px] border border-[#4d708b] bg-[#1f405b] p-4 text-sm leading-7 text-[#9db4c5]">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#cdddeb]">
             <UserRoundCog className="size-4 text-[#7cd9f3]" />
             Где хранится аватар

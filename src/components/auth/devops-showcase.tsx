@@ -37,10 +37,10 @@ export function DevopsShowcase({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-3xl border border-[#395773] bg-[#101f30]/82 p-5 shadow-[0_20px_44px_rgba(2,8,16,0.38)] backdrop-blur">
+      <div className="rounded-3xl border border-[#648faa] bg-[#101f30]/82 p-5 shadow-[0_20px_44px_rgba(2,8,16,0.38)] backdrop-blur">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#77b8d8]">{badge}</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#e3f1fb]">{title}</h2>
-        <p className="mt-3 text-sm leading-7 text-[#9db9cb]">{description}</p>
+        <p className="mt-3 text-sm leading-7 text-[#d1e2ee]">{description}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {chips.map((chip) => (
             <span key={chip} className="nook-chip">

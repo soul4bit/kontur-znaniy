@@ -1,4 +1,4 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { AuthForms } from "@/components/auth/auth-forms";
 import { DevopsShowcase } from "@/components/auth/devops-showcase";
 import { KnowledgeLogo } from "@/components/brand/knowledge-logo";
@@ -18,7 +18,7 @@ export default async function AuthPage() {
           <KnowledgeLogo
             subtitle="Приватная база знаний команды"
             className="relative z-10"
-            markClassName="border-[#3f5f78] bg-[#112437]"
+            markClassName="border-[#6b95b0] bg-[#112437]"
             titleClassName="text-[#c6e5f7]"
             subtitleClassName="text-[#8fb1c9]"
           />

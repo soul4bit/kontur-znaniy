@@ -222,7 +222,7 @@ function FormInput(props: ComponentProps<typeof Input>) {
   return (
     <Input
       {...props}
-      className={`h-12 rounded-xl border-[#2b465c] bg-[#101f31] text-slate-100 placeholder:text-[#7f9cb0] ${props.className ?? ""}`}
+      className={`h-12 rounded-xl border-[#2b465c] bg-[#1d3a55] text-slate-100 placeholder:text-[#b7cfde] ${props.className ?? ""}`}
     />
   );
 }
@@ -656,8 +656,8 @@ export function AuthForms() {
   }
 
   return (
-    <div className="nook-auth-reveal-1 w-full rounded-[32px] border border-[#2b4a63] bg-[#0f1c2d]/94 p-5 shadow-[0_18px_44px_rgba(3,9,18,0.42)] backdrop-blur sm:p-6 lg:h-full lg:overflow-y-auto nook-scroll">
-      <div className="space-y-4 border-b border-[#2b4a63] pb-6">
+    <div className="nook-auth-reveal-1 w-full rounded-[32px] border border-[#5c84a2] bg-[#1a3852]/94 p-5 shadow-[0_18px_44px_rgba(3,9,18,0.42)] backdrop-blur sm:p-6 lg:h-full lg:overflow-y-auto nook-scroll">
+      <div className="space-y-4 border-b border-[#5c84a2] pb-6">
         <div className="grid grid-cols-3 gap-2">
           {modeOptions.map((option) => (
             <button
@@ -666,7 +666,7 @@ export function AuthForms() {
               className={`flex min-h-[84px] flex-col justify-between rounded-2xl border px-3 py-3 text-left transition-colors ${
                 mode === option.id
                   ? "border-[#56b7d6] bg-[#162f45] text-[#e6f4ff]"
-                  : "border-[#2a455d] bg-[#111f31] text-[#9ab5ca] hover:border-[#3f6686] hover:bg-[#162a40] hover:text-[#d6e8f6]"
+                  : "border-[#5b84a2] bg-[#1d3a55] text-[#d0e1ec] hover:border-[#3f6686] hover:bg-[#162a40] hover:text-[#d6e8f6]"
               }`}
               onClick={() => {
                 openMode(option.id);
@@ -692,10 +692,10 @@ export function AuthForms() {
           ))}
         </div>
 
-        <div className="rounded-2xl border border-[#2f4f67] bg-[#122235]/82 p-4">
+        <div className="rounded-2xl border border-[#638dac] bg-[#1f3e59]/82 p-4">
           <span className="nook-kicker">{activeMode.badge}</span>
           <div className="mt-3 flex items-start gap-3">
-            <div className="mt-0.5 flex size-10 items-center justify-center rounded-xl bg-[#173149] text-[#d5e6f1] shadow-[inset_0_1px_0_rgba(186,230,253,0.12)]">
+            <div className="mt-0.5 flex size-10 items-center justify-center rounded-xl bg-[#27526f] text-[#d5e6f1] shadow-[inset_0_1px_0_rgba(186,230,253,0.12)]">
               <activeMode.icon className="size-4" />
             </div>
             <div className="space-y-1">
@@ -745,9 +745,9 @@ export function AuthForms() {
         {activeFeedback ? <FeedbackBanner feedback={activeFeedback} /> : null}
 
         {awaitingVerification ? (
-          <div className="nook-auth-mode-body rounded-2xl border border-[#3d637e] bg-[#14283d] p-4 text-sm leading-6 text-[#bed6e4]">
+          <div className="nook-auth-mode-body rounded-2xl border border-[#6f96b4] bg-[#234663] p-4 text-sm leading-6 text-[#bed6e4]">
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-[#1b3850] text-[#9fc7db]">
+              <div className="mt-0.5 flex size-10 items-center justify-center rounded-2xl bg-[#2d5d7b] text-[#9fc7db]">
                 <Mail className="size-4" />
               </div>
               <div className="space-y-3">
@@ -758,7 +758,7 @@ export function AuthForms() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-xl border-[#355970] bg-[#152a3f] text-[#cadbe8] hover:bg-[#1b334a]"
+                  className="rounded-xl border-[#5f88a5] bg-[#264d69] text-[#cadbe8] hover:bg-[#1b334a]"
                   onClick={handleResendVerification}
                   disabled={pendingAction === "resend"}
                 >
@@ -833,7 +833,7 @@ export function AuthForms() {
                     <button
                       type="button"
                       onClick={() => setShowSignInPassword((current) => !current)}
-                      className="rounded-lg p-2 hover:bg-[#20384f]"
+                      className="rounded-lg p-2 hover:bg-[#2f5d7c]"
                       aria-label={showSignInPassword ? "Скрыть пароль" : "Показать пароль"}
                     >
                       {showSignInPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -862,7 +862,7 @@ export function AuthForms() {
               </Button>
             </form>
 
-            <div className="rounded-2xl border border-[#2f4f67] bg-[#122235] p-4">
+            <div className="rounded-2xl border border-[#638dac] bg-[#1f3e59] p-4">
               <p className="text-sm font-semibold text-[#e4f0f8]">Нет аккаунта?</p>
               <p className="mt-1 text-sm leading-6 text-[#98b4c7]">
                 Отправьте заявку. После одобрения получите письмо подтверждения, активируйте email и войдите.
@@ -945,7 +945,7 @@ export function AuthForms() {
                       <button
                         type="button"
                         onClick={() => setShowSignUpPassword((current) => !current)}
-                        className="rounded-lg p-2 hover:bg-[#20384f]"
+                        className="rounded-lg p-2 hover:bg-[#2f5d7c]"
                         aria-label={showSignUpPassword ? "Скрыть пароль" : "Показать пароль"}
                       >
                         {showSignUpPassword ? (
@@ -979,7 +979,7 @@ export function AuthForms() {
                       <button
                         type="button"
                         onClick={() => setShowSignUpConfirmPassword((current) => !current)}
-                        className="rounded-lg p-2 hover:bg-[#20384f]"
+                        className="rounded-lg p-2 hover:bg-[#2f5d7c]"
                         aria-label={showSignUpConfirmPassword ? "Скрыть пароль" : "Показать пароль"}
                       >
                         {showSignUpConfirmPassword ? (
@@ -994,13 +994,13 @@ export function AuthForms() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-[#2f4f67] bg-[#122235]/82 p-4">
+              <div className="rounded-2xl border border-[#638dac] bg-[#1f3e59]/82 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8eaac0]">
                   Требования к паролю
                 </p>
                 <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
                   {passwordChecks.map((check) => (
-                    <div key={check.id} className="flex items-center gap-2 text-sm text-[#99b8cb]">
+                    <div key={check.id} className="flex items-center gap-2 text-sm text-[#d0e2ee]">
                       {check.passed ? (
                         <CheckCircle2 className="size-4 text-emerald-400" />
                       ) : (
@@ -1034,7 +1034,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-xl text-[#99b8cb] hover:bg-[#172d42] hover:text-[#e4f2fb]"
+              className="w-full rounded-xl text-[#d0e2ee] hover:bg-[#2c5674] hover:text-[#e4f2fb]"
               onClick={() => {
                 openMode("sign-in");
                 setSignInForm((current) => ({
@@ -1051,7 +1051,7 @@ export function AuthForms() {
 
         {mode === "reset" ? (
           <div className="nook-auth-mode-body space-y-5">
-            <div className="rounded-2xl border border-[#2f4f67] bg-[#122235]/82 p-4 text-sm leading-6 text-[#99b6c9]">
+            <div className="rounded-2xl border border-[#638dac] bg-[#1f3e59]/82 p-4 text-sm leading-6 text-[#cfe1ed]">
               Введите email аккаунта. Если он найден в системе, на почту придет ссылка для
               безопасной смены пароля.
             </div>
@@ -1099,7 +1099,7 @@ export function AuthForms() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full rounded-xl text-[#99b8cb] hover:bg-[#172d42] hover:text-[#e4f2fb]"
+              className="w-full rounded-xl text-[#d0e2ee] hover:bg-[#2c5674] hover:text-[#e4f2fb]"
               onClick={() => {
                 openMode("sign-in");
                 setSignInForm((current) => ({

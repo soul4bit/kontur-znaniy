@@ -90,7 +90,7 @@ export function WorkspacePanels({
           <section className="nook-surface rounded-2xl p-4 sm:p-5">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8ea9bd]">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#c4d9e8]">
                   {copy.editor}
                 </p>
                 <h2 className="mt-2 text-xl font-semibold text-[#e4eef6]">
@@ -101,7 +101,7 @@ export function WorkspacePanels({
               {selectedArticle && closeEditorHref ? (
                 <Link
                   href={closeEditorHref}
-                  className="rounded-lg border border-[#3a556c] bg-[#152a3d] px-3 py-2 text-sm font-medium text-[#c9dcea] hover:bg-[#1a3247]"
+                  className="rounded-lg border border-[#5a7f9b] bg-[#234761] px-3 py-2 text-sm font-medium text-[#e6f0f8] hover:bg-[#2d5876]"
                 >
                   {copy.closeEditor}
                 </Link>
@@ -123,10 +123,10 @@ export function WorkspacePanels({
           <section className="nook-surface rounded-2xl p-5 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#173d58] px-3 py-1 font-semibold text-[#97d5ef]">
+                <span className="rounded-full bg-[#2b5f7f] px-3 py-1 font-semibold text-[#97d5ef]">
                   {selectedArticle.topic}
                 </span>
-                <span className="rounded-full bg-[#1a3043] px-3 py-1 font-semibold text-[#b8cad7]">
+                <span className="rounded-full bg-[#2a516d] px-3 py-1 font-semibold text-[#b8cad7]">
                   {selectedArticle.category}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[#92acbf]">
@@ -137,7 +137,7 @@ export function WorkspacePanels({
               {editArticleHref && canEditSelectedArticle ? (
                 <Link
                   href={editArticleHref}
-                  className="rounded-lg border border-[#3a556c] bg-[#152a3d] px-3 py-2 text-sm font-medium text-[#c9dcea] hover:bg-[#1a3247]"
+                  className="rounded-lg border border-[#5a7f9b] bg-[#234761] px-3 py-2 text-sm font-medium text-[#e6f0f8] hover:bg-[#2d5876]"
                 >
                   {copy.editButton}
                 </Link>
@@ -152,34 +152,34 @@ export function WorkspacePanels({
             </p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-[#2f4a61] bg-[#13283a]/88 px-4 py-3">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[#8ea9bd]">
+              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-4 py-3">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[#c4d9e8]">
                   <UserRound className="size-3.5" />
                   {copy.author}
                 </div>
                 <p className="mt-2 text-sm font-semibold text-[#e4eef6]">
                   {selectedArticle.authorName}
                 </p>
-                <p className="mt-1 text-xs text-[#8ea9bd]">
+                <p className="mt-1 text-xs text-[#c4d9e8]">
                   {copy.created} {formatDateTime(selectedArticle.createdAt)}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-[#2f4a61] bg-[#13283a]/88 px-4 py-3">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[#8ea9bd]">
+              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-4 py-3">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[#c4d9e8]">
                   <PenSquare className="size-3.5" />
                   {copy.lastEditor}
                 </div>
                 <p className="mt-2 text-sm font-semibold text-[#e4eef6]">
                   {selectedArticle.updatedByName}
                 </p>
-                <p className="mt-1 text-xs text-[#8ea9bd]">
+                <p className="mt-1 text-xs text-[#c4d9e8]">
                   {copy.updated} {formatDateTime(selectedArticle.updatedAt)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 rounded-xl border border-[#2f4a61] bg-[#122536]/65 p-4">
+            <div className="mt-5 rounded-xl border border-[#4d708b] bg-[#224a67]/65 p-4">
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#c3d5e3]">
                 <BookOpenText className="size-4 text-[#7cd9f3]" />
                 {copy.reading}
@@ -194,7 +194,7 @@ export function WorkspacePanels({
         ) : (
           <section className="nook-surface rounded-2xl p-6">
             <h2 className="text-xl font-semibold text-[#e4eef6]">{copy.noAccessEmptyTitle}</h2>
-            <p className="mt-2 text-sm leading-7 text-[#9fb5c6]">{copy.noAccessEmptyText}</p>
+            <p className="mt-2 text-sm leading-7 text-[#d2e3ef]">{copy.noAccessEmptyText}</p>
           </section>
         )}
       </main>
@@ -202,22 +202,22 @@ export function WorkspacePanels({
       {!shouldShowEditor ? (
         <aside className="order-3 space-y-3 sm:space-y-4">
           <section className="nook-surface rounded-2xl p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8ea9bd]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#c4d9e8]">
               {copy.snapshot}
             </p>
             <div className="mt-3 grid gap-2">
-              <div className="rounded-xl border border-[#2f4a61] bg-[#13283a]/88 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-[#8ea9bd]">
+              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-[#c4d9e8]">
                   {copy.allArticles}
                 </p>
                 <p className="mt-1 text-xl font-semibold text-[#e4eef6]">{totalArticles}</p>
               </div>
-              <div className="rounded-xl border border-[#2f4a61] bg-[#13283a]/88 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-[#8ea9bd]">Категория</p>
+              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-[#c4d9e8]">Категория</p>
                 <p className="mt-1 text-sm font-semibold text-[#e4eef6]">{selectedCategory}</p>
               </div>
-              <div className="rounded-xl border border-[#2f4a61] bg-[#13283a]/88 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-[#8ea9bd]">
+              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-[#c4d9e8]">
                   {copy.lastUpdate}
                 </p>
                 <p className="mt-1 text-sm font-semibold text-[#e4eef6]">
