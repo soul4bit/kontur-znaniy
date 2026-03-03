@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { BookOpenText, Clock3, PenSquare, SearchSlash, UserRound } from "lucide-react";
 import { ArticleContent } from "@/components/articles/article-content";
 import { ThoughtEditor, type ThoughtEditorPreview } from "@/components/editor/thought-editor";
-import { UserAvatar } from "@/components/user/user-avatar";
 import { type ArticleTopic } from "@/lib/content/devops-library";
 
 const copy = {
@@ -47,8 +46,6 @@ type WorkspacePanelsProps = {
   isAdmin: boolean;
   currentUserId: string;
   displayName: string;
-  userEmail: string;
-  userImage: string | null | undefined;
   wikiLinks: WikiLink[];
 };
 
@@ -96,8 +93,6 @@ export function WorkspacePanels({
   isAdmin,
   currentUserId,
   displayName,
-  userEmail,
-  userImage,
   wikiLinks,
 }: WorkspacePanelsProps) {
   const [livePreview, setLivePreview] = useState<ThoughtEditorPreview>(() =>
@@ -203,21 +198,6 @@ export function WorkspacePanels({
       </main>
 
       <aside className="order-3 space-y-3 sm:space-y-4">
-        <section className="nook-surface rounded-2xl p-4">
-          <div className="flex items-center gap-3">
-            <UserAvatar
-              image={userImage}
-              name={displayName}
-              className="size-11 rounded-xl border border-slate-300 bg-slate-100"
-              fallbackClassName="text-sky-700"
-            />
-            <div className="min-w-0">
-              <h3 className="truncate text-base font-semibold text-slate-900">{displayName}</h3>
-              <p className="truncate text-xs text-slate-500">{userEmail}</p>
-            </div>
-          </div>
-        </section>
-
         <section className="nook-surface rounded-2xl p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
             {copy.snapshot}

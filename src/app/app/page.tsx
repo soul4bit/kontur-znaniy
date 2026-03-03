@@ -11,7 +11,6 @@ import {
   ServerCog,
   ShieldCheck,
   Sparkles,
-  UserRoundCog,
 } from "lucide-react";
 import { WorkspacePanels } from "@/components/app/workspace-panels";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -29,7 +28,6 @@ import { articleTopics, type ArticleTopic } from "@/lib/content/devops-library";
 
 const copy = {
   newArticle: "Новая заметка",
-  account: "Личный кабинет",
   admin: "Админ-панель",
   sections: "Разделы",
   articlesSuffix: "статей",
@@ -236,18 +234,6 @@ export default async function AppPage({ searchParams }: AppPageProps) {
               </Link>
             </Button>
 
-            <Button
-              asChild
-              size="sm"
-              variant="outline"
-              className="hidden h-9 rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-100 md:inline-flex"
-            >
-              <Link href="/app/account">
-                <UserRoundCog className="size-4" />
-                {copy.account}
-              </Link>
-            </Button>
-
             {isAdmin ? (
               <Button
                 asChild
@@ -264,12 +250,18 @@ export default async function AppPage({ searchParams }: AppPageProps) {
 
             <SignOutButton className="h-9 rounded-lg border-slate-300 bg-white px-2.5 text-slate-700 hover:bg-slate-100 sm:px-3" />
 
-            <UserAvatar
-              image={session.user.image}
-              name={displayName}
-              className="hidden size-9 rounded-lg border border-slate-300 bg-slate-100 sm:block"
-              fallbackClassName="text-sky-700"
-            />
+            <Link
+              href="/app/account"
+              className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200"
+              aria-label="Личный кабинет"
+            >
+              <UserAvatar
+                image={session.user.image}
+                name={displayName}
+                className="size-9 rounded-lg border border-slate-300 bg-slate-100"
+                fallbackClassName="text-sky-700"
+              />
+            </Link>
           </div>
         </div>
       </header>
@@ -427,8 +419,6 @@ export default async function AppPage({ searchParams }: AppPageProps) {
           isAdmin={isAdmin}
           currentUserId={session.user.id}
           displayName={displayName}
-          userEmail={session.user.email}
-          userImage={session.user.image}
           wikiLinks={wikiLinks}
         />
       </div>

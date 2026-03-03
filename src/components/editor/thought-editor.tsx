@@ -482,7 +482,7 @@ export function ThoughtEditor({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="article-title" className="text-sm font-medium text-slate-700">
             {copy.titleLabel}
@@ -507,7 +507,7 @@ export function ThoughtEditor({
         </div>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[220px_220px]">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="article-topic" className="text-sm font-medium text-slate-700">
             {copy.topicLabel}
