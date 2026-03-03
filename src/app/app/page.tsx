@@ -1,54 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  ArrowUpRight,
-  Boxes,
-  Cable,
-  FolderKanban,
-  HardDriveUpload,
-  Plus,
-  Search,
-  ServerCog,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { Plus, Search, ShieldCheck } from "lucide-react";
 import { WorkspacePanels } from "@/components/app/workspace-panels";
+import { TopicSidebar } from "@/components/app/topic-sidebar";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { KnowledgeLogo } from "@/components/brand/knowledge-logo";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { Button } from "@/components/ui/button";
-import { getCurrentSession, isAdminSession } from "@/lib/auth/session";
 import {
   getArticleById,
   isArticleTopic,
   listArticles,
   searchArticles,
 } from "@/lib/articles/server";
-import { articleTopics, type ArticleTopic } from "@/lib/content/devops-library";
 import { getUserArticleWriteAccess } from "@/lib/auth/article-permissions";
-
-const copy = {
-  newArticle: "Новая заметка",
-  admin: "Админ-панель",
-  sections: "Разделы",
-  articlesSuffix: "статей",
-  noArticlesInSection:
-    "В этой категории пока нет материалов. Создайте первую заметку через редактор справа.",
-  searchPlaceholder: "Поиск по заголовку, описанию и тексту",
-  searchButton: "Найти",
-  clearSearch: "Сброс",
-  searchResult: "Результаты поиска",
-} as const;
-
-const topicIcons = {
-  Linux: ServerCog,
-  Docker: Boxes,
-  "Сети": Cable,
-  Ansible: FolderKanban,
-  K8S: HardDriveUpload,
-  Terraform: FolderKanban,
-  "CI/CD": Sparkles,
-} as const;
+import { getCurrentSession, isAdminSession } from "@/lib/auth/session";
+import { buildAppHref } from "@/lib/app/build-app-href";
+import { articleTopics, type ArticleTopic } from "@/lib/content/devops-library";
 
 type AppPageProps = {
   searchParams?: Promise<{
@@ -61,41 +29,6 @@ type AppPageProps = {
   }>;
 };
 
-function buildAppHref(
-  topic: string,
-  options?: {
-    articleId?: string;
-    draft?: boolean;
-    edit?: boolean;
-    category?: string;
-    query?: string;
-  }
-) {
-  const params = new URLSearchParams({ topic });
-
-  if (options?.category) {
-    params.set("category", options.category);
-  }
-
-  if (options?.articleId) {
-    params.set("article", options.articleId);
-  }
-
-  if (options?.draft) {
-    params.set("draft", "1");
-  }
-
-  if (options?.edit) {
-    params.set("edit", "1");
-  }
-
-  if (options?.query?.trim()) {
-    params.set("q", options.query.trim());
-  }
-
-  return `/app?${params.toString()}`;
-}
-
 export default async function AppPage({ searchParams }: AppPageProps) {
   const session = await getCurrentSession();
 
@@ -104,51 +37,35 @@ export default async function AppPage({ searchParams }: AppPageProps) {
   }
 
   const params = searchParams ? await searchParams : undefined;
-  const requestedTopic =
-    params?.topic && isArticleTopic(params.topic) ? params.topic : null;
+  const requestedTopic = params?.topic && isArticleTopic(params.topic) ? params.topic : null;
   const requestedCategory = params?.category?.trim() || null;
   const requestedArticleId = params?.article;
   const draftMode = params?.draft === "1";
   const editModeRequested = params?.edit === "1";
   const searchQuery = params?.q?.trim().slice(0, 180) ?? "";
+
   const allArticles = await listArticles();
-  const articles = searchQuery ? await searchArticles(searchQuery) : allArticles;
-  const requestedArticle = requestedArticleId
-    ? await getArticleById(requestedArticleId)
-    : null;
+  const visibleArticles = searchQuery ? await searchArticles(searchQuery) : allArticles;
+  const requestedArticle = requestedArticleId ? await getArticleById(requestedArticleId) : null;
 
   const selectedTopic = requestedArticle?.topic ?? requestedTopic ?? articleTopics[0].name;
-  const topicArticles = articles.filter((article) => article.topic === selectedTopic);
-  const topicCategoryMap = Object.fromEntries(
-    articleTopics.map((topic) => [
-      topic.name,
-      Array.from(
-        new Set([
-          ...topic.categories,
-          ...allArticles
-            .filter((article) => article.topic === topic.name)
-            .map((article) => article.category),
-          "Общее",
-        ])
-      ),
-    ])
-  ) as Record<ArticleTopic, string[]>;
-  const currentTopic =
-    articleTopics.find((topic) => topic.name === selectedTopic) ?? articleTopics[0];
+  const topicArticles = visibleArticles.filter((article) => article.topic === selectedTopic);
+  const currentTopic = articleTopics.find((topic) => topic.name === selectedTopic) ?? articleTopics[0];
+
   const selectedCategory =
     requestedArticle?.category ??
     requestedCategory ??
     topicArticles[0]?.category ??
     currentTopic.categories[0] ??
     "Общее";
-  const categoryArticles = topicArticles.filter(
-    (article) => article.category === selectedCategory
-  );
+
+  const categoryArticles = topicArticles.filter((article) => article.category === selectedCategory);
   const selectedArticleSummary = draftMode
     ? null
     : requestedArticle && requestedArticle.topic === selectedTopic
       ? requestedArticle
       : categoryArticles[0] ?? null;
+
   const selectedArticle =
     selectedArticleSummary &&
     (!requestedArticle || requestedArticle.id !== selectedArticleSummary.id)
@@ -156,6 +73,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
       : draftMode
         ? null
         : requestedArticle;
+
   const isEditMode = Boolean(selectedArticle && editModeRequested);
   const selectedArticleHref = selectedArticle
     ? buildAppHref(selectedArticle.topic, {
@@ -173,23 +91,34 @@ export default async function AppPage({ searchParams }: AppPageProps) {
       })
     : null;
 
+  const topicCategoryMap = Object.fromEntries(
+    articleTopics.map((topic) => [
+      topic.name,
+      Array.from(
+        new Set([
+          ...topic.categories,
+          ...allArticles.filter((article) => article.topic === topic.name).map((article) => article.category),
+          "Общее",
+        ])
+      ),
+    ])
+  ) as Record<ArticleTopic, string[]>;
+
   const displayName = session.user.name?.trim() || session.user.email;
   const isAdmin = isAdminSession(session);
   const canManageArticles = await getUserArticleWriteAccess(
     session.user.id,
     (session.user as { role?: unknown }).role
   );
-  const totalArticles = allArticles.length;
-  const visibleArticlesCount = articles.length;
-  const lastUpdatedAt = articles[0]?.updatedAt ?? null;
+  const lastUpdatedAt = visibleArticles[0]?.updatedAt ?? null;
   const hasSearchQuery = Boolean(searchQuery);
   const seenSlugs = new Set<string>();
+
   const wikiLinks = allArticles
     .filter((article) => {
       if (seenSlugs.has(article.slug)) {
         return false;
       }
-
       seenSlugs.add(article.slug);
       return true;
     })
@@ -203,257 +132,110 @@ export default async function AppPage({ searchParams }: AppPageProps) {
     }));
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-100">
-      <header className="sticky top-0 z-30 border-b border-[#507391] bg-[#1a3a54]/92 shadow-[0_1px_0_rgba(71,103,128,0.35)] backdrop-blur-lg">
-        <div className="mx-auto flex max-w-[1700px] flex-wrap items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3 lg:px-8">
-          <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
-            <KnowledgeLogo
-              subtitle="Командная база знаний"
-              titleClassName="text-[#dce8f2]"
-              subtitleClassName="text-[#c4d9e8]"
-              markClassName="border-[#3a5469] bg-[#224a66] shadow-none"
-            />
-          </Link>
-
-          <form
-            action="/app"
-            method="get"
-            className="order-3 flex w-full items-center gap-2 md:order-none md:flex-1"
-          >
-            <input type="hidden" name="topic" value={selectedTopic} />
-            <input type="hidden" name="category" value={selectedCategory} />
-            <div className="relative w-full">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#88a7bc]" />
-              <input
-                type="search"
-                name="q"
-                defaultValue={searchQuery}
-                placeholder={copy.searchPlaceholder}
-                className="h-10 w-full rounded-xl border border-[#5a82a1] bg-[#234a67] pl-9 pr-3 text-sm text-[#d5e6f3] placeholder:text-[#b7cfde] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/45 sm:h-11"
-              />
-            </div>
-            <button
-              type="submit"
-              className="h-10 rounded-xl bg-[#0f7aaf] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#0d6997] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 sm:h-11"
-            >
-              {copy.searchButton}
-            </button>
-            {hasSearchQuery ? (
-              <Link
-                href={buildAppHref(selectedTopic, { category: selectedCategory })}
-                className="hidden text-sm font-semibold text-[#8ed9f5] hover:text-[#b8edff] hover:underline md:inline"
-              >
-                {copy.clearSearch}
-              </Link>
-            ) : null}
-          </form>
-
-          <div className="ml-auto flex w-full items-center justify-end gap-2 sm:w-auto sm:justify-start">
-            {canManageArticles ? (
-              <Button asChild size="sm" className="h-9 rounded-lg bg-sky-600 hover:bg-sky-700">
-                <Link
-                  href={buildAppHref(selectedTopic, {
-                    draft: true,
-                    category: selectedCategory,
-                    query: searchQuery || undefined,
-                  })}
-                >
-                  <Plus className="size-4" />
-                  <span className="hidden sm:inline">{copy.newArticle}</span>
-                </Link>
-              </Button>
-            ) : null}
-
-            {isAdmin ? (
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="hidden h-9 rounded-lg border-[#5a7f9b] bg-[#234761] text-[#e6f0f8] hover:bg-[#2d5876] md:inline-flex"
-              >
-                <Link href="/app/admin">
-                  <ShieldCheck className="size-4" />
-                  {copy.admin}
-                </Link>
-              </Button>
-            ) : null}
-
-            <SignOutButton className="h-9 rounded-lg border-[#5a7f9b] bg-[#234761] px-2.5 text-[#e6f0f8] hover:bg-[#2d5876] sm:px-3" />
-
-            <Link
-              href="/app/account"
-              className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200"
-              aria-label="Личный кабинет"
-            >
-              <UserAvatar
-                image={session.user.image}
-                name={displayName}
-                className="size-9 rounded-lg border border-[#5a7f9b] bg-[#234761]"
-                fallbackClassName="text-[#8fd4f0]"
-              />
+    <div className="min-h-screen px-3 py-3 sm:px-6 sm:py-4 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-4">
+        <header className="nook-shell sticky top-3 z-30 rounded-2xl p-3 sm:p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
+              <KnowledgeLogo subtitle="Командная база знаний" />
             </Link>
-          </div>
-        </div>
-      </header>
 
-      <div className="mx-auto grid max-w-[1700px] gap-4 px-3 py-3 sm:gap-5 sm:px-6 sm:py-4 lg:grid-cols-[300px_minmax(0,1fr)_430px] lg:px-8">
-        <aside className="order-2 space-y-3 sm:space-y-4 lg:order-1">
-          <section className="nook-surface rounded-2xl p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#c4d9e8]">
-                {copy.sections}
-              </p>
-              <span className="rounded-full bg-[#28536f] px-2 py-1 text-xs text-[#d4e4ee]">
-                {hasSearchQuery ? `${visibleArticlesCount}/${totalArticles}` : totalArticles} {" "}
-                {copy.articlesSuffix}
-              </span>
-            </div>
-            {hasSearchQuery ? (
-              <div className="rounded-xl border border-[#3b6f8f] bg-[#28536f] px-3 py-2 text-xs text-[#9ccbe3]">
-                {copy.searchResult}: {visibleArticlesCount}
+            <form action="/app" method="get" className="order-3 flex w-full items-center gap-2 md:order-none md:flex-1">
+              <input type="hidden" name="topic" value={selectedTopic} />
+              <input type="hidden" name="category" value={selectedCategory} />
+              <div className="relative w-full">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="search"
+                  name="q"
+                  defaultValue={searchQuery}
+                  placeholder="Поиск по заголовку, описанию и тексту"
+                  className="h-11 w-full rounded-xl border border-input bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                />
               </div>
-            ) : null}
-          </section>
-
-          <nav className="space-y-2 sm:space-y-3">
-            {articleTopics.map((topic) => {
-              const Icon = topicIcons[topic.name];
-              const isActive = topic.name === selectedTopic;
-              const nestedArticles = articles.filter((article) => article.topic === topic.name);
-              const nestedCategories = Array.from(
-                new Set([...topic.categories, ...nestedArticles.map((article) => article.category)])
-              );
-
-              return (
-                <article
-                  key={topic.name}
-                  className={`nook-surface rounded-2xl transition-[border-color,box-shadow] ${
-                    isActive
-                      ? "border-sky-300/90"
-                      : "border-[#4d708b] hover:border-[#6c8ea8] hover:shadow-[0_12px_26px_rgba(2,8,16,0.35)]"
-                  }`}
+              <Button type="submit" className="h-11 px-4">
+                Найти
+              </Button>
+              {hasSearchQuery ? (
+                <Link
+                  href={buildAppHref(selectedTopic, { category: selectedCategory })}
+                  className="hidden text-sm font-medium text-muted-foreground hover:text-foreground md:inline"
                 >
+                  Сброс
+                </Link>
+              ) : null}
+            </form>
+
+            <div className="ml-auto flex w-full items-center justify-end gap-2 sm:w-auto sm:justify-start">
+              {canManageArticles ? (
+                <Button asChild size="sm" className="h-9">
                   <Link
-                    href={buildAppHref(topic.name, {
+                    href={buildAppHref(selectedTopic, {
+                      draft: true,
+                      category: selectedCategory,
                       query: searchQuery || undefined,
                     })}
-                    className="flex items-start gap-3 px-4 py-3.5"
                   >
-                    <div
-                      className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl ${
-                        isActive ? "bg-[#163c58] text-[#8fd3ee]" : "bg-[#2a536f] text-[#99b1c2]"
-                      }`}
-                    >
-                      <Icon className="size-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-sm font-semibold text-[#e4eef6]">{topic.name}</h2>
-                        <span className="text-xs text-[#c4d9e8]">{nestedArticles.length}</span>
-                      </div>
-                      <p className="mt-1 text-xs leading-5 text-[#d0e1ec]">{topic.summary}</p>
-                    </div>
+                    <Plus className="size-4" />
+                    <span className="hidden sm:inline">Новая статья</span>
                   </Link>
+                </Button>
+              ) : null}
 
-                  {isActive ? (
-                    <div className="border-t border-[#2d455a] px-3 py-3">
-                      {nestedCategories.length > 0 ? (
-                        <div className="space-y-4">
-                          {nestedCategories.map((categoryName) => {
-                            const groupedArticles = nestedArticles.filter(
-                              (article) => article.category === categoryName
-                            );
-                            const isCategoryActive = categoryName === selectedCategory;
+              {isAdmin ? (
+                <Button asChild size="sm" variant="outline" className="hidden h-9 md:inline-flex">
+                  <Link href="/app/admin">
+                    <ShieldCheck className="size-4" />
+                    Админ
+                  </Link>
+                </Button>
+              ) : null}
 
-                            return (
-                              <div key={categoryName} className="space-y-2">
-                                <Link
-                                  href={buildAppHref(topic.name, {
-                                    category: categoryName,
-                                    query: searchQuery || undefined,
-                                  })}
-                                  className={`flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
-                                    isCategoryActive
-                                      ? "border-[#57c3e7] bg-[#173550] text-[#d8effb]"
-                                      : "border-transparent bg-[#2c5672] text-[#a2b9ca] hover:border-[#6a8ba6] hover:bg-[#2d5876]"
-                                  }`}
-                                >
-                                  <span>{categoryName}</span>
-                                  <span>{groupedArticles.length}</span>
-                                </Link>
+              <SignOutButton className="h-9 rounded-lg border-border bg-card px-2.5 text-foreground hover:bg-accent sm:px-3" />
 
-                                {groupedArticles.length > 0 ? (
-                                  <div className="space-y-2">
-                                    {groupedArticles.map((article) => {
-                                      const isSelected = article.id === selectedArticle?.id;
+              <Link
+                href="/app/account"
+                className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                aria-label="Личный кабинет"
+              >
+                <UserAvatar
+                  image={session.user.image}
+                  name={displayName}
+                  className="size-9 rounded-lg border border-border bg-card"
+                  fallbackClassName="text-primary"
+                />
+              </Link>
+            </div>
+          </div>
+        </header>
 
-                                      return (
-                                        <Link
-                                          key={article.id}
-                                          href={buildAppHref(topic.name, {
-                                            articleId: article.id,
-                                            category: categoryName,
-                                            query: searchQuery || undefined,
-                                          })}
-                                          className={`block rounded-xl border px-3 py-3 transition-all ${
-                                            isSelected
-                                              ? "border-[#62cdef] bg-[#2b5975] shadow-[inset_0_0_0_1px_rgba(125,211,252,0.28)]"
-                                              : "border-[#4d708b] bg-[#1a3852] hover:border-[#6c8da8] hover:bg-[#2f5b78]"
-                                          }`}
-                                        >
-                                          <div className="flex items-start justify-between gap-3">
-                                            <div className="min-w-0">
-                                              <p className="truncate text-sm font-semibold text-[#e4eef6]">
-                                                {article.title}
-                                              </p>
-                                              <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#d0e1ec]">
-                                                {article.summary}
-                                              </p>
-                                            </div>
-                                            <ArrowUpRight className="mt-0.5 size-3.5 shrink-0 text-[#88a7bc]" />
-                                          </div>
-                                        </Link>
-                                      );
-                                    })}
-                                  </div>
-                                ) : (
-                                  <div className="rounded-xl border border-dashed border-[#5b819e] bg-[#1f405b] px-3 py-3 text-xs leading-5 text-[#cde0ec]">
-                                    В этой категории пока нет статей.
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="rounded-xl border border-dashed border-[#5b819e] bg-[#1f405b] px-3 py-3 text-xs leading-5 text-[#cde0ec]">
-                          {copy.noArticlesInSection}
-                        </div>
-                      )}
-                    </div>
-                  ) : null}
-                </article>
-              );
-            })}
-          </nav>
-        </aside>
+        <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)_420px]">
+          <TopicSidebar
+            allArticles={allArticles}
+            visibleArticles={visibleArticles}
+            selectedTopic={selectedTopic}
+            selectedCategory={selectedCategory}
+            selectedArticleId={selectedArticle?.id ?? null}
+            searchQuery={searchQuery}
+          />
 
-        <WorkspacePanels
-          selectedArticle={selectedArticle}
-          selectedTopic={selectedTopic}
-          selectedCategory={selectedCategory}
-          topics={articleTopics.map((topic) => topic.name)}
-          topicCategories={topicCategoryMap}
-          totalArticles={totalArticles}
-          lastUpdatedAt={lastUpdatedAt}
-          isAdmin={isAdmin}
-          currentUserId={session.user.id}
-          canManageArticles={canManageArticles}
-          isEditMode={isEditMode}
-          editArticleHref={editArticleHref}
-          closeEditorHref={selectedArticleHref}
-          wikiLinks={wikiLinks}
-        />
+          <WorkspacePanels
+            selectedArticle={selectedArticle}
+            selectedTopic={selectedTopic}
+            selectedCategory={selectedCategory}
+            topics={articleTopics.map((topic) => topic.name)}
+            topicCategories={topicCategoryMap}
+            totalArticles={allArticles.length}
+            lastUpdatedAt={lastUpdatedAt}
+            isAdmin={isAdmin}
+            currentUserId={session.user.id}
+            canManageArticles={canManageArticles}
+            isEditMode={isEditMode}
+            editArticleHref={editArticleHref}
+            closeEditorHref={selectedArticleHref}
+            wikiLinks={wikiLinks}
+          />
+        </div>
       </div>
     </div>
   );

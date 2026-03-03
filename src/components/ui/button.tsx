@@ -4,19 +4,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-4 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-4 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
   {
     variants: {
       variant: {
-        default:
-          "border border-[#38c7eb] bg-[#1aa9cf] text-[#052235] shadow-[0_10px_22px_rgba(26,169,207,0.34)] hover:bg-[#1698bb]",
+        default: "border border-primary/70 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
         destructive:
-          "border border-rose-400 bg-destructive text-white shadow-[0_8px_18px_rgba(220,77,104,0.28)] hover:bg-[#c83a55] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "border border-destructive/70 bg-destructive text-white shadow-sm hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border border-[#5b7f9c] bg-[#284b66] text-[#d8e8f3] shadow-[inset_0_1px_0_rgba(186,230,253,0.12)] hover:bg-[#315875]",
+          "border border-border bg-card text-card-foreground hover:bg-accent",
         secondary:
-          "border border-[#567b98] bg-[#2a4f6b] text-[#dceaf4] shadow-[inset_0_1px_0_rgba(186,230,253,0.1)] hover:bg-[#346080]",
-        ghost: "text-[#c8deee] hover:bg-[#315a78] hover:text-[#eef8ff]",
+          "border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

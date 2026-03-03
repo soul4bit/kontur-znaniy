@@ -22,8 +22,7 @@ function normalizeWikiSlug(value: string) {
 
 function getCodeLanguage(codeElement: HTMLElement) {
   const languageClass = Array.from(codeElement.classList).find(
-    (className) =>
-      className.startsWith("language-") || className.startsWith("lang-")
+    (className) => className.startsWith("language-") || className.startsWith("lang-")
   );
 
   if (!languageClass) {
@@ -123,7 +122,7 @@ function enhanceCodeBlocks(root: HTMLElement) {
     try {
       hljs.highlightElement(codeElement);
     } catch {
-      // Если язык не определился, оставляем блок как есть.
+      // Если язык не распознан, оставляем блок без дополнительной подсветки.
     }
 
     const snippetWrapper = document.createElement("div");
@@ -161,11 +160,7 @@ function enhanceCodeBlocks(root: HTMLElement) {
   }
 }
 
-export function ArticleContent({
-  html,
-  wikiLinks,
-  className,
-}: ArticleContentProps) {
+export function ArticleContent({ html, wikiLinks, className }: ArticleContentProps) {
   const rootRef = useRef<HTMLElement | null>(null);
   const wikiMap = useMemo(() => {
     const entries = wikiLinks.map((link) => [normalizeWikiSlug(link.slug), link] as const);

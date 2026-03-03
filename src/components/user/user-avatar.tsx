@@ -38,13 +38,13 @@ export function UserAvatar({
   return (
     <div
       className={cn(
-        "relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#36566f] bg-[#152c41]",
+        "relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-card",
         className
       )}
     >
       {showImage ? (
         <>
-          {/* Для локального превью и файлов из аккаунта обычный img здесь надежнее. */}
+          {/* Для локального preview и пользовательских файлов обычный img надежнее. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             key={normalizedImage}
@@ -57,7 +57,7 @@ export function UserAvatar({
       ) : (
         <span
           className={cn(
-            "text-sm font-semibold uppercase tracking-[0.16em] text-[#9ad6ee]",
+            "text-sm font-semibold uppercase tracking-[0.16em] text-primary",
             fallbackClassName
           )}
         >

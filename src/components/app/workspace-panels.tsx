@@ -7,7 +7,7 @@ import { ThoughtEditor } from "@/components/editor/thought-editor";
 import { type ArticleTopic } from "@/lib/content/devops-library";
 
 const copy = {
-  snapshot: "Состояние",
+  snapshot: "Сводка",
   allArticles: "Всего статей",
   lastUpdate: "Последнее обновление",
   emptyValue: "Пока нет данных",
@@ -15,17 +15,16 @@ const copy = {
   created: "Создано",
   author: "Автор",
   lastEditor: "Последний редактор",
-  reading: "Просмотр статьи",
+  reading: "Чтение",
   editor: "Редактор",
   editArticle: "Редактирование статьи",
-  newNote: "Создание статьи",
-  editorText:
-    "Изменения сохраняются в PostgreSQL и сразу отображаются в структуре разделов.",
+  newNote: "Новая статья",
+  editorText: "Изменения сохраняются в PostgreSQL и сразу появляются в базе знаний.",
   editButton: "Редактировать",
   closeEditor: "К статье",
-  noAccessEmptyTitle: "Пустой раздел",
+  noAccessEmptyTitle: "Пустая категория",
   noAccessEmptyText:
-    "В этой категории пока нет статей. У вас права только на просмотр, обратитесь к администратору для доступа к созданию.",
+    "В этой категории пока нет материалов. У вас только режим чтения, обратитесь к администратору для прав редактирования.",
 } as const;
 
 type EditorArticle = Parameters<typeof ThoughtEditor>[0]["article"];
@@ -74,9 +73,7 @@ export function WorkspacePanels({
   wikiLinks,
 }: WorkspacePanelsProps) {
   const canEditSelectedArticle = Boolean(
-    selectedArticle &&
-      canManageArticles &&
-      (!selectedArticle.authorIsAdmin || isAdmin)
+    selectedArticle && canManageArticles && (!selectedArticle.authorIsAdmin || isAdmin)
   );
   const canDeleteArticle = selectedArticle
     ? selectedArticle.authorId === currentUserId || isAdmin
@@ -87,21 +84,21 @@ export function WorkspacePanels({
     <>
       <main className={`order-1 space-y-4 lg:order-2 ${shouldShowEditor ? "lg:col-span-2" : ""}`}>
         {shouldShowEditor ? (
-          <section className="nook-surface rounded-2xl p-4 sm:p-5">
+          <section className="nook-panel rounded-xl p-4 sm:p-5">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#c4d9e8]">
+                <p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">
                   {copy.editor}
                 </p>
-                <h2 className="mt-2 text-xl font-semibold text-[#e4eef6]">
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
                   {selectedArticle ? copy.editArticle : copy.newNote}
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-[#9eb4c5]">{copy.editorText}</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{copy.editorText}</p>
               </div>
               {selectedArticle && closeEditorHref ? (
                 <Link
                   href={closeEditorHref}
-                  className="rounded-lg border border-[#5a7f9b] bg-[#234761] px-3 py-2 text-sm font-medium text-[#e6f0f8] hover:bg-[#2d5876]"
+                  className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
                 >
                   {copy.closeEditor}
                 </Link>
@@ -120,16 +117,16 @@ export function WorkspacePanels({
             />
           </section>
         ) : selectedArticle ? (
-          <section className="nook-surface rounded-2xl p-5 sm:p-6">
+          <section className="nook-panel rounded-xl p-5 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#2b5f7f] px-3 py-1 font-semibold text-[#97d5ef]">
+                <span className="rounded-full border border-primary/45 bg-primary/10 px-3 py-1 font-semibold text-primary">
                   {selectedArticle.topic}
                 </span>
-                <span className="rounded-full bg-[#2a516d] px-3 py-1 font-semibold text-[#b8cad7]">
+                <span className="rounded-full border border-border/80 bg-muted/50 px-3 py-1 font-semibold text-muted-foreground">
                   {selectedArticle.category}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[#92acbf]">
+                <span className="inline-flex items-center gap-1 text-muted-foreground">
                   <Clock3 className="size-3.5" />
                   {copy.updated} {formatDateTime(selectedArticle.updatedAt)}
                 </span>
@@ -137,90 +134,86 @@ export function WorkspacePanels({
               {editArticleHref && canEditSelectedArticle ? (
                 <Link
                   href={editArticleHref}
-                  className="rounded-lg border border-[#5a7f9b] bg-[#234761] px-3 py-2 text-sm font-medium text-[#e6f0f8] hover:bg-[#2d5876]"
+                  className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
                 >
                   {copy.editButton}
                 </Link>
               ) : null}
             </div>
 
-            <h2 className="mt-4 text-[clamp(1.65rem,3vw,2.05rem)] font-semibold tracking-tight text-[#e8f0f7]">
+            <h2 className="mt-4 text-[clamp(1.55rem,3vw,2.05rem)] font-semibold tracking-tight text-foreground">
               {selectedArticle.title}
             </h2>
-            <p className="mt-3 text-sm leading-7 text-[#a4b8c8] sm:text-[15px]">
+            <p className="mt-3 text-sm leading-7 text-muted-foreground sm:text-[15px]">
               {selectedArticle.summary}
             </p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-4 py-3">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[#c4d9e8]">
+              <div className="nook-panel-soft rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-muted-foreground">
                   <UserRound className="size-3.5" />
                   {copy.author}
                 </div>
-                <p className="mt-2 text-sm font-semibold text-[#e4eef6]">
-                  {selectedArticle.authorName}
-                </p>
-                <p className="mt-1 text-xs text-[#c4d9e8]">
+                <p className="mt-2 text-sm font-semibold text-foreground">{selectedArticle.authorName}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
                   {copy.created} {formatDateTime(selectedArticle.createdAt)}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-4 py-3">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-[#c4d9e8]">
+              <div className="nook-panel-soft rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-muted-foreground">
                   <PenSquare className="size-3.5" />
                   {copy.lastEditor}
                 </div>
-                <p className="mt-2 text-sm font-semibold text-[#e4eef6]">
-                  {selectedArticle.updatedByName}
-                </p>
-                <p className="mt-1 text-xs text-[#c4d9e8]">
+                <p className="mt-2 text-sm font-semibold text-foreground">{selectedArticle.updatedByName}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
                   {copy.updated} {formatDateTime(selectedArticle.updatedAt)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 rounded-xl border border-[#4d708b] bg-[#224a67]/65 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#c3d5e3]">
-                <BookOpenText className="size-4 text-[#7cd9f3]" />
+            <div className="mt-5 rounded-xl border border-border/80 bg-card/75 p-4">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
+                <BookOpenText className="size-4 text-primary" />
                 {copy.reading}
               </div>
               <ArticleContent
                 html={selectedArticle.contentHtml}
                 wikiLinks={wikiLinks}
-                className="max-w-none space-y-4 text-[15px] leading-7 text-[#b8cad8]"
+                className="max-w-none space-y-4 text-[15px] leading-7 text-slate-200"
               />
             </div>
           </section>
         ) : (
-          <section className="nook-surface rounded-2xl p-6">
-            <h2 className="text-xl font-semibold text-[#e4eef6]">{copy.noAccessEmptyTitle}</h2>
-            <p className="mt-2 text-sm leading-7 text-[#d2e3ef]">{copy.noAccessEmptyText}</p>
+          <section className="nook-panel rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-foreground">{copy.noAccessEmptyTitle}</h2>
+            <p className="mt-2 text-sm leading-7 text-muted-foreground">{copy.noAccessEmptyText}</p>
           </section>
         )}
       </main>
 
       {!shouldShowEditor ? (
-        <aside className="order-3 space-y-3 sm:space-y-4">
-          <section className="nook-surface rounded-2xl p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#c4d9e8]">
+        <aside className="order-3 space-y-4">
+          <section className="nook-panel rounded-xl p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">
               {copy.snapshot}
             </p>
             <div className="mt-3 grid gap-2">
-              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-[#c4d9e8]">
+              <div className="nook-panel-soft rounded-lg px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
                   {copy.allArticles}
                 </p>
-                <p className="mt-1 text-xl font-semibold text-[#e4eef6]">{totalArticles}</p>
+                <p className="mt-1 text-xl font-semibold text-foreground">{totalArticles}</p>
               </div>
-              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-[#c4d9e8]">Категория</p>
-                <p className="mt-1 text-sm font-semibold text-[#e4eef6]">{selectedCategory}</p>
+              <div className="nook-panel-soft rounded-lg px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Категория</p>
+                <p className="mt-1 text-sm font-semibold text-foreground">{selectedCategory}</p>
               </div>
-              <div className="rounded-xl border border-[#4d708b] bg-[#1f405b]/88 px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-[#c4d9e8]">
+              <div className="nook-panel-soft rounded-lg px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
                   {copy.lastUpdate}
                 </p>
-                <p className="mt-1 text-sm font-semibold text-[#e4eef6]">
+                <p className="mt-1 text-sm font-semibold text-foreground">
                   {lastUpdatedAt ? formatDateTime(lastUpdatedAt) : copy.emptyValue}
                 </p>
               </div>
