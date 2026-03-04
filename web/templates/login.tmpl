@@ -14,10 +14,10 @@
   <main class="auth-layout">
     <aside class="auth-aside">
       <p class="eyebrow">Knowledge Atlas</p>
-      <h1 class="aside-title">DevOps wiki auth gateway</h1>
+      <h1 class="aside-title">Контур авторизации DevOps-вики</h1>
       <p class="aside-text">
-        Live bash scene reacts to your input. Enter email and password,
-        watch deploy progress move in real time.
+        Живая bash-сцена реагирует на ваш ввод.
+        Введите email и пароль и смотрите, как двигается прогресс.
       </p>
 
       <div class="devops-scene" data-auth-scene>
@@ -26,9 +26,9 @@
           <span class="scene-line">module.vpc: complete after 13s</span>
           <span class="scene-line">module.cluster: complete after 22s</span>
           <span class="scene-line">Outputs: endpoint = ready</span>
-          <span class="scene-line scene-line-live" data-live-email>input.email: waiting...</span>
-          <span class="scene-line scene-line-live" data-live-password>input.password: waiting...</span>
-          <span class="scene-line scene-line-live" data-live-event>auth.event: awaiting credentials</span>
+          <span class="scene-line scene-line-live" data-live-email>input.email: ожидание...</span>
+          <span class="scene-line scene-line-live" data-live-password>input.password: ожидание...</span>
+          <span class="scene-line scene-line-live" data-live-event>auth.event: ожидаем данные</span>
         </div>
 
         <div class="scene-flow" data-live-flow>
@@ -43,7 +43,7 @@
             <span class="scene-progress-fill" data-live-fill></span>
             <span class="scene-progress-thumb" data-live-thumb></span>
           </div>
-          <span class="scene-progress-label" data-live-status>status: waiting for input</span>
+          <span class="scene-progress-label" data-live-status>статус: ожидание ввода</span>
         </div>
       </div>
     </aside>
@@ -53,17 +53,17 @@
         <div class="brand-mark">KZ</div>
         <div>
           <p class="brand-title">{{.AppName}}</p>
-          <p class="brand-subtitle">Sign in</p>
+          <p class="brand-subtitle">Вход</p>
         </div>
       </div>
 
-      <nav class="auth-tabs" aria-label="Auth mode">
-        <a href="/auth/login" class="auth-tab auth-tab-active">Sign in</a>
-        <a href="/auth/register" class="auth-tab">Register</a>
+      <nav class="auth-tabs" aria-label="Режим авторизации">
+        <a href="/auth/login" class="auth-tab auth-tab-active">Вход</a>
+        <a href="/auth/register" class="auth-tab">Регистрация</a>
       </nav>
 
-      <h2 class="auth-title">Welcome back</h2>
-      <p class="auth-subtitle">Use your email and password to enter the workspace.</p>
+      <h2 class="auth-title">С возвращением</h2>
+      <p class="auth-subtitle">Введите email и пароль, чтобы войти в рабочее пространство.</p>
 
       {{if .Error}}
       <div class="alert alert-error">{{.Error}}</div>
@@ -81,17 +81,17 @@
         </label>
 
         <label class="field">
-          <span>Password</span>
-          <input type="password" name="password" placeholder="Minimum 10 chars" autocomplete="current-password" required />
-          <small class="field-hint">Use numbers and symbols for a stronger password.</small>
+          <span>Пароль</span>
+          <input type="password" name="password" placeholder="Минимум 10 символов" autocomplete="current-password" required />
+          <small class="field-hint">Используйте цифры и спецсимволы для более сильного пароля.</small>
         </label>
 
-        <button class="button button-primary" type="submit">Sign in</button>
+        <button class="button button-primary" type="submit">Войти</button>
       </form>
 
       <p class="footnote">
-        No account yet?
-        <a href="/auth/register">Create one</a>
+        Еще нет аккаунта?
+        <a href="/auth/register">Создать</a>
       </p>
     </section>
   </main>

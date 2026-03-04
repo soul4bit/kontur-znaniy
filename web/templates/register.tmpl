@@ -14,10 +14,10 @@
   <main class="auth-layout">
     <aside class="auth-aside">
       <p class="eyebrow">Knowledge Atlas</p>
-      <h1 class="aside-title">Create your knowledge node</h1>
+      <h1 class="aside-title">Создайте узел знаний</h1>
       <p class="aside-text">
-        Registration creates a user instantly. Bash scene reacts to
-        email and password input while you type.
+        Регистрация сразу создает пользователя.
+        Bash-сцена реагирует на ввод email и пароля в реальном времени.
       </p>
 
       <div class="devops-scene" data-auth-scene>
@@ -26,9 +26,9 @@
           <span class="scene-line">module.vpc: complete after 13s</span>
           <span class="scene-line">module.cluster: complete after 22s</span>
           <span class="scene-line">Outputs: endpoint = ready</span>
-          <span class="scene-line scene-line-live" data-live-email>input.email: waiting...</span>
-          <span class="scene-line scene-line-live" data-live-password>input.password: waiting...</span>
-          <span class="scene-line scene-line-live" data-live-event>auth.event: awaiting credentials</span>
+          <span class="scene-line scene-line-live" data-live-email>input.email: ожидание...</span>
+          <span class="scene-line scene-line-live" data-live-password>input.password: ожидание...</span>
+          <span class="scene-line scene-line-live" data-live-event>auth.event: ожидаем данные</span>
         </div>
 
         <div class="scene-flow" data-live-flow>
@@ -43,7 +43,7 @@
             <span class="scene-progress-fill" data-live-fill></span>
             <span class="scene-progress-thumb" data-live-thumb></span>
           </div>
-          <span class="scene-progress-label" data-live-status>status: waiting for input</span>
+          <span class="scene-progress-label" data-live-status>статус: ожидание ввода</span>
         </div>
       </div>
     </aside>
@@ -53,17 +53,17 @@
         <div class="brand-mark">KZ</div>
         <div>
           <p class="brand-title">{{.AppName}}</p>
-          <p class="brand-subtitle">Register</p>
+          <p class="brand-subtitle">Регистрация</p>
         </div>
       </div>
 
-      <nav class="auth-tabs" aria-label="Auth mode">
-        <a href="/auth/login" class="auth-tab">Sign in</a>
-        <a href="/auth/register" class="auth-tab auth-tab-active">Register</a>
+      <nav class="auth-tabs" aria-label="Режим авторизации">
+        <a href="/auth/login" class="auth-tab">Вход</a>
+        <a href="/auth/register" class="auth-tab auth-tab-active">Регистрация</a>
       </nav>
 
-      <h2 class="auth-title">New account</h2>
-      <p class="auth-subtitle">Fill the form and start building your DevOps wiki.</p>
+      <h2 class="auth-title">Новый аккаунт</h2>
+      <p class="auth-subtitle">Заполните форму и начните вести свою DevOps-вики.</p>
 
       {{if .Error}}
       <div class="alert alert-error">{{.Error}}</div>
@@ -71,8 +71,8 @@
 
       <form method="post" action="/auth/register" class="auth-form" data-auth-form>
         <label class="field">
-          <span>Name</span>
-          <input type="text" name="name" value="{{.Name}}" placeholder="How should we call you" autocomplete="name" required />
+          <span>Имя</span>
+          <input type="text" name="name" value="{{.Name}}" placeholder="Как к вам обращаться" autocomplete="name" required />
         </label>
 
         <label class="field">
@@ -81,22 +81,22 @@
         </label>
 
         <label class="field">
-          <span>Password</span>
-          <input type="password" name="password" placeholder="Minimum 10 chars" autocomplete="new-password" required />
-          <small class="field-hint">Use a unique password for this service.</small>
+          <span>Пароль</span>
+          <input type="password" name="password" placeholder="Минимум 10 символов" autocomplete="new-password" required />
+          <small class="field-hint">Используйте уникальный пароль для этого сервиса.</small>
         </label>
 
         <label class="field">
-          <span>Confirm password</span>
-          <input type="password" name="confirm_password" placeholder="Repeat password" autocomplete="new-password" required />
+          <span>Повторите пароль</span>
+          <input type="password" name="confirm_password" placeholder="Повторите пароль" autocomplete="new-password" required />
         </label>
 
-        <button class="button button-primary" type="submit">Create account</button>
+        <button class="button button-primary" type="submit">Создать аккаунт</button>
       </form>
 
       <p class="footnote">
-        Already have an account?
-        <a href="/auth/login">Sign in</a>
+        Уже есть аккаунт?
+        <a href="/auth/login">Войти</a>
       </p>
     </section>
   </main>

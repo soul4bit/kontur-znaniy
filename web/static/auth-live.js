@@ -75,30 +75,30 @@
     }
 
     if (emailLine) {
-      emailLine.textContent = hasEmail ? `input.email: ${shortEmail(email)}` : "input.email: waiting...";
+      emailLine.textContent = hasEmail ? `input.email: ${shortEmail(email)}` : "input.email: ожидание...";
     }
     if (passwordLine) {
       passwordLine.textContent = hasPassword
         ? `input.password: ${maskPassword(password)} (${password.length})`
-        : "input.password: waiting...";
+        : "input.password: ожидание...";
     }
 
     if (eventLine && statusLine) {
       if (!hasEmail && !hasPassword) {
-        eventLine.textContent = "auth.event: awaiting credentials";
-        statusLine.textContent = "status: waiting for input";
+        eventLine.textContent = "auth.event: ожидаем данные";
+        statusLine.textContent = "статус: ожидание ввода";
       } else if (hasEmail && !hasPassword) {
-        eventLine.textContent = "auth.event: email accepted, waiting for password";
-        statusLine.textContent = "status: enter password";
+        eventLine.textContent = "auth.event: email принят, ожидаем пароль";
+        statusLine.textContent = "статус: введите пароль";
       } else if (!hasEmail && hasPassword) {
-        eventLine.textContent = "auth.event: password accepted, waiting for email";
-        statusLine.textContent = "status: enter email";
+        eventLine.textContent = "auth.event: пароль принят, ожидаем email";
+        statusLine.textContent = "статус: введите email";
       } else if (!strongPassword) {
-        eventLine.textContent = "auth.event: password policy check failed (<10)";
-        statusLine.textContent = "status: strengthen password";
+        eventLine.textContent = "auth.event: пароль не проходит политику (<10)";
+        statusLine.textContent = "статус: усильте пароль";
       } else {
-        eventLine.textContent = "auth.event: credentials staged, ready to submit";
-        statusLine.textContent = "status: ready to submit";
+        eventLine.textContent = "auth.event: данные готовы, можно отправлять";
+        statusLine.textContent = "статус: готово к отправке";
       }
     }
 
