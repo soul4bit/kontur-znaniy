@@ -511,61 +511,115 @@ body {
     linear-gradient(172deg, #f6f8f4 0%, #e9ede6 100%);
 }
 
-.app-shell {
-  width: min(1080px, 100%);
+.atlas-shell {
+  width: min(1320px, 100%);
   margin: 0 auto;
   border: 1px solid rgba(199, 210, 203, 0.9);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-soft);
-  padding: 32px;
+  padding: 18px;
   animation: rise-in 0.45s ease both;
 }
 
-.app-header {
+.atlas-topbar {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 12px;
 }
 
-.app-title {
-  margin: 8px 0 0;
-  font-size: clamp(28px, 4vw, 38px);
-  line-height: 1.15;
+.atlas-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.app-subtitle {
-  margin: 8px 0 0;
-  max-width: 58ch;
-  color: var(--muted);
-}
-
-.dashboard-grid {
-  margin-top: 24px;
+.atlas-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  place-items: center;
+  font-weight: 800;
+  color: #f2fcfa;
+  background: linear-gradient(138deg, var(--accent-strong) 0%, var(--accent) 100%);
+  box-shadow: 0 10px 28px rgba(11, 97, 88, 0.24);
+}
+
+.atlas-heading {
+  margin: 6px 0 0;
+  font-size: clamp(24px, 3.4vw, 34px);
+  line-height: 1.1;
+}
+
+.atlas-topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.atlas-user-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #d6e0db;
+  background: #f2f7f4;
+  color: #486760;
+  font-size: 13px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-layout {
+  display: grid;
+  grid-template-columns: 265px minmax(0, 1fr) 280px;
+  gap: 14px;
+  align-items: start;
+}
+
+.atlas-rail,
+.atlas-main,
+.atlas-right {
+  display: grid;
   gap: 14px;
 }
 
-.panel {
+.atlas-main {
+  min-width: 0;
+}
+
+.atlas-card {
   border-radius: var(--radius-md);
-  border: 1px solid var(--line);
+  border: 1px solid #d4ddd8;
+  background: rgba(255, 255, 255, 0.92);
   padding: 16px;
+  box-shadow: 0 7px 20px rgba(24, 51, 44, 0.07);
 }
 
-.panel-strong {
-  grid-column: span 7;
-  background: var(--surface);
+.atlas-profile-name {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
 }
 
-.panel-soft {
-  grid-column: span 5;
-  background: var(--surface-soft);
+.atlas-profile-email {
+  margin: 7px 0 0;
+  color: #355e57;
+  word-break: break-word;
+}
+
+.atlas-profile-meta {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .panel-label {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.13em;
@@ -573,29 +627,312 @@ body {
   color: #5e736d;
 }
 
-.panel p {
-  margin: 7px 0;
+.atlas-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
 }
 
-.panel ul {
-  margin: 0;
-  padding-left: 19px;
-  color: var(--muted);
-  display: grid;
+.atlas-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.atlas-list span {
+  color: #2e423d;
+}
+
+.atlas-list em {
+  font-style: normal;
+  color: #5f766f;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-tags {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
-.panel-soft .stat-tile {
-  border-color: #d1ddd7;
-  background: #f1f7f4;
+.atlas-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #cfe0d9;
+  background: #f2f8f5;
+  color: #40635c;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
 }
 
-.panel-soft .stat-tile span {
-  color: #566963;
+.atlas-hero {
+  border-color: #b6d2ca;
+  background:
+    radial-gradient(circle at 96% -4%, rgba(206, 153, 86, 0.22), transparent 36%),
+    linear-gradient(140deg, rgba(228, 244, 239, 0.94), rgba(244, 251, 248, 0.94));
 }
 
-.panel-soft .stat-tile strong {
-  color: var(--text);
+.atlas-hero-title {
+  margin: 0;
+  font-size: clamp(25px, 3.2vw, 36px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.atlas-hero-text {
+  margin: 10px 0 0;
+  max-width: 68ch;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.atlas-pill-row {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.atlas-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #c9ddd6;
+  background: rgba(255, 255, 255, 0.75);
+  color: #3f655d;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: 14px;
+}
+
+.atlas-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.atlas-column {
+  border: 1px solid #d5e2dc;
+  border-radius: 12px;
+  background: #f8fbf9;
+  padding: 10px;
+}
+
+.atlas-column h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.atlas-column ul {
+  margin: 8px 0 0;
+  padding-left: 17px;
+  color: #4d625c;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.atlas-terminal pre {
+  margin: 0;
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(213, 242, 234, 0.24);
+  background: linear-gradient(160deg, #082623 0%, #0f3a35 100%);
+  color: #d8fff2;
+  box-shadow: inset 0 0 0 1px rgba(141, 211, 193, 0.08);
+}
+
+.atlas-terminal code {
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.atlas-status {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.atlas-status li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.atlas-status span {
+  color: #375e57;
+}
+
+.atlas-status strong {
+  font-style: normal;
+  color: #0b6f66;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-note {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.atlas-column li,
+.atlas-note,
+.atlas-profile-meta {
+  text-wrap: pretty;
+}
+
+.atlas-column ul,
+.atlas-list,
+.atlas-status,
+.atlas-note {
+  margin-block: 0;
+}
+
+.atlas-column li:last-child,
+.atlas-list li:last-child,
+.atlas-status li:last-child {
+  margin-bottom: 0;
+}
+
+.atlas-list,
+.atlas-status {
+  color: var(--muted);
+}
+
+.atlas-column ul,
+.atlas-list,
+.atlas-status {
+  line-height: 1.45;
+}
+
+.atlas-column li,
+.atlas-list li,
+.atlas-status li {
+  min-height: 20px;
+}
+
+.atlas-column li::marker {
+  color: #6e8b83;
+}
+
+.atlas-list li,
+.atlas-status li {
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #dbe6e1;
+}
+
+.atlas-list li:last-child,
+.atlas-status li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.atlas-rail .atlas-card,
+.atlas-right .atlas-card {
+  background: rgba(248, 252, 250, 0.95);
+}
+
+.atlas-main .atlas-card {
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.atlas-column ul {
+  margin-bottom: 2px;
+}
+
+.atlas-column li {
+  padding-right: 4px;
+}
+
+.atlas-column li:last-child {
+  margin-bottom: 0;
+}
+
+.atlas-column h3 {
+  color: #20453f;
+}
+
+.atlas-layout {
+  margin-top: 6px;
+}
+
+.atlas-hero .panel-label {
+  color: #4a6f68;
+}
+
+.atlas-card .panel-label {
+  margin-bottom: 10px;
+}
+
+.atlas-main .atlas-card {
+  border-color: #cdd9d3;
+}
+
+.atlas-right .atlas-card,
+.atlas-rail .atlas-card {
+  border-color: #d4dfda;
+}
+
+.atlas-main .atlas-card.atlas-hero {
+  border-color: #b7d2ca;
+}
+
+.atlas-shell .button-ghost {
+  background: #f4f8f6;
+}
+
+.atlas-shell .button-ghost:hover {
+  background: #eaf1ee;
+}
+
+.atlas-shell .eyebrow {
+  color: #62857d;
+}
+
+.atlas-topbar .eyebrow {
+  margin: 0;
+}
+
+.atlas-heading {
+  color: #1d342f;
+}
+
+.atlas-layout {
+  margin-bottom: 2px;
+}
+
+.atlas-main .atlas-card,
+.atlas-right .atlas-card,
+.atlas-rail .atlas-card {
+  backdrop-filter: blur(2px);
+}
+
+.atlas-column ul {
+  margin: 0;
+  padding-left: 18px;
 }
 
 @keyframes scene-shell-float {
@@ -684,9 +1021,17 @@ body {
     font-size: 27px;
   }
 
-  .panel-strong,
-  .panel-soft {
-    grid-column: span 12;
+  .atlas-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .atlas-right {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .atlas-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -700,15 +1045,6 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .app-shell {
-    padding: 20px;
-  }
-
-  .app-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
   .scene-shell {
     padding: 10px 11px;
   }
@@ -719,5 +1055,35 @@ body {
 
   .scene-flow {
     margin-top: 12px;
+  }
+
+  .atlas-shell {
+    padding: 12px;
+  }
+
+  .atlas-topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .atlas-topbar-meta {
+    justify-content: space-between;
+  }
+
+  .atlas-mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .atlas-layout,
+  .atlas-grid,
+  .atlas-right,
+  .atlas-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .atlas-heading {
+    font-size: 26px;
   }
 }

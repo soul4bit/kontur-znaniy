@@ -10,48 +10,131 @@
   <link rel="stylesheet" href="/static/app.css" />
 </head>
 <body class="app-page">
-  <main class="app-shell">
-    <header class="app-header">
-      <div>
-        <p class="eyebrow">{{.AppName}}</p>
-        <h1 class="app-title">Привет, {{.User.Name}}</h1>
-        <p class="app-subtitle">Ваш atlas готов: контент, заметки и связи теперь в одном месте.</p>
+  <main class="atlas-shell">
+    <header class="atlas-topbar">
+      <div class="atlas-brand">
+        <div class="atlas-mark">KZ</div>
+        <div>
+          <p class="eyebrow">{{.AppName}}</p>
+          <h1 class="atlas-heading">Контур знаний</h1>
+        </div>
       </div>
-      <form method="post" action="/auth/logout">
-        <button class="button button-ghost" type="submit">Выйти</button>
-      </form>
+
+      <div class="atlas-topbar-meta">
+        <span class="atlas-user-chip">@{{.User.Name}}</span>
+        <form method="post" action="/auth/logout">
+          <button class="button button-ghost" type="submit">Выйти</button>
+        </form>
+      </div>
     </header>
 
-    <section class="dashboard-grid">
-      <article class="panel panel-strong">
-        <p class="panel-label">Профиль</p>
-        <p><strong>Email:</strong> {{.User.Email}}</p>
-        <p><strong>User ID:</strong> {{.User.ID}}</p>
-        <p><strong>Создан:</strong> {{.User.CreatedAt.Format "02.01.2006 15:04"}}</p>
-      </article>
+    <section class="atlas-layout">
+      <aside class="atlas-rail">
+        <article class="atlas-card atlas-profile">
+          <p class="panel-label">Профиль</p>
+          <p class="atlas-profile-name">{{.User.Name}}</p>
+          <p class="atlas-profile-email">{{.User.Email}}</p>
+          <p class="atlas-profile-meta">ID: {{.User.ID}} · С нами с {{.User.CreatedAt.Format "02.01.2006 15:04"}}</p>
+        </article>
 
-      <article class="panel panel-soft">
-        <p class="panel-label">Живая статистика БД</p>
-        <div class="stat-grid stat-grid-compact">
-          <article class="stat-tile">
-            <span>Пользователей</span>
-            <strong>{{.UsersTotal}}</strong>
+        <article class="atlas-card">
+          <p class="panel-label">Быстрый доступ</p>
+          <ul class="atlas-list">
+            <li><span>Runbook инцидентов</span><em>в работе</em></li>
+            <li><span>Шпаргалка по Terraform</span><em>готово</em></li>
+            <li><span>Kubernetes плейбук</span><em>обновить</em></li>
+          </ul>
+        </article>
+
+        <article class="atlas-card">
+          <p class="panel-label">Ритм команды</p>
+          <div class="atlas-tags">
+            <span class="atlas-tag">postmortem</span>
+            <span class="atlas-tag">monitoring</span>
+            <span class="atlas-tag">rollback</span>
+            <span class="atlas-tag">automation</span>
+          </div>
+        </article>
+      </aside>
+
+      <section class="atlas-main">
+        <article class="atlas-card atlas-hero">
+          <p class="panel-label">Рабочее пространство</p>
+          <h2 class="atlas-hero-title">Привет, {{.User.Name}}. Собираем знания, а не боль.</h2>
+          <p class="atlas-hero-text">
+            Это ваш командный центр: заметки, сценарии и решения в одном месте.
+            Добавляйте все, что помогает тушить инциденты быстрее и повторять хорошие практики.
+          </p>
+          <div class="atlas-pill-row">
+            <span class="atlas-pill">Текущих сессий: {{.ActiveSessions}}</span>
+            <span class="atlas-pill">Пользователей: {{.UsersTotal}}</span>
+            <span class="atlas-pill">Режим: Focus</span>
+          </div>
+        </article>
+
+        <div class="atlas-grid">
+          <article class="atlas-card">
+            <p class="panel-label">Карта фокуса</p>
+            <div class="atlas-columns">
+              <section class="atlas-column">
+                <h3>Инфра</h3>
+                <ul>
+                  <li>Обновить runbook по бэкапам</li>
+                  <li>Проверить лимиты по VPS</li>
+                </ul>
+              </section>
+              <section class="atlas-column">
+                <h3>Сервисы</h3>
+                <ul>
+                  <li>Синхронизировать healthcheck</li>
+                  <li>Свести логи auth в один поток</li>
+                </ul>
+              </section>
+              <section class="atlas-column">
+                <h3>Автоматизация</h3>
+                <ul>
+                  <li>Скрипт еженедельного smoke-test</li>
+                  <li>Шаблон changelog релиза</li>
+                </ul>
+              </section>
+            </div>
           </article>
-          <article class="stat-tile">
-            <span>Активных сессий</span>
-            <strong>{{.ActiveSessions}}</strong>
+
+          <article class="atlas-card atlas-terminal">
+            <p class="panel-label">Живой фрагмент</p>
+            <pre><code>$ kontur wiki sync --scope devops
+notes.scan: 42 files
+links.check: passed
+alerts.map: updated
+status: knowledge atlas is ready</code></pre>
           </article>
         </div>
-      </article>
+      </section>
 
-      <article class="panel panel-soft">
-        <p class="panel-label">Что дальше</p>
-        <ul>
-          <li>добавить разделы и статьи</li>
-          <li>собрать карту знаний по тегам</li>
-          <li>включить ACL и роли редакторов</li>
-        </ul>
-      </article>
+      <aside class="atlas-right">
+        <article class="atlas-card">
+          <p class="panel-label">Пульс системы</p>
+          <ul class="atlas-status">
+            <li><span>API</span><strong>ok</strong></li>
+            <li><span>PostgreSQL</span><strong>ok</strong></li>
+            <li><span>Deploy pipeline</span><strong>watching</strong></li>
+          </ul>
+        </article>
+
+        <article class="atlas-card">
+          <p class="panel-label">Сегодняшний фокус</p>
+          <p class="atlas-note">Пишем коротко, документируем сразу, не оставляем "потом". Контур знаний любит конкретику.</p>
+        </article>
+
+        <article class="atlas-card">
+          <p class="panel-label">Шаги на потом</p>
+          <ul class="atlas-list">
+            <li><span>Шаблоны страниц</span><em>draft</em></li>
+            <li><span>Права по ролям</span><em>next</em></li>
+            <li><span>Поиск по тегам</span><em>plan</em></li>
+          </ul>
+        </article>
+      </aside>
     </section>
   </main>
 </body>
