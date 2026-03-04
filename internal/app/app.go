@@ -137,9 +137,8 @@ func (a *Application) Routes() http.Handler {
 
 	staticHandler := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
-		w.Header().Set("Pragma", "no-cache")
-		w.Header().Set("Expires", "0")
+		// Versioned assets are safe to cache aggressively.
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		staticHandler.ServeHTTP(w, r)
 	})))
 

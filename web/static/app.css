@@ -1275,6 +1275,71 @@ body {
   line-height: 1.6;
 }
 
+.atlas-rofl-card {
+  border-color: #b8d2ca;
+  background:
+    radial-gradient(circle at 95% -10%, rgba(13, 118, 109, 0.16), transparent 34%),
+    radial-gradient(circle at 8% 115%, rgba(206, 153, 86, 0.18), transparent 36%),
+    linear-gradient(145deg, rgba(239, 249, 245, 0.94), rgba(249, 252, 251, 0.94));
+}
+
+.atlas-rofl-title {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 27px);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #1c473f;
+}
+
+.atlas-rofl-text {
+  margin: 8px 0 0;
+  color: #44645d;
+  line-height: 1.55;
+}
+
+.atlas-rofl-code {
+  margin: 12px 0 0;
+  border-radius: 12px;
+  border: 1px solid rgba(167, 207, 195, 0.46);
+  background: linear-gradient(160deg, #0a2f2b 0%, #11443d 100%);
+  color: #d8fff2;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.atlas-rofl-code code {
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-rofl-meta {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.atlas-rofl-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid #bed8cf;
+  background: rgba(255, 255, 255, 0.82);
+  color: #335f57;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-rofl-refresh {
+  min-width: 122px;
+}
+
 .atlas-shift-card {
   border-color: #bfd6cf;
   background:
