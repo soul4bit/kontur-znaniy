@@ -219,7 +219,7 @@ body {
 
 .flow-node {
   position: absolute;
-  top: 9px;
+  top: 10px;
   width: 14px;
   height: 14px;
   border-radius: 999px;
@@ -245,7 +245,7 @@ body {
 
 .flow-pulse {
   position: absolute;
-  top: 11px;
+  top: 12px;
   left: 14px;
   width: 10px;
   height: 10px;
