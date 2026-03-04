@@ -178,10 +178,12 @@ body {
 }
 
 .scene-line-live {
-  max-width: 42ch;
+  max-width: none;
   opacity: 1;
   color: #d9fff4;
   animation: none;
+  overflow: visible;
+  padding-right: 6px;
 }
 
 .scene-line-live:last-child {

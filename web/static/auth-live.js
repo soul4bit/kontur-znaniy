@@ -9,14 +9,18 @@
 
   const mode = (form.dataset.authMode || "login").toLowerCase();
 
+  const nickInput = form.querySelector('input[name="name"], input[name="nick"]');
   const emailInput = form.querySelector('input[name="email"]');
   const passwordInput = form.querySelector('input[name="password"]');
   if (!emailInput || !passwordInput) {
     return;
   }
+  const confirmInput = form.querySelector('input[name="confirm_password"]');
 
+  const nickLine = scene.querySelector("[data-live-nick]");
   const emailLine = scene.querySelector("[data-live-email]");
   const passwordLine = scene.querySelector("[data-live-password]");
+  const confirmLine = scene.querySelector("[data-live-confirm]");
   const eventLine = scene.querySelector("[data-live-event]");
   const statusLine = scene.querySelector("[data-live-status]");
   const fill = scene.querySelector("[data-live-fill]");
@@ -37,6 +41,21 @@
   const maskPassword = (value) => {
     const count = Math.min(value.length, 16);
     return "*".repeat(count);
+  };
+
+  const shortNick = (value) => {
+    const clean = value.trim();
+    if (clean.length <= 18) {
+      return clean;
+    }
+    return `${clean.slice(0, 16)}...`;
+  };
+
+  const setLine = (node, text) => {
+    if (!node) {
+      return;
+    }
+    node.textContent = text;
   };
 
   const setProgress = (value) => {
@@ -63,28 +82,7 @@
     }
   };
 
-  const setWaitingState = () => {
-    if (emailLine) {
-      emailLine.textContent = "input.email: ожидание...";
-    }
-    if (passwordLine) {
-      passwordLine.textContent = "input.password: ожидание...";
-    }
-    if (eventLine) {
-      eventLine.textContent = "auth.event: ожидание...";
-    }
-    if (statusLine) {
-      statusLine.textContent = "статус: ожидание ввода";
-    }
-    setProgress(0);
-  };
-
-  const updateScene = () => {
-    if (mode === "register") {
-      setWaitingState();
-      return;
-    }
-
+  const updateLoginScene = () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
 
@@ -103,37 +101,129 @@
       progress += 20;
     }
 
-    if (emailLine) {
-      emailLine.textContent = hasEmail ? `input.email: ${shortEmail(email)}` : "input.email: ожидание...";
-    }
-    if (passwordLine) {
-      passwordLine.textContent = hasPassword
-        ? `input.password: ${maskPassword(password)} (${password.length})`
-        : "input.password: ожидание...";
-    }
+    setLine(emailLine, hasEmail ? `input.email: ${shortEmail(email)}` : "input.email: ожидание...");
+    setLine(
+      passwordLine,
+      hasPassword ? `input.password: ${maskPassword(password)} (${password.length})` : "input.password: ожидание...",
+    );
 
     if (eventLine && statusLine) {
       if (!hasEmail && !hasPassword) {
-        eventLine.textContent = "auth.event: ожидаем данные";
-        statusLine.textContent = "статус: ожидание ввода";
+        setLine(eventLine, "auth.event: ожидаем данные");
+        setLine(statusLine, "статус: ожидание ввода");
       } else if (hasEmail && !hasPassword) {
-        eventLine.textContent = "auth.event: email принят, ожидаем пароль";
-        statusLine.textContent = "статус: введите пароль";
+        setLine(eventLine, "auth.event: email принят, ожидаем пароль");
+        setLine(statusLine, "статус: введите пароль");
       } else if (!hasEmail && hasPassword) {
-        eventLine.textContent = "auth.event: пароль принят, ожидаем email";
-        statusLine.textContent = "статус: введите email";
+        setLine(eventLine, "auth.event: пароль принят, ожидаем email");
+        setLine(statusLine, "статус: введите email");
       } else if (!strongPassword) {
-        eventLine.textContent = "auth.event: пароль не проходит политику (<10)";
-        statusLine.textContent = "статус: усильте пароль";
+        setLine(eventLine, "auth.event: пароль не проходит политику (<10)");
+        setLine(statusLine, "статус: усильте пароль");
       } else {
-        eventLine.textContent = "auth.event: данные готовы, можно отправлять";
-        statusLine.textContent = "статус: готово к отправке";
+        setLine(eventLine, "auth.event: данные готовы, можно отправлять");
+        setLine(statusLine, "статус: готово к отправке");
       }
     }
 
     setProgress(progress);
   };
 
+  const updateRegisterScene = () => {
+    const nick = nickInput ? nickInput.value.trim() : "";
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmInput ? confirmInput.value : "";
+
+    const hasNick = nick.length > 0;
+    const hasEmail = email.length > 0;
+    const hasPassword = password.length > 0;
+    const hasConfirm = confirmPassword.length > 0;
+    const strongPassword = password.length >= 10;
+    const passwordsMatch = hasPassword && hasConfirm && password === confirmPassword;
+
+    let progress = 0;
+    if (hasNick) {
+      progress += 25;
+    }
+    if (hasEmail) {
+      progress += 25;
+    }
+    if (hasPassword) {
+      progress += 20;
+    }
+    if (hasConfirm) {
+      progress += 20;
+    }
+    if (strongPassword) {
+      progress += 5;
+    }
+    if (passwordsMatch) {
+      progress += 5;
+    }
+
+    setLine(nickLine, hasNick ? `input.nick: ${shortNick(nick)}` : "input.nick: ожидание...");
+    setLine(emailLine, hasEmail ? `input.email: ${shortEmail(email)}` : "input.email: ожидание...");
+    setLine(
+      passwordLine,
+      hasPassword ? `input.password: ${maskPassword(password)} (${password.length})` : "input.password: ожидание...",
+    );
+
+    if (hasConfirm) {
+      if (!hasPassword) {
+        setLine(confirmLine, "input.confirm_password: введено");
+      } else if (passwordsMatch) {
+        setLine(confirmLine, "input.confirm_password: совпадает");
+      } else {
+        setLine(confirmLine, "input.confirm_password: не совпадает");
+      }
+    } else {
+      setLine(confirmLine, "input.confirm_password: ожидание...");
+    }
+
+    if (!hasNick && !hasEmail && !hasPassword && !hasConfirm) {
+      setLine(eventLine, "auth.event: ожидаем данные");
+      setLine(statusLine, "статус: ожидание ввода");
+    } else if (!hasNick) {
+      setLine(eventLine, "auth.event: ожидаем ник");
+      setLine(statusLine, "статус: введите ник");
+    } else if (!hasEmail) {
+      setLine(eventLine, "auth.event: ожидаем email");
+      setLine(statusLine, "статус: введите email");
+    } else if (!hasPassword) {
+      setLine(eventLine, "auth.event: ожидаем пароль");
+      setLine(statusLine, "статус: введите пароль");
+    } else if (!strongPassword) {
+      setLine(eventLine, "auth.event: пароль не проходит политику (<10)");
+      setLine(statusLine, "статус: усильте пароль");
+    } else if (!hasConfirm) {
+      setLine(eventLine, "auth.event: ожидаем подтверждение пароля");
+      setLine(statusLine, "статус: подтвердите пароль");
+    } else if (!passwordsMatch) {
+      setLine(eventLine, "auth.event: пароли не совпадают");
+      setLine(statusLine, "статус: проверьте подтверждение");
+    } else {
+      setLine(eventLine, "auth.event: данные готовы, можно отправлять");
+      setLine(statusLine, "статус: готово к регистрации");
+    }
+
+    setProgress(progress);
+  };
+
+  const updateScene = () => {
+    if (mode === "register") {
+      updateRegisterScene();
+      return;
+    }
+    updateLoginScene();
+  };
+
+  if (nickInput) {
+    nickInput.addEventListener("input", updateScene);
+  }
+  if (confirmInput) {
+    confirmInput.addEventListener("input", updateScene);
+  }
   emailInput.addEventListener("input", updateScene);
   passwordInput.addEventListener("input", updateScene);
   window.addEventListener("resize", updateScene);

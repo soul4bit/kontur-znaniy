@@ -17,7 +17,7 @@
       <h1 class="aside-title">Создайте узел знаний</h1>
       <p class="aside-text">
         Регистрация сразу создает пользователя.
-        Bash-сцена реагирует на ввод email и пароля в реальном времени.
+        Bash-сцена реагирует на ник, email, пароль и подтверждение в реальном времени.
       </p>
 
       <div class="devops-scene" data-auth-scene>
@@ -26,8 +26,10 @@
           <span class="scene-line">module.vpc: complete after 13s</span>
           <span class="scene-line">module.cluster: complete after 22s</span>
           <span class="scene-line">Outputs: endpoint = ready</span>
+          <span class="scene-line scene-line-live" data-live-nick>input.nick: ожидание...</span>
           <span class="scene-line scene-line-live" data-live-email>input.email: ожидание...</span>
           <span class="scene-line scene-line-live" data-live-password>input.password: ожидание...</span>
+          <span class="scene-line scene-line-live" data-live-confirm>input.confirm_password: ожидание...</span>
           <span class="scene-line scene-line-live" data-live-event>auth.event: ожидание...</span>
         </div>
 
@@ -67,8 +69,8 @@
 
       <form method="post" action="/auth/register" class="auth-form" data-auth-form data-auth-mode="register">
         <label class="field">
-          <span>Имя</span>
-          <input type="text" name="name" value="{{.Name}}" placeholder="Как к вам обращаться" autocomplete="name" required />
+          <span>Ник</span>
+          <input type="text" name="name" value="{{.Name}}" placeholder="@devops_nick" autocomplete="nickname" required />
         </label>
 
         <label class="field">
