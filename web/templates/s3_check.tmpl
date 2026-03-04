@@ -29,6 +29,9 @@
       <aside class="atlas-rail">
         <article class="atlas-card atlas-sections-sidebar">
           <p class="panel-label">Разделы</p>
+          <label class="atlas-nav-search-wrap">
+            <input class="atlas-nav-search" type="search" placeholder="Найти раздел или тему..." />
+          </label>
           <ul class="atlas-nav">
             {{range .Sections}}
               {{$section := .}}
@@ -46,6 +49,7 @@
               </li>
             {{end}}
           </ul>
+          <p class="atlas-nav-empty" data-nav-empty hidden>Ничего не нашлось. Попробуйте другое слово.</p>
         </article>
       </aside>
 
@@ -85,5 +89,6 @@
       </section>
     </section>
   </main>
+  <script src="/static/wiki-ui.js"></script>
 </body>
 </html>

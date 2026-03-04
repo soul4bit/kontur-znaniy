@@ -511,6 +511,14 @@ body {
     linear-gradient(172deg, #f6f8f4 0%, #e9ede6 100%);
 }
 
+.app-page a,
+.app-page a:visited,
+.app-page a:hover,
+.app-page a:active {
+  color: inherit;
+  text-decoration: none;
+}
+
 .atlas-shell {
   width: min(1320px, 100%);
   margin: 0 auto;
@@ -742,10 +750,53 @@ body {
 }
 
 .atlas-sections-sidebar {
+  position: relative;
+  overflow: hidden;
   border-color: #bfd8cf;
   background:
     radial-gradient(circle at 95% -6%, rgba(206, 153, 86, 0.18), transparent 34%),
     linear-gradient(145deg, rgba(244, 251, 248, 0.96), rgba(236, 246, 242, 0.96));
+}
+
+.atlas-sections-sidebar::before {
+  content: "";
+  position: absolute;
+  right: -30px;
+  top: -38px;
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(13, 118, 109, 0.16), rgba(13, 118, 109, 0));
+  pointer-events: none;
+}
+
+.atlas-nav-search-wrap {
+  display: block;
+  margin-bottom: 11px;
+}
+
+.atlas-nav-search {
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #c7d8d2;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0 11px;
+  font: inherit;
+  color: #284740;
+  font-size: 13px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+}
+
+.atlas-nav-search::placeholder {
+  color: #7a938d;
+}
+
+.atlas-nav-search:focus {
+  outline: none;
+  border-color: #88b9ab;
+  box-shadow: 0 0 0 4px rgba(13, 118, 109, 0.12);
+  background: #ffffff;
 }
 
 .atlas-nav {
@@ -757,11 +808,23 @@ body {
 }
 
 .atlas-nav-item {
+  position: relative;
   border: 1px solid #d4e0db;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.72);
   padding: 8px 9px;
   transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.atlas-nav-item::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 2px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(13, 118, 109, 0), rgba(13, 118, 109, 0.55), rgba(13, 118, 109, 0));
 }
 
 .atlas-nav-item:hover {
@@ -773,6 +836,10 @@ body {
 .atlas-nav-item-active {
   border-color: #a6ccc0;
   box-shadow: 0 8px 20px rgba(14, 93, 83, 0.12);
+}
+
+.atlas-nav-item-active::after {
+  background: linear-gradient(180deg, rgba(13, 118, 109, 0.2), rgba(13, 118, 109, 0.9), rgba(13, 118, 109, 0.2));
 }
 
 .atlas-nav-link {
@@ -855,6 +922,13 @@ body {
   background: rgba(13, 118, 109, 0.14);
   color: #164f48;
   font-weight: 700;
+}
+
+.atlas-nav-empty {
+  margin: 10px 0 0;
+  color: #667d77;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .atlas-cheats-list {
@@ -1129,6 +1203,42 @@ body {
   margin: 0;
   color: #526761;
   line-height: 1.6;
+}
+
+.atlas-shift-card {
+  border-color: #bfd6cf;
+  background:
+    radial-gradient(circle at 104% -8%, rgba(206, 153, 86, 0.18), transparent 34%),
+    linear-gradient(140deg, rgba(239, 249, 245, 0.94), rgba(249, 252, 251, 0.94));
+}
+
+.atlas-shift-title {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #1d4a42;
+}
+
+.atlas-shift-text {
+  margin: 8px 0 0;
+  color: #4d6761;
+  line-height: 1.5;
+}
+
+.atlas-shift-code {
+  margin: 12px 0 0;
+  border-radius: 12px;
+  border: 1px solid rgba(191, 220, 211, 0.42);
+  background: linear-gradient(160deg, #0a2f2b 0%, #11443d 100%);
+  color: #d8fff2;
+  padding: 11px 12px;
+  overflow-x: auto;
+}
+
+.atlas-shift-code code {
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
 }
 
 .article-form {

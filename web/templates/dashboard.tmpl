@@ -32,6 +32,9 @@
       <aside class="atlas-rail">
         <article class="atlas-card atlas-sections-sidebar">
           <p class="panel-label">Разделы</p>
+          <label class="atlas-nav-search-wrap">
+            <input class="atlas-nav-search" type="search" placeholder="Найти раздел или тему..." />
+          </label>
           <ul class="atlas-nav">
             {{range .Sections}}
               {{$section := .}}
@@ -49,13 +52,14 @@
               </li>
             {{end}}
           </ul>
+          <p class="atlas-nav-empty" data-nav-empty hidden>Ничего не нашлось. Попробуйте другое слово.</p>
         </article>
 
-        <article class="atlas-card atlas-profile">
-          <p class="panel-label">Профиль</p>
-          <p class="atlas-profile-name">{{.User.Name}}</p>
-          <p class="atlas-profile-email">{{.User.Email}}</p>
-          <p class="atlas-profile-meta">В базе с {{.User.CreatedAt.Format "02.01.2006 15:04"}}</p>
+        <article class="atlas-card atlas-shift-card">
+          <p class="panel-label">Радар смены</p>
+          <p class="atlas-shift-title" data-shift-title>Инициализация...</p>
+          <p class="atlas-shift-text" data-shift-text>Собираем контекст смены и прогреваем боевой мозг.</p>
+          <pre class="atlas-shift-code"><code data-shift-command>$ echo "контур готов"</code></pre>
         </article>
       </aside>
 
@@ -95,5 +99,6 @@
       </section>
     </section>
   </main>
+  <script src="/static/wiki-ui.js"></script>
 </body>
 </html>
