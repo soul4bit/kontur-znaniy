@@ -207,6 +207,134 @@ func (a *Application) getAuthStats() (authStats, error) {
 	return stats, nil
 }
 
+func scanArticle(scanner interface {
+	Scan(dest ...any) error
+}) (*Article, error) {
+	var article Article
+	if err := scanner.Scan(
+		&article.ID,
+		&article.AuthorID,
+		&article.AuthorName,
+		&article.SectionSlug,
+		&article.Title,
+		&article.Body,
+		&article.CreatedAt,
+		&article.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+	return &article, nil
+}
+
+func (a *Application) createArticle(authorID int64, sectionSlug string, title string, body string) (*Article, error) {
+	now := time.Now().UTC()
+	row := a.db.QueryRow(
+		`insert into articles (author_id, section_slug, title, body, created_at, updated_at)
+		 values ($1, $2, $3, $4, $5, $5)
+		 returning
+			id,
+			author_id,
+			'' as author_name,
+			section_slug,
+			title,
+			body,
+			created_at,
+			updated_at`,
+		authorID,
+		sectionSlug,
+		title,
+		body,
+		now,
+	)
+	return scanArticle(row)
+}
+
+func (a *Application) getArticlesBySection(sectionSlug string, limit int) ([]Article, error) {
+	if limit < 1 {
+		limit = 1
+	}
+
+	rows, err := a.db.Query(
+		`select
+			a.id,
+			a.author_id,
+			u.name as author_name,
+			a.section_slug,
+			a.title,
+			a.body,
+			a.created_at,
+			a.updated_at
+		from articles a
+		join users u on u.id = a.author_id
+		where a.section_slug = $1
+		order by a.updated_at desc
+		limit $2`,
+		sectionSlug,
+		limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]Article, 0, limit)
+	for rows.Next() {
+		article, scanErr := scanArticle(rows)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		result = append(result, *article)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (a *Application) getRecentArticles(limit int) ([]Article, error) {
+	if limit < 1 {
+		limit = 1
+	}
+
+	rows, err := a.db.Query(
+		`select
+			a.id,
+			a.author_id,
+			u.name as author_name,
+			a.section_slug,
+			a.title,
+			a.body,
+			a.created_at,
+			a.updated_at
+		from articles a
+		join users u on u.id = a.author_id
+		order by a.updated_at desc
+		limit $1`,
+		limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]Article, 0, limit)
+	for rows.Next() {
+		article, scanErr := scanArticle(rows)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		result = append(result, *article)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func scanRegistrationRequest(scanner interface {
 	Scan(dest ...any) error
 }) (*registrationRequest, error) {

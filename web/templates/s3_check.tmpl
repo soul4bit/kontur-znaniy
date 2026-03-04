@@ -21,10 +21,8 @@
       </div>
 
       <div class="atlas-topbar-meta">
+        <a class="button button-ghost" href="/app">На главную</a>
         <span class="atlas-user-chip">@{{.User.Name}}</span>
-        <form method="post" action="/auth/logout">
-          <button class="button button-ghost" type="submit">Выйти</button>
-        </form>
       </div>
     </header>
 
@@ -48,49 +46,32 @@
           </ul>
           <a class="atlas-side-tool {{if eq .CurrentPage "s3"}}atlas-side-tool-active{{end}}" href="/app/s3">Проверка S3</a>
         </article>
-
-        <article class="atlas-card atlas-profile">
-          <p class="panel-label">Профиль</p>
-          <p class="atlas-profile-name">{{.User.Name}}</p>
-          <p class="atlas-profile-email">{{.User.Email}}</p>
-          <p class="atlas-profile-meta">В базе с {{.User.CreatedAt.Format "02.01.2006 15:04"}}</p>
-        </article>
       </aside>
 
       <section class="atlas-main">
-        <article class="atlas-card atlas-hero">
-          <p class="panel-label">Панель знаний</p>
-          <h2 class="atlas-hero-title">Всё по делу: разделы слева, статьи внутри разделов.</h2>
-          <p class="atlas-hero-text">
-            Выберите раздел, откройте форму и зафиксируйте рабочую заметку. Формат простой: заголовок, шаги, команда, итог.
-          </p>
+        <article class="atlas-card atlas-main-head">
+          <p class="panel-label">Проверка S3</p>
+          <h2 class="atlas-section-title">Бакет и ключи под рукой</h2>
+          <p class="atlas-hero-text">Нажмите кнопку ниже, и сервер проверит доступность бакета по текущим переменным окружения.</p>
           <div class="atlas-actions">
-            <a class="button button-primary" href="/app/section?slug=linux">Открыть Linux</a>
-            <a class="button button-ghost" href="/app/s3">Проверить S3</a>
+            <a class="button button-primary" href="/app/s3?run=1">Запустить проверку</a>
           </div>
         </article>
 
-        {{if .Success}}
-          <p class="alert alert-success">{{.Success}}</p>
-        {{end}}
-
         <article class="atlas-card">
-          <p class="panel-label">Последние статьи</p>
-          {{if .RecentArticles}}
-            <div class="atlas-article-list">
-              {{range .RecentArticles}}
-                <article class="atlas-article-card">
-                  <div class="atlas-article-meta">
-                    <span>{{.SectionName}}</span>
-                    <span>{{.UpdatedAt.Format "02.01.2006 15:04"}}</span>
-                  </div>
-                  <h3>{{.Title}}</h3>
-                  <p class="atlas-article-body">{{.Body}}</p>
-                </article>
-              {{end}}
-            </div>
+          <ul class="atlas-list">
+            <li><span>Endpoint</span><em>{{.S3Endpoint}}</em></li>
+            <li><span>Bucket</span><em>{{.S3Bucket}}</em></li>
+          </ul>
+
+          {{if .S3Check}}
+            {{if .S3Check.OK}}
+              <p class="alert alert-success">{{.S3Check.Message}}</p>
+            {{else}}
+              <p class="alert alert-error">{{.S3Check.Message}}</p>
+            {{end}}
           {{else}}
-            <p class="atlas-empty">Пока пусто. Создайте первую статью из любого раздела.</p>
+            <p class="atlas-empty">Проверка еще не запускалась.</p>
           {{end}}
         </article>
       </section>

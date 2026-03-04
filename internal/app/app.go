@@ -34,22 +34,53 @@ type User struct {
 	CreatedAt time.Time
 }
 
+type Article struct {
+	ID          int64
+	AuthorID    int64
+	AuthorName  string
+	SectionSlug string
+	SectionName string
+	Title       string
+	Body        string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type s3CheckResult struct {
+	Checked  bool
+	OK       bool
+	Message  string
+	Endpoint string
+	Bucket   string
+}
+
 type userCredentials struct {
 	User
 	PasswordHash string
 }
 
 type viewData struct {
-	AppName string
-	Title   string
-	Error   string
-	Success string
-	User    *User
-	Name    string
-	Email   string
-	Next    string
-	UsersTotal     int
-	ActiveSessions int
+	AppName            string
+	Title              string
+	Error              string
+	Success            string
+	User               *User
+	Name               string
+	Email              string
+	Next               string
+	UsersTotal         int
+	ActiveSessions     int
+	Sections           []wikiSection
+	CurrentSection     *wikiSection
+	CurrentSectionSlug string
+	CurrentPage        string
+	RecentArticles     []Article
+	SectionArticles    []Article
+	ArticleTitle       string
+	ArticleBody        string
+	S3Check            *s3CheckResult
+	S3Endpoint         string
+	S3Bucket           string
 }
 
 type contextKey string
@@ -105,6 +136,9 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/auth/verify-email", a.handleVerifyEmail)
 	mux.HandleFunc("/auth/logout", a.requireAuth(a.handleLogout))
 	mux.HandleFunc("/app", a.requireAuth(a.handleDashboard))
+	mux.HandleFunc("/app/section", a.requireAuth(a.handleSection))
+	mux.HandleFunc("/app/article/new", a.requireAuth(a.handleArticleNew))
+	mux.HandleFunc("/app/s3", a.requireAuth(a.handleS3Check))
 	mux.HandleFunc("/admin/registration/approve", a.handleApproveRegistration)
 	mux.HandleFunc("/admin/registration/reject", a.handleRejectRegistration)
 
@@ -113,7 +147,14 @@ func (a *Application) Routes() http.Handler {
 
 func loadTemplates() (map[string]*template.Template, error) {
 	templateDir := filepath.Join("web", "templates")
-	names := []string{"login.tmpl", "register.tmpl", "dashboard.tmpl"}
+	names := []string{
+		"login.tmpl",
+		"register.tmpl",
+		"dashboard.tmpl",
+		"section.tmpl",
+		"article_new.tmpl",
+		"s3_check.tmpl",
+	}
 
 	result := make(map[string]*template.Template, len(names))
 	for _, name := range names {
@@ -159,8 +200,20 @@ func runMigrations(db *sql.DB) error {
 			moderated_at timestamptz,
 			email_verified_at timestamptz
 		);`,
+		`create table if not exists articles (
+			id bigserial primary key,
+			author_id bigint not null,
+			section_slug text not null,
+			title text not null,
+			body text not null,
+			created_at timestamptz not null default now(),
+			updated_at timestamptz not null default now(),
+			foreign key(author_id) references users(id) on delete cascade
+		);`,
 		`create index if not exists idx_sessions_user_id on sessions(user_id);`,
 		`create index if not exists idx_sessions_expires_at on sessions(expires_at);`,
+		`create index if not exists idx_articles_author_id on articles(author_id);`,
+		`create index if not exists idx_articles_section_updated_at on articles(section_slug, updated_at desc);`,
 		`create unique index if not exists idx_registration_requests_email_verify_token
 			on registration_requests(email_verify_token)
 			where email_verify_token is not null;`,

@@ -21,10 +21,8 @@
       </div>
 
       <div class="atlas-topbar-meta">
+        <a class="button button-ghost" href="/app/section?slug={{.CurrentSection.Slug}}">Назад в раздел</a>
         <span class="atlas-user-chip">@{{.User.Name}}</span>
-        <form method="post" action="/auth/logout">
-          <button class="button button-ghost" type="submit">Выйти</button>
-        </form>
       </div>
     </header>
 
@@ -48,50 +46,38 @@
           </ul>
           <a class="atlas-side-tool {{if eq .CurrentPage "s3"}}atlas-side-tool-active{{end}}" href="/app/s3">Проверка S3</a>
         </article>
-
-        <article class="atlas-card atlas-profile">
-          <p class="panel-label">Профиль</p>
-          <p class="atlas-profile-name">{{.User.Name}}</p>
-          <p class="atlas-profile-email">{{.User.Email}}</p>
-          <p class="atlas-profile-meta">В базе с {{.User.CreatedAt.Format "02.01.2006 15:04"}}</p>
-        </article>
       </aside>
 
       <section class="atlas-main">
-        <article class="atlas-card atlas-hero">
-          <p class="panel-label">Панель знаний</p>
-          <h2 class="atlas-hero-title">Всё по делу: разделы слева, статьи внутри разделов.</h2>
-          <p class="atlas-hero-text">
-            Выберите раздел, откройте форму и зафиксируйте рабочую заметку. Формат простой: заголовок, шаги, команда, итог.
-          </p>
-          <div class="atlas-actions">
-            <a class="button button-primary" href="/app/section?slug=linux">Открыть Linux</a>
-            <a class="button button-ghost" href="/app/s3">Проверить S3</a>
-          </div>
+        <article class="atlas-card atlas-main-head">
+          <p class="panel-label">Новая статья</p>
+          <h2 class="atlas-section-title">{{.CurrentSection.Name}}</h2>
+          <p class="atlas-hero-text">Формат простой: что случилось, какие шаги, какая команда, какой результат.</p>
         </article>
 
-        {{if .Success}}
-          <p class="alert alert-success">{{.Success}}</p>
+        {{if .Error}}
+          <p class="alert alert-error">{{.Error}}</p>
         {{end}}
 
         <article class="atlas-card">
-          <p class="panel-label">Последние статьи</p>
-          {{if .RecentArticles}}
-            <div class="atlas-article-list">
-              {{range .RecentArticles}}
-                <article class="atlas-article-card">
-                  <div class="atlas-article-meta">
-                    <span>{{.SectionName}}</span>
-                    <span>{{.UpdatedAt.Format "02.01.2006 15:04"}}</span>
-                  </div>
-                  <h3>{{.Title}}</h3>
-                  <p class="atlas-article-body">{{.Body}}</p>
-                </article>
-              {{end}}
+          <form class="article-form" method="post" action="/app/article/new">
+            <input type="hidden" name="section" value="{{.CurrentSection.Slug}}" />
+
+            <label class="field">
+              <span>Заголовок</span>
+              <input name="title" type="text" maxlength="180" placeholder="Например: Как починить systemd unit после деплоя" value="{{.ArticleTitle}}" required />
+            </label>
+
+            <label class="field">
+              <span>Текст статьи</span>
+              <textarea name="body" rows="13" placeholder="Проблема, шаги, команда, проверка результата...">{{.ArticleBody}}</textarea>
+            </label>
+
+            <div class="atlas-actions">
+              <button class="button button-primary" type="submit">Сохранить статью</button>
+              <a class="button button-ghost" href="/app/section?slug={{.CurrentSection.Slug}}">Отмена</a>
             </div>
-          {{else}}
-            <p class="atlas-empty">Пока пусто. Создайте первую статью из любого раздела.</p>
-          {{end}}
+          </form>
         </article>
       </section>
     </section>
