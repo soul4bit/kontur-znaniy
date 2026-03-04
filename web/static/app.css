@@ -636,11 +636,11 @@ body {
 @keyframes pulse-spark {
   0%,
   100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     box-shadow: 0 0 0 4px rgba(173, 236, 220, 0.24);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.12);
+    transform: scale(1.12);
     box-shadow: 0 0 0 6px rgba(173, 236, 220, 0.34);
   }
 }
