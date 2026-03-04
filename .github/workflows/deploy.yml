@@ -38,7 +38,7 @@ jobs:
             cd "${APP_DIR}"
             git fetch --prune origin main
             git reset --hard FETCH_HEAD
-            mkdir -p bin data
+            mkdir -p bin
             export GOTOOLCHAIN=auto
             go version
             GOFLAGS=-mod=mod go mod download

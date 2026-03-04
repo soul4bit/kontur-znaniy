@@ -31,10 +31,16 @@
       </div>
 
       <ul class="aside-list">
-        <li>SQLite хранит аккаунты и сессии</li>
+        <li>PostgreSQL хранит аккаунты и сессии</li>
         <li>Пароли защищены через bcrypt</li>
         <li>HttpOnly cookie и безопасный redirect</li>
       </ul>
+
+      <div class="tech-tags">
+        <span>Go</span>
+        <span>PostgreSQL</span>
+        <span>bcrypt</span>
+      </div>
     </aside>
 
     <section class="auth-card">
@@ -45,6 +51,11 @@
           <p class="brand-subtitle">Вход в аккаунт</p>
         </div>
       </div>
+
+      <nav class="auth-tabs" aria-label="Переключение формы">
+        <a href="/auth/login" class="auth-tab auth-tab-active">Вход</a>
+        <a href="/auth/register" class="auth-tab">Регистрация</a>
+      </nav>
 
       <h2 class="auth-title">С возвращением</h2>
       <p class="auth-subtitle">Введите email и пароль, чтобы открыть ваш контур знаний.</p>
@@ -67,6 +78,7 @@
         <label class="field">
           <span>Пароль</span>
           <input type="password" name="password" placeholder="Минимум 10 символов" autocomplete="current-password" required />
+          <small class="field-hint">Минимум 10 символов, лучше с цифрами и спецсимволами.</small>
         </label>
 
         <button class="button button-primary" type="submit">Войти</button>

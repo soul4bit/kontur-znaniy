@@ -35,6 +35,12 @@
         <li>Уникальность аккаунта по email</li>
         <li>Сессия создаётся в таблице sessions</li>
       </ul>
+
+      <div class="tech-tags">
+        <span>Go</span>
+        <span>PostgreSQL</span>
+        <span>sessions</span>
+      </div>
     </aside>
 
     <section class="auth-card">
@@ -45,6 +51,11 @@
           <p class="brand-subtitle">Регистрация</p>
         </div>
       </div>
+
+      <nav class="auth-tabs" aria-label="Переключение формы">
+        <a href="/auth/login" class="auth-tab">Вход</a>
+        <a href="/auth/register" class="auth-tab auth-tab-active">Регистрация</a>
+      </nav>
 
       <h2 class="auth-title">Новый аккаунт</h2>
       <p class="auth-subtitle">Заполните поля и начните вести DevOps-вики в одном месте.</p>
@@ -67,6 +78,7 @@
         <label class="field">
           <span>Пароль</span>
           <input type="password" name="password" placeholder="Минимум 10 символов" autocomplete="new-password" required />
+          <small class="field-hint">Используйте уникальный пароль для этого сервиса.</small>
         </label>
 
         <label class="field">

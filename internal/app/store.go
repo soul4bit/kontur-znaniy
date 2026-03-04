@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type authStats struct {
@@ -13,62 +15,56 @@ type authStats struct {
 }
 
 func (a *Application) createUser(name string, email string, passwordHash string) (*User, error) {
-	nowUnix := time.Now().UTC().Unix()
-
-	result, err := a.db.Exec(
-		`insert into users (email, name, password_hash, created_at) values (?, ?, ?, ?)`,
+	now := time.Now().UTC()
+	row := a.db.QueryRow(
+		`insert into users (email, name, password_hash, created_at)
+		 values ($1, $2, $3, $4)
+		 returning id, email, name, created_at`,
 		email,
 		name,
 		passwordHash,
-		nowUnix,
+		now,
 	)
-	if err != nil {
+
+	var user User
+	if err := row.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt); err != nil {
 		return nil, err
 	}
 
-	userID, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-
-	return a.getUserByID(userID)
+	return &user, nil
 }
 
 func (a *Application) getUserByID(userID int64) (*User, error) {
 	row := a.db.QueryRow(
-		`select id, email, name, created_at from users where id = ? limit 1`,
+		`select id, email, name, created_at from users where id = $1 limit 1`,
 		userID,
 	)
 
 	var user User
-	var createdAtUnix int64
-	if err := row.Scan(&user.ID, &user.Email, &user.Name, &createdAtUnix); err != nil {
+	if err := row.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt); err != nil {
 		return nil, err
 	}
 
-	user.CreatedAt = time.Unix(createdAtUnix, 0).UTC()
 	return &user, nil
 }
 
 func (a *Application) getCredentialsByEmail(email string) (*userCredentials, error) {
 	row := a.db.QueryRow(
-		`select id, email, name, password_hash, created_at from users where email = ? limit 1`,
+		`select id, email, name, password_hash, created_at from users where email = $1 limit 1`,
 		email,
 	)
 
 	var creds userCredentials
-	var createdAtUnix int64
 	if err := row.Scan(
 		&creds.ID,
 		&creds.Email,
 		&creds.Name,
 		&creds.PasswordHash,
-		&createdAtUnix,
+		&creds.CreatedAt,
 	); err != nil {
 		return nil, err
 	}
 
-	creds.CreatedAt = time.Unix(createdAtUnix, 0).UTC()
 	return &creds, nil
 }
 
@@ -87,11 +83,11 @@ func (a *Application) createSession(userID int64) (token string, expiresAt time.
 	tokenHash := hashSessionToken(token)
 
 	_, err = a.db.Exec(
-		`insert into sessions (user_id, token_hash, created_at, expires_at) values (?, ?, ?, ?)`,
+		`insert into sessions (user_id, token_hash, created_at, expires_at) values ($1, $2, $3, $4)`,
 		userID,
 		tokenHash,
-		now.Unix(),
-		expiresAt.Unix(),
+		now,
+		expiresAt,
 	)
 	if err != nil {
 		return "", time.Time{}, err
@@ -111,20 +107,19 @@ func (a *Application) getUserBySessionToken(token string) (*User, error) {
 			s.expires_at
 		from sessions s
 		join users u on u.id = s.user_id
-		where s.token_hash = ?
+		where s.token_hash = $1
 		limit 1`,
 		tokenHash,
 	)
 
 	var user User
-	var userCreatedAtUnix int64
-	var expiresAtUnix int64
+	var expiresAt time.Time
 	err := row.Scan(
 		&user.ID,
 		&user.Email,
 		&user.Name,
-		&userCreatedAtUnix,
-		&expiresAtUnix,
+		&user.CreatedAt,
+		&expiresAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -133,38 +128,37 @@ func (a *Application) getUserBySessionToken(token string) (*User, error) {
 		return nil, err
 	}
 
-	if expiresAtUnix <= time.Now().UTC().Unix() {
+	if !expiresAt.After(time.Now().UTC()) {
 		if delErr := a.deleteSessionByToken(token); delErr != nil {
 			a.logger.Printf("delete expired session: %v", delErr)
 		}
 		return nil, nil
 	}
 
-	user.CreatedAt = time.Unix(userCreatedAtUnix, 0).UTC()
 	return &user, nil
 }
 
 func (a *Application) deleteSessionByToken(token string) error {
 	tokenHash := hashSessionToken(token)
-	_, err := a.db.Exec(`delete from sessions where token_hash = ?`, tokenHash)
+	_, err := a.db.Exec(`delete from sessions where token_hash = $1`, tokenHash)
 	return err
 }
 
 func (a *Application) cleanupExpiredSessions() error {
 	_, err := a.db.Exec(
-		`delete from sessions where expires_at <= ?`,
-		time.Now().UTC().Unix(),
+		`delete from sessions where expires_at <= $1`,
+		time.Now().UTC(),
 	)
 	return err
 }
 
 func (a *Application) getAuthStats() (authStats, error) {
-	nowUnix := time.Now().UTC().Unix()
+	now := time.Now().UTC()
 	row := a.db.QueryRow(
 		`select
 			(select count(*) from users),
-			(select count(*) from sessions where expires_at > ?)`,
-		nowUnix,
+			(select count(*) from sessions where expires_at > $1)`,
+		now,
 	)
 
 	var stats authStats
@@ -180,6 +174,20 @@ func isUniqueEmailError(err error) bool {
 		return false
 	}
 
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		if pgErr.Code != "23505" {
+			return false
+		}
+
+		if pgErr.ConstraintName == "users_email_key" {
+			return true
+		}
+
+		return strings.Contains(strings.ToLower(pgErr.Message), "email")
+	}
+
 	text := strings.ToLower(err.Error())
-	return strings.Contains(text, "unique") && strings.Contains(text, "users.email")
+	return strings.Contains(text, "users_email_key") ||
+		(strings.Contains(text, "duplicate key") && strings.Contains(text, "email"))
 }

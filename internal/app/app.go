@@ -11,14 +11,13 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"nook/internal/config"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type Application struct {
@@ -58,11 +57,7 @@ type contextKey string
 const userContextKey contextKey = "authenticated_user"
 
 func New(cfg config.Config, logger *log.Logger) (*Application, error) {
-	if err := os.MkdirAll("data", 0o755); err != nil {
-		return nil, err
-	}
-
-	db, err := sql.Open("sqlite", cfg.DatabaseDSN)
+	db, err := sql.Open("pgx", cfg.DatabaseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -132,20 +127,19 @@ func loadTemplates() (map[string]*template.Template, error) {
 
 func runMigrations(db *sql.DB) error {
 	statements := []string{
-		`pragma foreign_keys = on;`,
 		`create table if not exists users (
-			id integer primary key autoincrement,
+			id bigserial primary key,
 			email text not null unique,
 			name text not null,
 			password_hash text not null,
-			created_at integer not null
+			created_at timestamptz not null default now()
 		);`,
 		`create table if not exists sessions (
-			id integer primary key autoincrement,
-			user_id integer not null,
+			id bigserial primary key,
+			user_id bigint not null,
 			token_hash text not null unique,
-			created_at integer not null,
-			expires_at integer not null,
+			created_at timestamptz not null,
+			expires_at timestamptz not null,
 			foreign key(user_id) references users(id) on delete cascade
 		);`,
 		`create index if not exists idx_sessions_user_id on sessions(user_id);`,

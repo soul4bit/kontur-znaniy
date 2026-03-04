@@ -10,7 +10,7 @@ import (
 type Config struct {
 	AppName           string
 	Port              string
-	DatabaseDSN       string
+	DatabaseURL       string
 	SessionCookieName string
 	SessionTTL        time.Duration
 	SecureCookies     bool
@@ -24,11 +24,13 @@ func Load() Config {
 	}
 
 	secureByDefault := appEnv == "production"
+	defaultDatabaseURL := "postgres://kontur_znaniy:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/kontur_znaniy?sslmode=disable"
+	databaseURL := getEnv("DATABASE_URL", getEnv("DATABASE_DSN", defaultDatabaseURL))
 
 	return Config{
 		AppName:           getEnv("APP_NAME", "Контур Знаний"),
 		Port:              getEnv("APP_PORT", "8080"),
-		DatabaseDSN:       getEnv("DATABASE_DSN", "file:data/kontur.db"),
+		DatabaseURL:       databaseURL,
 		SessionCookieName: getEnv("SESSION_COOKIE_NAME", "kontur_session"),
 		SessionTTL:        time.Duration(ttlHours) * time.Hour,
 		SecureCookies:     getEnvBool("SECURE_COOKIES", secureByDefault),
