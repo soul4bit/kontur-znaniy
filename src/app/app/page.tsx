@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Clock3, Layers3, Plus, Search, ShieldCheck, Sparkles } from "lucide-react";
+import { Clock3, Compass, Plus, Route, Search, ShieldCheck, Waypoints } from "lucide-react";
 import { TopicSidebar } from "@/components/app/topic-sidebar";
 import { WorkspacePanels } from "@/components/app/workspace-panels";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -149,11 +149,11 @@ export default async function AppPage({ searchParams }: AppPageProps) {
 
   return (
     <div className="min-h-screen px-3 py-3 sm:px-6 sm:py-4 lg:px-8">
-      <div className="mx-auto flex w-full max-w-[1720px] flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-[1740px] flex-col gap-4">
         <header className="nook-shell sticky top-3 z-30 rounded-3xl p-3 sm:p-4">
           <div className="flex flex-wrap items-center gap-3">
             <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
-              <KnowledgeLogo subtitle="командная база «Контур Знаний»" />
+              <KnowledgeLogo subtitle="knowledge atlas workspace" />
             </Link>
 
             <div className="ml-auto flex w-full items-center justify-end gap-2 sm:w-auto">
@@ -167,7 +167,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                     })}
                   >
                     <Plus className="size-4" />
-                    <span className="hidden sm:inline">Новая статья</span>
+                    <span className="hidden sm:inline">Новый узел</span>
                   </Link>
                 </Button>
               ) : null}
@@ -181,7 +181,7 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 </Button>
               ) : null}
 
-              <SignOutButton className="h-9 rounded-lg border-border bg-card px-2.5 text-foreground hover:bg-accent sm:px-3" />
+              <SignOutButton className="h-9 rounded-lg border-border bg-card px-2.5 text-foreground hover:bg-muted sm:px-3" />
 
               <Link
                 href="/app/account"
@@ -198,6 +198,26 @@ export default async function AppPage({ searchParams }: AppPageProps) {
             </div>
           </div>
 
+          <div className="mt-3 grid gap-2 lg:grid-cols-[1fr_auto]">
+            <div className="nook-panel-soft rounded-xl px-3 py-2.5 text-sm text-foreground">
+              <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.11em] text-muted-foreground">
+                <Route className="size-3.5" />
+                текущий маршрут
+              </p>
+              <p className="mt-1 font-semibold">
+                {selectedTopic} / {selectedCategory}
+                {selectedArticle ? ` / ${selectedArticle.title}` : ""}
+              </p>
+            </div>
+            <div className="nook-panel-soft rounded-xl px-3 py-2.5 text-sm text-muted-foreground">
+              <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.11em]">
+                <Clock3 className="size-3.5" />
+                последнее обновление
+              </p>
+              <p className="mt-1 font-semibold text-foreground">{formatHeaderDate(lastUpdatedAt)}</p>
+            </div>
+          </div>
+
           <form action="/app" method="get" className="mt-3 grid gap-2 md:grid-cols-[1fr_auto_auto]">
             <input type="hidden" name="topic" value={selectedTopic} />
             <input type="hidden" name="category" value={selectedCategory} />
@@ -207,12 +227,12 @@ export default async function AppPage({ searchParams }: AppPageProps) {
                 type="search"
                 name="q"
                 defaultValue={searchQuery}
-                placeholder="Ищите по заголовку, описанию и содержанию статьи"
+                placeholder="Поиск по узлам атласа: заголовок, описание, содержимое"
                 className="h-11 w-full rounded-xl border border-input bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
               />
             </div>
             <Button type="submit" className="h-11 px-4">
-              Найти
+              Искать
             </Button>
             {hasSearchQuery ? (
               <Button asChild type="button" variant="outline" className="h-11 px-4">
@@ -222,33 +242,28 @@ export default async function AppPage({ searchParams }: AppPageProps) {
           </form>
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Всего статей</p>
+            <div className="rounded-xl border border-border bg-card/86 px-3 py-2">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Узлов всего</p>
               <p className="mt-1 text-base font-semibold text-foreground">{totalArticles}</p>
             </div>
-            <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">В текущей выборке</p>
+            <div className="rounded-xl border border-border bg-card/86 px-3 py-2">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Узлов в выборке</p>
               <p className="mt-1 text-base font-semibold text-foreground">{visibleArticles.length}</p>
             </div>
-            <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Текущий раздел</p>
+            <div className="rounded-xl border border-border bg-card/86 px-3 py-2">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Активный раздел</p>
               <p className="mt-1 inline-flex items-center gap-1.5 text-base font-semibold text-foreground">
-                <Layers3 className="size-4 text-primary" />
+                <Compass className="size-4 text-primary" />
                 {selectedTopic}
               </p>
             </div>
-            <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Обновление</p>
+            <div className="rounded-xl border border-border bg-card/86 px-3 py-2">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Режим</p>
               <p className="mt-1 inline-flex items-center gap-1.5 text-base font-semibold text-foreground">
-                <Clock3 className="size-4 text-primary" />
-                {formatHeaderDate(lastUpdatedAt)}
+                <Waypoints className="size-4 text-primary" />
+                Knowledge Atlas
               </p>
             </div>
-          </div>
-
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground">
-            <Sparkles className="size-3.5 text-orange-500" />
-            Контур Знаний: заметки, runbook и решения в одном рабочем пространстве
           </div>
         </header>
 
@@ -277,6 +292,8 @@ export default async function AppPage({ searchParams }: AppPageProps) {
             editArticleHref={editArticleHref}
             closeEditorHref={selectedArticleHref}
             wikiLinks={wikiLinks}
+            visibleArticles={visibleArticles}
+            searchQuery={searchQuery}
           />
         </div>
       </div>

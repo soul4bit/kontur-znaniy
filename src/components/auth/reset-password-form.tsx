@@ -3,7 +3,7 @@
 import { type FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Circle, KeyRound, LoaderCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, KeyRound, LoaderCircle, Waypoints } from "lucide-react";
 import { FeedbackBanner } from "@/components/auth/forms/feedback-banner";
 import { BotTrap, PasswordField } from "@/components/auth/forms/form-fields";
 import { isStrongPassword, postAuth } from "@/components/auth/forms/helpers";
@@ -114,10 +114,10 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <span className="nook-kicker">режим восстановления</span>
+        <span className="nook-kicker">восстановление узла доступа</span>
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">Новый пароль для аккаунта</h2>
         <p className="text-sm leading-6 text-muted-foreground">
-          Установите пароль и вернитесь к обычному входу в Контур Знаний.
+          Установите новый пароль и вернитесь в Knowledge Atlas.
         </p>
       </div>
 
@@ -136,7 +136,13 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
           </Button>
         </div>
       ) : (
-        <div className="nook-panel rounded-2xl p-4 sm:p-5">
+        <div className="atlas-field rounded-2xl p-4 sm:p-5">
+          <div className="relative z-10">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-lg border border-border bg-card/75 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+              <Waypoints className="size-3.5 text-primary" />
+              Маршрут: новый пароль, затем вход в систему
+            </div>
+
           <form className="space-y-4" onSubmit={handleSubmit}>
             <BotTrap value={website} onChange={(event) => setWebsite(event.target.value)} />
 
@@ -199,6 +205,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
               </Link>
             </Button>
           </form>
+          </div>
         </div>
       )}
     </div>

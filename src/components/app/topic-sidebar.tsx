@@ -3,9 +3,9 @@ import {
   ArrowUpRight,
   Boxes,
   Cable,
+  Compass,
   FolderKanban,
   HardDriveUpload,
-  Layers3,
   Search,
   ServerCog,
   Sparkles,
@@ -46,33 +46,36 @@ export function TopicSidebar({
 
   return (
     <aside className="order-2 space-y-4 lg:order-1">
-      <section className="nook-panel rounded-2xl p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">Навигация</p>
-        <div className="mt-3 grid gap-2">
-          <div className="nook-panel-soft rounded-xl px-3 py-2.5">
-            <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Все материалы</p>
-            <p className="mt-1 text-base font-semibold text-foreground">{totalArticles}</p>
+      <section className="atlas-field rounded-2xl p-4">
+        <div className="relative z-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">Легенда атласа</p>
+          <div className="mt-3 grid gap-2">
+            <div className="atlas-node rounded-xl px-3 py-2.5">
+              <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Всего узлов</p>
+              <p className="mt-1 text-base font-semibold text-foreground">{totalArticles}</p>
+            </div>
+            <div className="atlas-node rounded-xl px-3 py-2.5">
+              <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Видимые узлы</p>
+              <p className="mt-1 inline-flex items-center gap-1.5 text-base font-semibold text-foreground">
+                <Search className="size-4 text-primary" />
+                {visibleArticles.length}
+              </p>
+            </div>
+            <div className="atlas-node rounded-xl px-3 py-2.5">
+              <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Текущий континент</p>
+              <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                <Compass className="size-4 text-primary" />
+                {selectedTopic}
+              </p>
+            </div>
           </div>
-          <div className="nook-panel-soft rounded-xl px-3 py-2.5">
-            <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">В выборке</p>
-            <p className="mt-1 inline-flex items-center gap-1.5 text-base font-semibold text-foreground">
-              <Search className="size-4 text-primary" />
-              {visibleArticles.length}
+
+          {hasSearchQuery ? (
+            <p className="mt-3 rounded-lg border border-dashed border-border bg-card/70 px-3 py-2 text-xs text-muted-foreground">
+              По запросу «{searchQuery}» найдено {visibleArticles.length} узлов.
             </p>
-          </div>
-          <div className="nook-panel-soft rounded-xl px-3 py-2.5">
-            <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Текущий раздел</p>
-            <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
-              <Layers3 className="size-4 text-primary" />
-              {selectedTopic}
-            </p>
-          </div>
+          ) : null}
         </div>
-        {hasSearchQuery ? (
-          <p className="mt-3 rounded-lg border border-dashed border-border bg-card/70 px-3 py-2 text-xs text-muted-foreground">
-            По запросу «{searchQuery}» найдено {visibleArticles.length} статей.
-          </p>
-        ) : null}
       </section>
 
       <nav className="space-y-3">
@@ -86,19 +89,16 @@ export function TopicSidebar({
           );
 
           return (
-            <article
-              key={topic.name}
-              className={`nook-panel rounded-2xl transition-transform ${
-                isActive ? "border-primary/60" : "hover:-translate-y-px"
-              }`}
-            >
+            <article key={topic.name} className={`nook-panel rounded-2xl ${isActive ? "border-primary/55" : ""}`}>
               <Link
                 href={buildAppHref(topic.name, { query: searchQuery || undefined })}
                 className="flex items-start gap-3 px-4 py-3.5"
               >
                 <div
                   className={`flex size-9 shrink-0 items-center justify-center rounded-lg border ${
-                    isActive ? "border-primary/50 bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground"
+                    isActive
+                      ? "border-primary/50 bg-primary/10 text-primary"
+                      : "border-border bg-card text-muted-foreground"
                   }`}
                 >
                   <Icon className="size-4" />
@@ -127,8 +127,8 @@ export function TopicSidebar({
                           })}
                           className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] ${
                             isCategoryActive
-                              ? "border-primary/60 bg-primary/10 text-foreground"
-                              : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                              ? "border-primary/65 bg-primary/12 text-foreground"
+                              : "border-border bg-card text-muted-foreground hover:border-primary/45"
                           }`}
                         >
                           <span>{categoryName}</span>
@@ -137,7 +137,7 @@ export function TopicSidebar({
 
                         {groupedArticles.length > 0 ? (
                           <div className="space-y-2">
-                            {groupedArticles.map((article) => {
+                            {groupedArticles.slice(0, 5).map((article) => {
                               const isSelected = article.id === selectedArticleId;
 
                               return (
@@ -150,8 +150,8 @@ export function TopicSidebar({
                                   })}
                                   className={`block rounded-lg border px-3 py-2.5 ${
                                     isSelected
-                                      ? "border-primary/65 bg-primary/10"
-                                      : "border-border bg-card/85 hover:border-primary/45"
+                                      ? "atlas-node atlas-node-active"
+                                      : "atlas-node hover:border-primary/45"
                                   }`}
                                 >
                                   <div className="flex items-start justify-between gap-2">
@@ -169,7 +169,7 @@ export function TopicSidebar({
                           </div>
                         ) : (
                           <p className="rounded-lg border border-dashed border-border bg-card/70 px-3 py-2.5 text-xs leading-5 text-muted-foreground">
-                            Пока в категории нет материалов.
+                            В этой зоне пока нет статей.
                           </p>
                         )}
                       </div>

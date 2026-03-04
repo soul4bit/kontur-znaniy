@@ -1,47 +1,34 @@
 import { redirect } from "next/navigation";
-import { Database, Search, ShieldCheck, Sparkles, Workflow, Zap } from "lucide-react";
+import { Compass, Database, Orbit, Route, Search, ShieldCheck, Waypoints } from "lucide-react";
 import { AuthForms } from "@/components/auth/auth-forms";
 import { KnowledgeLogo } from "@/components/brand/knowledge-logo";
 import { getCurrentSession } from "@/lib/auth/session";
 
-const highlights = [
-  {
-    title: "Заметки не теряются в чатиках",
-    text: "Runbook и инструкции лежат в базе, а не в потоке сообщений.",
-    icon: Database,
-  },
-  {
-    title: "Поиск работает по делу",
-    text: "FTS находит решение по заголовку, описанию и содержимому статьи.",
-    icon: Search,
-  },
-  {
-    title: "Доступ под контролем",
-    text: "Регистрация проходит через модерацию, а вход защищен guard-проверками.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Связный граф знаний",
-    text: "Wiki-ссылки связывают заметки в рабочий контекст команды.",
-    icon: Workflow,
-  },
-] as const;
-
-const values = [
-  {
-    title: "Формат, который читает вся команда",
-    text: "Одинаковая структура статьи помогает быстрее ориентироваться в runbook и ретро-заметках.",
-  },
-  {
-    title: "Быстрый онбординг инженеров",
-    text: "Новый участник проекта не ищет контекст по каналам, а открывает готовую карту решений.",
-  },
+const mapNodes = [
+  { id: "source", label: "Черновики и заметки", top: 12, left: 14 },
+  { id: "index", label: "Индексация", top: 42, left: 31 },
+  { id: "route", label: "Связи между статьями", top: 67, left: 52 },
+  { id: "lookup", label: "Поиск решения", top: 34, left: 67 },
+  { id: "runbook", label: "Runbook для команды", top: 62, left: 81 },
 ] as const;
 
 const stats = [
-  { label: "Хранилище", value: "PostgreSQL" },
-  { label: "Auth", value: "Better Auth + Guard" },
-  { label: "Контент", value: "Статьи + Wiki связи" },
+  { label: "Хранилище", value: "PostgreSQL", icon: Database },
+  { label: "Навигация", value: "Wiki + FTS", icon: Search },
+  { label: "Контроль", value: "Guard + Moderation", icon: ShieldCheck },
+] as const;
+
+const checkpoints = [
+  {
+    title: "Один живой атлас",
+    text: "Контекст инцидентов, runbook и инфраструктурные заметки собраны в единую карту знаний.",
+    icon: Orbit,
+  },
+  {
+    title: "Быстрые маршруты к решению",
+    text: "Инженер открывает нужную вершину графа и сразу получает рабочий ответ.",
+    icon: Route,
+  },
 ] as const;
 
 export default async function AuthPage() {
@@ -53,36 +40,69 @@ export default async function AuthPage() {
 
   return (
     <div className="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
-      <main className="mx-auto grid w-full max-w-[1320px] gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(440px,0.92fr)]">
+      <main className="mx-auto grid w-full max-w-[1360px] gap-5 lg:grid-cols-[minmax(0,1.06fr)_minmax(440px,0.94fr)]">
         <section className="nook-shell rounded-3xl p-6 sm:p-8">
-          <KnowledgeLogo subtitle="Контур Знаний для DevOps-команды" />
+          <KnowledgeLogo subtitle="Knowledge Atlas для DevOps-команды" />
 
           <div className="mt-8 space-y-4">
-            <span className="nook-kicker">вики без офисной скуки</span>
+            <span className="nook-kicker">
+              <Compass className="size-3.5" />
+              knowledge atlas
+            </span>
             <h1 className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
               Контур Знаний
               <br />
-              как единый рабочий ритм команды.
+              как карта маршрутов, а не склад заметок.
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-              Не переписывайте одни и те же инструкции. Соберите статьи, runbook и контекст инцидентов в
-              одну систему, которая реально используется каждый день.
+              Соберите разрозненные DevOps-знания в связный атлас: где каждая статья - это узел, а переход
+              между узлами ведет к рабочему решению без хаоса в чатах.
             </p>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <section className="atlas-field mt-6 rounded-3xl p-5">
+            <div className="relative z-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Карта маршрута знаний
+              </p>
+              <div className="relative mt-4 h-[290px]">
+                <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100">
+                  <path d="M14 12 L31 42 L52 67 L67 34 L81 62" fill="none" stroke="rgba(50,88,177,0.44)" strokeWidth="0.9" />
+                  <path d="M31 42 L67 34" fill="none" stroke="rgba(80,122,210,0.38)" strokeWidth="0.75" strokeDasharray="2.2 2" />
+                  <path d="M52 67 L81 62" fill="none" stroke="rgba(64,100,186,0.36)" strokeWidth="0.7" />
+                </svg>
+
+                {mapNodes.map((node, index) => (
+                  <div
+                    key={node.id}
+                    className={`atlas-node absolute w-40 -translate-x-1/2 -translate-y-1/2 px-3 py-2 text-xs font-semibold ${
+                      index === 2 ? "atlas-node-active" : ""
+                    }`}
+                    style={{ top: `${node.top}%`, left: `${node.left}%` }}
+                  >
+                    {node.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
             {stats.map((item) => (
               <article key={item.label} className="nook-panel-soft rounded-2xl px-4 py-3">
-                <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">{item.label}</p>
+                <p className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+                  <item.icon className="size-3.5" />
+                  {item.label}
+                </p>
                 <p className="mt-1 text-sm font-semibold text-foreground">{item.value}</p>
               </article>
             ))}
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {highlights.map((item) => (
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {checkpoints.map((item) => (
               <article key={item.title} className="nook-panel rounded-2xl p-4">
-                <div className="inline-flex size-10 items-center justify-center rounded-lg border border-border bg-accent/45 text-foreground">
+                <div className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
                   <item.icon className="size-4" />
                 </div>
                 <h2 className="mt-3 text-sm font-semibold text-foreground">{item.title}</h2>
@@ -91,19 +111,9 @@ export default async function AuthPage() {
             ))}
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {values.map((item) => (
-              <article key={item.title} className="nook-panel-soft rounded-2xl p-4">
-                <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
-                <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{item.text}</p>
-              </article>
-            ))}
-          </div>
-
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground">
-            <Zap className="size-3.5 text-primary" />
-            <span>Один контур для решений, а не десятки разрозненных заметок</span>
-            <Sparkles className="size-3.5 text-orange-500" />
+            <Waypoints className="size-3.5 text-primary" />
+            Атлас живет вместе с командой и обновляется в рабочем ритме.
           </div>
         </section>
 

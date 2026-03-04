@@ -1,4 +1,4 @@
-import { KeyRound, ShieldCheck, TimerReset } from "lucide-react";
+import { KeyRound, ShieldCheck, TimerReset, Waypoints } from "lucide-react";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { KnowledgeLogo } from "@/components/brand/knowledge-logo";
 
@@ -11,18 +11,23 @@ type ResetPasswordPageProps = {
 
 const steps = [
   {
-    title: "Одноразовый токен",
-    text: "Ссылка из письма работает ограниченное время и только один раз.",
+    title: "Валидация ссылки",
+    text: "Одноразовый токен проверяется перед изменением пароля.",
     icon: ShieldCheck,
   },
   {
-    title: "Новый пароль",
-    text: "После сохранения вход выполняется с новым паролем.",
+    title: "Создание нового ключа",
+    text: "Новый пароль становится главным ключом входа.",
     icon: KeyRound,
   },
   {
-    title: "Возврат в рабочий контур",
-    text: "Сразу переходите обратно к статьям и runbook.",
+    title: "Возврат в атлас",
+    text: "После сохранения можно сразу войти в рабочее пространство.",
+    icon: Waypoints,
+  },
+  {
+    title: "Повторный доступ",
+    text: "Старые ссылки и токены больше не действуют.",
     icon: TimerReset,
   },
 ] as const;
@@ -32,34 +37,36 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
 
   return (
     <div className="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
-      <main className="mx-auto grid w-full max-w-[1320px] gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(440px,0.92fr)]">
+      <main className="mx-auto grid w-full max-w-[1360px] gap-5 lg:grid-cols-[minmax(0,1.06fr)_minmax(440px,0.94fr)]">
         <section className="nook-shell rounded-3xl p-6 sm:p-8">
-          <KnowledgeLogo subtitle="Контур Знаний: восстановление доступа" />
+          <KnowledgeLogo subtitle="Knowledge Atlas: восстановление доступа" />
 
           <div className="mt-8 space-y-4">
-            <span className="nook-kicker">безопасное восстановление</span>
+            <span className="nook-kicker">маршрут восстановления</span>
             <h1 className="max-w-xl text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
               Обновите пароль
               <br />
-              и возвращайтесь к работе
+              и вернитесь на карту
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-              Восстановление устроено просто: открываете ссылку из письма, задаете новый пароль и
-              возвращаетесь в Контур Знаний.
+              Ссылка из письма запускает защищенный маршрут восстановления. После смены пароля входите в
+              систему как обычно.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            {steps.map((item, index) => (
-              <article key={item.title} className={`nook-panel rounded-2xl p-4 ${index === 1 ? "sm:-translate-y-0.5" : ""}`}>
-                <div className="inline-flex size-10 items-center justify-center rounded-lg border border-border bg-accent/45 text-foreground">
-                  <item.icon className="size-4" />
-                </div>
-                <h2 className="mt-3 text-sm font-semibold text-foreground">{item.title}</h2>
-                <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{item.text}</p>
-              </article>
-            ))}
-          </div>
+          <section className="atlas-field mt-8 rounded-3xl p-5">
+            <div className="relative z-10 grid gap-3 sm:grid-cols-2">
+              {steps.map((item) => (
+                <article key={item.title} className="atlas-node rounded-2xl p-4">
+                  <div className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
+                    <item.icon className="size-4" />
+                  </div>
+                  <h2 className="mt-3 text-sm font-semibold text-foreground">{item.title}</h2>
+                  <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
         </section>
 
         <section className="nook-shell rounded-3xl p-6 sm:p-8">

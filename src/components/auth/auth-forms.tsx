@@ -3,14 +3,15 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  BadgeCheck,
-  Clock3,
+  Compass,
+  GitBranch,
   LoaderCircle,
   LogIn,
   Mail,
   RotateCcw,
   ShieldCheck,
   UserPlus2,
+  Waypoints,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FeedbackBanner } from "@/components/auth/forms/feedback-banner";
@@ -34,23 +35,23 @@ import {
 
 const modeMeta = {
   "sign-in": {
-    badge: "режим входа",
-    title: "Войти в Контур Знаний",
-    description: "Быстрый вход по email и паролю без лишних шагов.",
+    badge: "маршрут входа",
+    title: "Вход в атлас",
+    description: "Быстрый переход к рабочей карте знаний.",
     label: "Вход",
     icon: LogIn,
   },
   "sign-up": {
-    badge: "режим регистрации",
+    badge: "маршрут регистрации",
     title: "Запросить доступ",
-    description: "Новый аккаунт проходит модерацию, после чего активируется по email.",
+    description: "Создаем новый узел пользователя через модерацию.",
     label: "Регистрация",
     icon: UserPlus2,
   },
   reset: {
-    badge: "режим восстановления",
+    badge: "маршрут восстановления",
     title: "Сбросить пароль",
-    description: "Отправим письмо со ссылкой для безопасного восстановления доступа.",
+    description: "Восстановите доступ по одноразовой безопасной ссылке.",
     label: "Сброс",
     icon: RotateCcw,
   },
@@ -59,43 +60,43 @@ const modeMeta = {
 const modeFlow = {
   "sign-in": [
     {
-      title: "Введите учетные данные",
-      text: "Email и пароль действующего аккаунта.",
-      icon: BadgeCheck,
+      title: "Учетные данные",
+      text: "Email и пароль для существующего аккаунта.",
+      icon: Compass,
     },
     {
-      title: "Проверка guard-слоя",
-      text: "Rate limit и anti-bot защита перед входом.",
+      title: "Guard-проверка",
+      text: "Rate-limit и anti-bot слой проверяют запрос.",
       icon: ShieldCheck,
     },
     {
-      title: "Переход в workspace",
-      text: "После проверки открывается рабочая база знаний.",
-      icon: Clock3,
+      title: "Вход в workspace",
+      text: "Открывается ваш рабочий атлас знаний.",
+      icon: Waypoints,
     },
   ],
   "sign-up": [
     {
-      title: "Отправка заявки",
-      text: "Заполняете форму и отправляете запрос.",
-      icon: BadgeCheck,
+      title: "Заявка",
+      text: "Отправляете данные нового участника.",
+      icon: Compass,
     },
     {
-      title: "Решение модератора",
-      text: "Админ подтверждает заявку через модерацию.",
+      title: "Модерация",
+      text: "Админ подтверждает или отклоняет доступ.",
       icon: ShieldCheck,
     },
     {
-      title: "Активация аккаунта",
-      text: "Подтверждаете email и входите обычным способом.",
-      icon: Clock3,
+      title: "Активация",
+      text: "Подтверждение email и обычный вход.",
+      icon: Waypoints,
     },
   ],
   reset: [
     {
       title: "Запрос письма",
       text: "Отправляем одноразовую ссылку на email.",
-      icon: BadgeCheck,
+      icon: Compass,
     },
     {
       title: "Проверка токена",
@@ -104,8 +105,8 @@ const modeFlow = {
     },
     {
       title: "Новый пароль",
-      text: "Сохраняете пароль и входите обратно в систему.",
-      icon: Clock3,
+      text: "После смены пароля вход восстанавливается.",
+      icon: Waypoints,
     },
   ],
 } as const;
@@ -215,7 +216,7 @@ export function AuthForms() {
         setLastEmail(email);
         setFeedback({
           tone: "info",
-          text: "Email еще не подтвержден. Запросите письмо повторно и активируйте аккаунт.",
+          text: "Email не подтвержден. Запросите письмо повторно и завершите активацию.",
         });
       } else {
         setFeedback({
@@ -362,10 +363,13 @@ export function AuthForms() {
   return (
     <div className="space-y-5">
       <div className="space-y-3">
-        <span className="nook-kicker">контур доступа</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Авторизация и регистрация</h2>
+        <span className="nook-kicker">
+          <GitBranch className="size-3.5" />
+          маршруты доступа
+        </span>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Авторизация в Knowledge Atlas</h2>
         <p className="text-sm leading-6 text-muted-foreground">
-          Выберите сценарий и выполните его в одном экране без переходов по разным страницам.
+          Выберите маршрут и завершите сценарий на одном экране.
         </p>
       </div>
 
@@ -378,10 +382,8 @@ export function AuthForms() {
             <button
               key={option}
               type="button"
-              className={`rounded-2xl border px-3 py-3 text-left transition ${
-                selected
-                  ? "border-primary/70 bg-primary/10 shadow-[0_10px_20px_rgba(29,40,34,0.1)]"
-                  : "border-border bg-card/80 hover:border-primary/45"
+              className={`atlas-node rounded-2xl px-3 py-3 text-left ${
+                selected ? "atlas-node-active" : "hover:border-primary/40"
               }`}
               onClick={() => {
                 openMode(option);
@@ -399,7 +401,9 @@ export function AuthForms() {
               <div className="flex items-center gap-2">
                 <span
                   className={`inline-flex size-7 items-center justify-center rounded-lg border ${
-                    selected ? "border-primary/40 bg-primary/15 text-primary" : "border-border bg-muted text-foreground"
+                    selected
+                      ? "border-primary/50 bg-primary/15 text-primary"
+                      : "border-border bg-muted text-foreground"
                   }`}
                 >
                   <Icon className="size-4" />
@@ -420,7 +424,7 @@ export function AuthForms() {
           <p className="text-sm leading-6 text-muted-foreground">{activeMeta.description}</p>
         </div>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.18fr_0.82fr]">
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="order-2 lg:order-1">
             {awaitingVerification ? (
               <div className="mb-4 nook-panel-soft rounded-xl p-4 text-sm leading-6 text-muted-foreground">
@@ -523,27 +527,31 @@ export function AuthForms() {
             ) : null}
           </div>
 
-          <aside className="order-1 nook-panel-soft rounded-2xl p-4 lg:order-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Как это работает</p>
-            <div className="mt-3 space-y-2.5">
-              {modeFlow[mode].map((step, index) => (
-                <div key={step.title} className="rounded-xl border border-border bg-card/80 px-3 py-2.5">
-                  <div className="flex items-start gap-2.5">
-                    <span className="mt-0.5 inline-flex size-7 items-center justify-center rounded-lg border border-border bg-muted">
-                      <step.icon className="size-3.5 text-primary" />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-foreground">
-                        {index + 1}. {step.title}
-                      </p>
-                      <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{step.text}</p>
+          <aside className="order-1 atlas-field rounded-2xl p-4 lg:order-2">
+            <div className="relative z-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Легенда маршрута
+              </p>
+              <div className="mt-3 space-y-2.5">
+                {modeFlow[mode].map((step, index) => (
+                  <div key={step.title} className="atlas-node rounded-xl px-3 py-2.5">
+                    <div className="flex items-start gap-2.5">
+                      <span className="mt-0.5 inline-flex size-7 items-center justify-center rounded-lg border border-border bg-card/80">
+                        <step.icon className="size-3.5 text-primary" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground">
+                          {index + 1}. {step.title}
+                        </p>
+                        <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{step.text}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 rounded-xl border border-dashed border-border bg-card/70 px-3 py-2.5 text-xs leading-5 text-muted-foreground">
-              Все заявки на регистрацию проходят модерацию, поэтому доступ остается управляемым.
+                ))}
+              </div>
+              <div className="mt-3 rounded-xl border border-dashed border-border bg-card/70 px-3 py-2.5 text-xs leading-5 text-muted-foreground">
+                Регистрация проходит через модерацию, поэтому карта знаний остается рабочей и безопасной.
+              </div>
             </div>
           </aside>
         </div>
