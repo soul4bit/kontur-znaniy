@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, Search, ShieldCheck, Sparkles } from "lucide-react";
+import { Clock3, Layers3, Plus, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { TopicSidebar } from "@/components/app/topic-sidebar";
 import { WorkspacePanels } from "@/components/app/workspace-panels";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -28,6 +28,19 @@ type AppPageProps = {
     q?: string;
   }>;
 };
+
+function formatHeaderDate(value: string | null) {
+  if (!value) {
+    return "нет данных";
+  }
+
+  return new Date(value).toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export default async function AppPage({ searchParams }: AppPageProps) {
   const session = await getCurrentSession();
@@ -136,44 +149,14 @@ export default async function AppPage({ searchParams }: AppPageProps) {
 
   return (
     <div className="min-h-screen px-3 py-3 sm:px-6 sm:py-4 lg:px-8">
-      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-[1720px] flex-col gap-4">
         <header className="nook-shell sticky top-3 z-30 rounded-3xl p-3 sm:p-4">
           <div className="flex flex-wrap items-center gap-3">
             <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>
               <KnowledgeLogo subtitle="командная база «Контур Знаний»" />
             </Link>
 
-            <form
-              action="/app"
-              method="get"
-              className="order-3 flex w-full items-center gap-2 md:order-none md:flex-1"
-            >
-              <input type="hidden" name="topic" value={selectedTopic} />
-              <input type="hidden" name="category" value={selectedCategory} />
-              <div className="relative w-full">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="search"
-                  name="q"
-                  defaultValue={searchQuery}
-                  placeholder="Ищи по заголовку, описанию и тексту статьи"
-                  className="h-11 w-full rounded-xl border-2 border-input bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-                />
-              </div>
-              <Button type="submit" className="h-11 px-4">
-                Найти
-              </Button>
-              {hasSearchQuery ? (
-                <Link
-                  href={buildAppHref(selectedTopic, { category: selectedCategory })}
-                  className="hidden text-sm font-medium text-muted-foreground hover:text-foreground md:inline"
-                >
-                  Сброс
-                </Link>
-              ) : null}
-            </form>
-
-            <div className="ml-auto flex w-full items-center justify-end gap-2 sm:w-auto sm:justify-start">
+            <div className="ml-auto flex w-full items-center justify-end gap-2 sm:w-auto">
               {canManageArticles ? (
                 <Button asChild size="sm" className="h-9">
                   <Link
@@ -215,28 +198,61 @@ export default async function AppPage({ searchParams }: AppPageProps) {
             </div>
           </div>
 
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-border bg-white px-3 py-1.5 text-xs font-medium text-foreground">
-            <Sparkles className="size-3.5 text-orange-500" />
-            Контур Знаний: решения, runbook и контекст в одном рабочем контуре
-          </div>
+          <form action="/app" method="get" className="mt-3 grid gap-2 md:grid-cols-[1fr_auto_auto]">
+            <input type="hidden" name="topic" value={selectedTopic} />
+            <input type="hidden" name="category" value={selectedCategory} />
+            <div className="relative w-full">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="search"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Ищите по заголовку, описанию и содержанию статьи"
+                className="h-11 w-full rounded-xl border border-input bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+              />
+            </div>
+            <Button type="submit" className="h-11 px-4">
+              Найти
+            </Button>
+            {hasSearchQuery ? (
+              <Button asChild type="button" variant="outline" className="h-11 px-4">
+                <Link href={buildAppHref(selectedTopic, { category: selectedCategory })}>Сбросить</Link>
+              </Button>
+            ) : null}
+          </form>
 
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Статей в базе</p>
+              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Всего статей</p>
               <p className="mt-1 text-base font-semibold text-foreground">{totalArticles}</p>
             </div>
             <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">В выборке</p>
+              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">В текущей выборке</p>
               <p className="mt-1 text-base font-semibold text-foreground">{visibleArticles.length}</p>
             </div>
             <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
               <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Текущий раздел</p>
-              <p className="mt-1 text-base font-semibold text-foreground">{selectedTopic}</p>
+              <p className="mt-1 inline-flex items-center gap-1.5 text-base font-semibold text-foreground">
+                <Layers3 className="size-4 text-primary" />
+                {selectedTopic}
+              </p>
             </div>
+            <div className="rounded-xl border border-border bg-card/85 px-3 py-2">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Обновление</p>
+              <p className="mt-1 inline-flex items-center gap-1.5 text-base font-semibold text-foreground">
+                <Clock3 className="size-4 text-primary" />
+                {formatHeaderDate(lastUpdatedAt)}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground">
+            <Sparkles className="size-3.5 text-orange-500" />
+            Контур Знаний: заметки, runbook и решения в одном рабочем пространстве
           </div>
         </header>
 
-        <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)_420px]">
+        <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)_390px]">
           <TopicSidebar
             allArticles={allArticles}
             visibleArticles={visibleArticles}

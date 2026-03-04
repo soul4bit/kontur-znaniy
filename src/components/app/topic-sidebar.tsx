@@ -5,6 +5,8 @@ import {
   Cable,
   FolderKanban,
   HardDriveUpload,
+  Layers3,
+  Search,
   ServerCog,
   Sparkles,
 } from "lucide-react";
@@ -45,15 +47,30 @@ export function TopicSidebar({
   return (
     <aside className="order-2 space-y-4 lg:order-1">
       <section className="nook-panel rounded-2xl p-4">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">Разделы</p>
-          <span className="rounded-full border-2 border-border px-2.5 py-1 text-xs font-medium text-foreground">
-            {hasSearchQuery ? `${visibleArticles.length}/${totalArticles}` : totalArticles} статей
-          </span>
+        <p className="text-xs font-semibold uppercase tracking-[0.13em] text-muted-foreground">Навигация</p>
+        <div className="mt-3 grid gap-2">
+          <div className="nook-panel-soft rounded-xl px-3 py-2.5">
+            <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Все материалы</p>
+            <p className="mt-1 text-base font-semibold text-foreground">{totalArticles}</p>
+          </div>
+          <div className="nook-panel-soft rounded-xl px-3 py-2.5">
+            <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">В выборке</p>
+            <p className="mt-1 inline-flex items-center gap-1.5 text-base font-semibold text-foreground">
+              <Search className="size-4 text-primary" />
+              {visibleArticles.length}
+            </p>
+          </div>
+          <div className="nook-panel-soft rounded-xl px-3 py-2.5">
+            <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Текущий раздел</p>
+            <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
+              <Layers3 className="size-4 text-primary" />
+              {selectedTopic}
+            </p>
+          </div>
         </div>
         {hasSearchQuery ? (
-          <p className="mt-3 rounded-lg bg-muted/80 px-3 py-2 text-xs text-muted-foreground">
-            Нашли: {visibleArticles.length}
+          <p className="mt-3 rounded-lg border border-dashed border-border bg-card/70 px-3 py-2 text-xs text-muted-foreground">
+            По запросу «{searchQuery}» найдено {visibleArticles.length} статей.
           </p>
         ) : null}
       </section>
@@ -72,7 +89,7 @@ export function TopicSidebar({
             <article
               key={topic.name}
               className={`nook-panel rounded-2xl transition-transform ${
-                isActive ? "border-primary/80" : "hover:-translate-y-px"
+                isActive ? "border-primary/60" : "hover:-translate-y-px"
               }`}
             >
               <Link
@@ -80,8 +97,8 @@ export function TopicSidebar({
                 className="flex items-start gap-3 px-4 py-3.5"
               >
                 <div
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-border ${
-                    isActive ? "bg-primary/20 text-primary" : "bg-white text-muted-foreground"
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-lg border ${
+                    isActive ? "border-primary/50 bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground"
                   }`}
                 >
                   <Icon className="size-4" />
@@ -96,7 +113,7 @@ export function TopicSidebar({
               </Link>
 
               {isActive ? (
-                <div className="space-y-4 border-t-2 border-border/70 px-3 py-3">
+                <div className="space-y-4 border-t border-border/80 px-3 py-3">
                   {categoryList.map((categoryName) => {
                     const groupedArticles = topicArticles.filter((article) => article.category === categoryName);
                     const isCategoryActive = categoryName === selectedCategory;
@@ -108,10 +125,10 @@ export function TopicSidebar({
                             category: categoryName,
                             query: searchQuery || undefined,
                           })}
-                          className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] ${
+                          className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] ${
                             isCategoryActive
-                              ? "border-primary/80 bg-primary/10 text-foreground"
-                              : "border-border bg-white text-muted-foreground hover:border-primary/50"
+                              ? "border-primary/60 bg-primary/10 text-foreground"
+                              : "border-border bg-card text-muted-foreground hover:border-primary/40"
                           }`}
                         >
                           <span>{categoryName}</span>
@@ -131,17 +148,15 @@ export function TopicSidebar({
                                     category: categoryName,
                                     query: searchQuery || undefined,
                                   })}
-                                  className={`block rounded-lg border-2 px-3 py-2.5 ${
+                                  className={`block rounded-lg border px-3 py-2.5 ${
                                     isSelected
-                                      ? "border-primary/80 bg-primary/10"
-                                      : "border-border bg-card hover:border-primary/50"
+                                      ? "border-primary/65 bg-primary/10"
+                                      : "border-border bg-card/85 hover:border-primary/45"
                                   }`}
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="min-w-0">
-                                      <p className="truncate text-sm font-semibold text-foreground">
-                                        {article.title}
-                                      </p>
+                                      <p className="truncate text-sm font-semibold text-foreground">{article.title}</p>
                                       <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">
                                         {article.summary}
                                       </p>
@@ -153,8 +168,8 @@ export function TopicSidebar({
                             })}
                           </div>
                         ) : (
-                          <p className="rounded-lg border-2 border-dashed border-border bg-muted/35 px-3 py-2.5 text-xs leading-5 text-muted-foreground">
-                            Пока пусто. Можно стать первым героем этой категории.
+                          <p className="rounded-lg border border-dashed border-border bg-card/70 px-3 py-2.5 text-xs leading-5 text-muted-foreground">
+                            Пока в категории нет материалов.
                           </p>
                         )}
                       </div>

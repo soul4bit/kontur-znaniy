@@ -4,19 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-4 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-4 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/45 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
   {
     variants: {
       variant: {
         default:
-          "border border-border bg-primary text-primary-foreground shadow-[0_6px_14px_rgba(36,28,48,0.18)] hover:brightness-105",
+          "border border-primary/40 bg-primary text-primary-foreground shadow-[0_8px_16px_rgba(18,40,34,0.17)] hover:brightness-105",
         destructive:
-          "border border-border bg-destructive text-white shadow-[0_6px_14px_rgba(36,28,48,0.18)] hover:brightness-105 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "border border-destructive/40 bg-destructive text-white shadow-[0_8px_16px_rgba(70,20,34,0.2)] hover:brightness-105 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border border-border bg-card text-card-foreground hover:bg-accent",
+          "border border-border bg-card text-card-foreground hover:bg-muted",
         secondary:
-          "border border-border bg-secondary text-secondary-foreground shadow-[0_6px_14px_rgba(36,28,48,0.15)] hover:brightness-105",
-        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
+          "border border-border bg-secondary text-secondary-foreground shadow-[0_7px_14px_rgba(34,29,23,0.12)] hover:brightness-105",
+        ghost: "text-foreground hover:bg-muted hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

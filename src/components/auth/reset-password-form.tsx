@@ -114,10 +114,10 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <span className="nook-kicker">безопасная смена пароля</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Новый пароль</h2>
+        <span className="nook-kicker">режим восстановления</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Новый пароль для аккаунта</h2>
         <p className="text-sm leading-6 text-muted-foreground">
-          Установите новый пароль для аккаунта и вернитесь к обычному входу.
+          Установите пароль и вернитесь к обычному входу в Контур Знаний.
         </p>
       </div>
 
@@ -136,68 +136,70 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
           </Button>
         </div>
       ) : (
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <BotTrap value={website} onChange={(event) => setWebsite(event.target.value)} />
+        <div className="nook-panel rounded-2xl p-4 sm:p-5">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <BotTrap value={website} onChange={(event) => setWebsite(event.target.value)} />
 
-          <PasswordField
-            id="reset-password"
-            label="Новый пароль"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Минимум 10 символов"
-            autoComplete="new-password"
-            required
-          />
+            <PasswordField
+              id="reset-password"
+              label="Новый пароль"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Минимум 10 символов"
+              autoComplete="new-password"
+              required
+            />
 
-          <PasswordField
-            id="reset-password-confirm"
-            label="Повторите пароль"
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            placeholder="Повторите пароль"
-            autoComplete="new-password"
-            required
-          />
+            <PasswordField
+              id="reset-password-confirm"
+              label="Повторите пароль"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              placeholder="Повторите пароль"
+              autoComplete="new-password"
+              required
+            />
 
-          <div className="nook-panel-soft rounded-xl p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-              Проверка пароля
-            </p>
-            <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
-              {passwordChecks.map((check) => (
-                <div key={check.id} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {check.passed ? (
-                    <CheckCircle2 className="size-4 text-emerald-400" />
-                  ) : (
-                    <Circle className="size-4 text-muted-foreground/75" />
-                  )}
-                  <span className={check.passed ? "text-foreground" : ""}>{check.text}</span>
-                </div>
-              ))}
+            <div className="nook-panel-soft rounded-xl p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Проверка пароля
+              </p>
+              <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
+                {passwordChecks.map((check) => (
+                  <div key={check.id} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {check.passed ? (
+                      <CheckCircle2 className="size-4 text-emerald-500" />
+                    ) : (
+                      <Circle className="size-4 text-muted-foreground/75" />
+                    )}
+                    <span className={check.passed ? "text-foreground" : ""}>{check.text}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <Button type="submit" className="h-11 w-full" disabled={isPending}>
-            {isPending ? (
-              <>
-                <LoaderCircle className="size-4 animate-spin" />
-                Сохраняем пароль...
-              </>
-            ) : (
-              <>
-                <KeyRound className="size-4" />
-                Сохранить новый пароль
-              </>
-            )}
-          </Button>
+            <Button type="submit" className="h-11 w-full" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <LoaderCircle className="size-4 animate-spin" />
+                  Сохраняем пароль...
+                </>
+              ) : (
+                <>
+                  <KeyRound className="size-4" />
+                  Сохранить новый пароль
+                </>
+              )}
+            </Button>
 
-          <Button asChild type="button" variant="ghost" className="w-full">
-            <Link href="/auth">
-              <ArrowLeft className="size-4" />
-              Назад ко входу
-            </Link>
-          </Button>
-        </form>
+            <Button asChild type="button" variant="ghost" className="w-full">
+              <Link href="/auth">
+                <ArrowLeft className="size-4" />
+                Назад ко входу
+              </Link>
+            </Button>
+          </form>
+        </div>
       )}
     </div>
   );

@@ -20,7 +20,7 @@ export function KnowledgeLogo({
     <div className={cn("flex items-center gap-3", className)}>
       <div
         className={cn(
-          "flex h-12 w-16 items-center justify-center rounded-xl border border-border bg-card shadow-[0_6px_14px_rgba(36,28,48,0.14)]",
+          "flex h-12 w-16 items-center justify-center rounded-xl border border-border bg-card shadow-[0_6px_14px_rgba(33,28,21,0.12)]",
           markClassName
         )}
       >
@@ -36,7 +36,7 @@ export function KnowledgeLogo({
       <div>
         <p
           className={cn(
-            "text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground",
+            "text-[11px] font-semibold uppercase tracking-[0.21em] text-foreground",
             titleClassName
           )}
         >

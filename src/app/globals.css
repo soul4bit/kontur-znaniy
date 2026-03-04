@@ -47,74 +47,74 @@
 }
 
 :root {
-  --radius: 0.92rem;
-  --background: #f5f9ff;
-  --foreground: #1a1f35;
-  --card: #ffffff;
-  --card-foreground: #1a1f35;
-  --popover: #ffffff;
-  --popover-foreground: #1a1f35;
-  --primary: #1f78ff;
-  --primary-foreground: #f7fbff;
-  --secondary: #eaf2ff;
-  --secondary-foreground: #1a1f35;
-  --muted: #f1f6ff;
-  --muted-foreground: #5d6584;
-  --accent: #e8f1ff;
-  --accent-foreground: #1a1f35;
-  --destructive: #e84b67;
-  --border: #d8e5ff;
-  --input: #d2e0fb;
-  --ring: #2d80ff;
-  --success: #17b26a;
-  --chart-1: #1f78ff;
-  --chart-2: #17b26a;
-  --chart-3: #ff7f50;
-  --chart-4: #2ec9c2;
-  --chart-5: #f362a8;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1a1f35;
-  --sidebar-primary: #1f78ff;
-  --sidebar-primary-foreground: #f7fbff;
-  --sidebar-accent: #eef4ff;
-  --sidebar-accent-foreground: #1a1f35;
-  --sidebar-border: #d8e5ff;
-  --sidebar-ring: #2d80ff;
+  --radius: 0.88rem;
+  --background: #f5f2ea;
+  --foreground: #20242a;
+  --card: #fcfaf5;
+  --card-foreground: #20242a;
+  --popover: #fcfaf5;
+  --popover-foreground: #20242a;
+  --primary: #0a7a68;
+  --primary-foreground: #f4fffc;
+  --secondary: #ece7da;
+  --secondary-foreground: #20242a;
+  --muted: #efeade;
+  --muted-foreground: #5b626d;
+  --accent: #f5c86f;
+  --accent-foreground: #272015;
+  --destructive: #d24e62;
+  --border: #d8d0c0;
+  --input: #d6cebf;
+  --ring: #0d8a75;
+  --success: #1b9f66;
+  --chart-1: #0a7a68;
+  --chart-2: #f08d44;
+  --chart-3: #4f6fca;
+  --chart-4: #5fa88d;
+  --chart-5: #ce637f;
+  --sidebar: #fcfaf5;
+  --sidebar-foreground: #20242a;
+  --sidebar-primary: #0a7a68;
+  --sidebar-primary-foreground: #f4fffc;
+  --sidebar-accent: #f1ebde;
+  --sidebar-accent-foreground: #20242a;
+  --sidebar-border: #d8d0c0;
+  --sidebar-ring: #0d8a75;
 }
 
 .dark {
-  --background: #0c1226;
-  --foreground: #e8eeff;
-  --card: #121a34;
-  --card-foreground: #e8eeff;
-  --popover: #121a34;
-  --popover-foreground: #e8eeff;
-  --primary: #4f96ff;
-  --primary-foreground: #081022;
-  --secondary: #1a2648;
-  --secondary-foreground: #dfe8ff;
-  --muted: #182341;
-  --muted-foreground: #9eb0d8;
-  --accent: #243767;
-  --accent-foreground: #e8eeff;
-  --destructive: #ff6b86;
-  --border: #344a79;
-  --input: #344a79;
-  --ring: #5da2ff;
-  --success: #39d195;
-  --chart-1: #4f96ff;
-  --chart-2: #39d195;
-  --chart-3: #ff7f50;
-  --chart-4: #2ec9c2;
-  --chart-5: #f362a8;
-  --sidebar: #121a34;
-  --sidebar-foreground: #e8eeff;
-  --sidebar-primary: #4f96ff;
-  --sidebar-primary-foreground: #081022;
-  --sidebar-accent: #1a2648;
-  --sidebar-accent-foreground: #dfe8ff;
-  --sidebar-border: #344a79;
-  --sidebar-ring: #5da2ff;
+  --background: #15181d;
+  --foreground: #eef3f1;
+  --card: #1b1f25;
+  --card-foreground: #eef3f1;
+  --popover: #1b1f25;
+  --popover-foreground: #eef3f1;
+  --primary: #2eb69f;
+  --primary-foreground: #091310;
+  --secondary: #252b32;
+  --secondary-foreground: #e4ebe8;
+  --muted: #232931;
+  --muted-foreground: #a5b0b8;
+  --accent: #e5aa43;
+  --accent-foreground: #1c1610;
+  --destructive: #ef6b7e;
+  --border: #38414b;
+  --input: #38414b;
+  --ring: #36c3aa;
+  --success: #43ca86;
+  --chart-1: #2eb69f;
+  --chart-2: #e5aa43;
+  --chart-3: #6d89e6;
+  --chart-4: #79b89f;
+  --chart-5: #dd7694;
+  --sidebar: #1b1f25;
+  --sidebar-foreground: #eef3f1;
+  --sidebar-primary: #2eb69f;
+  --sidebar-primary-foreground: #091310;
+  --sidebar-accent: #252b32;
+  --sidebar-accent-foreground: #e4ebe8;
+  --sidebar-border: #38414b;
+  --sidebar-ring: #36c3aa;
 }
 
 @layer base {
@@ -130,10 +130,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(circle at 8% 9%, rgba(31, 120, 255, 0.13), transparent 36%),
-      radial-gradient(circle at 92% 12%, rgba(243, 98, 168, 0.13), transparent 34%),
-      radial-gradient(circle at 20% 88%, rgba(46, 201, 194, 0.1), transparent 32%),
-      linear-gradient(180deg, #f8fbff 0%, #f4f9ff 56%, #f3f7ff 100%);
+      radial-gradient(circle at 9% 12%, rgba(10, 122, 104, 0.11), transparent 34%),
+      radial-gradient(circle at 93% 8%, rgba(240, 141, 68, 0.12), transparent 32%),
+      radial-gradient(circle at 18% 90%, rgba(79, 111, 202, 0.1), transparent 28%),
+      linear-gradient(180deg, #f8f4eb 0%, #f5f1e6 57%, #f2eee3 100%);
   }
 
   body::before {
@@ -142,42 +142,42 @@
     inset: 0;
     pointer-events: none;
     background-image:
-      radial-gradient(rgba(22, 19, 24, 0.11) 0.75px, transparent 0.75px);
-    background-size: 20px 20px;
-    opacity: 0.08;
+      radial-gradient(rgba(37, 27, 12, 0.11) 0.8px, transparent 0.8px);
+    background-size: 18px 18px;
+    opacity: 0.06;
     z-index: -1;
   }
 
   ::selection {
-    background: rgba(0, 169, 255, 0.26);
-    color: #0d1420;
+    background: rgba(240, 141, 68, 0.32);
+    color: #221d14;
   }
 }
 
 .nook-shell {
-  border: 1px solid color-mix(in oklab, var(--border) 90%, white 10%);
-  border-radius: calc(var(--radius) + 8px);
+  border: 1px solid color-mix(in oklab, var(--border) 86%, white 14%);
+  border-radius: calc(var(--radius) + 7px);
   background:
-    radial-gradient(circle at 12% 10%, rgba(31, 120, 255, 0.06), transparent 32%),
+    radial-gradient(circle at 14% 9%, rgba(10, 122, 104, 0.08), transparent 34%),
     var(--card);
   box-shadow:
-    0 18px 40px rgba(21, 39, 83, 0.14),
-    0 2px 10px rgba(21, 39, 83, 0.08);
+    0 16px 34px rgba(32, 29, 23, 0.11),
+    0 3px 10px rgba(32, 29, 23, 0.06);
 }
 
 .nook-panel {
-  border: 1px solid color-mix(in oklab, var(--border) 88%, white 12%);
+  border: 1px solid color-mix(in oklab, var(--border) 82%, white 18%);
   border-radius: calc(var(--radius) + 4px);
-  background: color-mix(in oklab, var(--card) 95%, #e8f2ff 5%);
+  background: color-mix(in oklab, var(--card) 94%, #fffdf7 6%);
   box-shadow:
-    0 10px 22px rgba(21, 39, 83, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+    0 8px 20px rgba(35, 31, 24, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
 }
 
 .nook-panel-soft {
-  border: 1px solid color-mix(in oklab, var(--border) 80%, white 20%);
+  border: 1px solid color-mix(in oklab, var(--border) 76%, white 24%);
   border-radius: var(--radius);
-  background: color-mix(in oklab, var(--muted) 92%, white 8%);
+  background: color-mix(in oklab, var(--muted) 90%, white 10%);
 }
 
 .nook-kicker {
@@ -185,14 +185,14 @@
   align-items: center;
   gap: 0.4rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: linear-gradient(135deg, #c7ddff 0%, #d7ecff 100%);
+  border: 1px solid color-mix(in oklab, var(--accent) 55%, var(--border) 45%);
+  background: linear-gradient(135deg, #ffe2b2 0%, #f8c975 100%);
   padding: 0.28rem 0.72rem;
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #1f1a24;
+  color: #342615;
 }
 
 .nook-chip {
@@ -200,11 +200,11 @@
   align-items: center;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: color-mix(in oklab, var(--card) 82%, #edf5ff 18%);
+  background: color-mix(in oklab, var(--card) 82%, #fff5df 18%);
   padding: 0.22rem 0.62rem;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #1f1a24;
+  color: #2a2d33;
 }
 
 .nook-scroll {
@@ -232,7 +232,7 @@
   line-height: 1.28;
   font-weight: 700;
   letter-spacing: -0.015em;
-  color: #1d1a20;
+  color: #23201a;
 }
 
 .nook-editor h3 {
@@ -240,7 +240,7 @@
   font-size: 1.15rem;
   line-height: 1.35;
   font-weight: 650;
-  color: #242029;
+  color: #2c2822;
 }
 
 .nook-editor p {
@@ -263,18 +263,18 @@
 
 .nook-editor blockquote {
   margin: 0.95rem 0;
-  border-left: 3px solid color-mix(in oklab, var(--primary) 65%, var(--accent) 35%);
+  border-left: 3px solid color-mix(in oklab, var(--primary) 62%, var(--accent) 38%);
   padding-left: 1rem;
-  color: #4f4860;
+  color: #4c4a45;
 }
 
 .nook-editor pre {
   margin: 0.95rem 0;
   overflow-x: auto;
   border-radius: calc(var(--radius) + 3px);
-  background: #0d1320;
+  background: #151c2b;
   padding: 0.92rem 1rem;
-  color: #dbeafb;
+  color: #dce7ff;
 }
 
 .nook-editor code {
@@ -284,9 +284,9 @@
 .nook-editor p code,
 .nook-editor li code {
   border-radius: 0.4rem;
-  background: #e7f1ff;
+  background: #ede8d5;
   padding: 0.14rem 0.38rem;
-  color: #114f8f;
+  color: #15534a;
 }
 
 .nook-editor hr {
@@ -301,8 +301,8 @@
   width: 100%;
   max-width: 100%;
   border-radius: calc(var(--radius) + 5px);
-  border: 2px solid var(--border);
-  background: #fff;
+  border: 1px solid var(--border);
+  background: #fefcf8;
   object-fit: cover;
 }
 
@@ -310,7 +310,7 @@
   pointer-events: none;
   float: left;
   height: 0;
-  color: #7a7388;
+  color: #7a7468;
   content: attr(data-placeholder);
 }
 
@@ -318,16 +318,16 @@
   margin: 0.95rem 0;
   overflow: hidden;
   border-radius: calc(var(--radius) + 2px);
-  border: 2px solid #202030;
-  background: #0d1320;
+  border: 1px solid #27304a;
+  background: #151c2b;
 }
 
 .nook-snippet-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #2d3852;
-  background: #101b31;
+  border-bottom: 1px solid #304061;
+  background: #1a2947;
   padding: 0.44rem 0.7rem;
 }
 
@@ -335,21 +335,21 @@
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #93dfff;
+  color: #b8deff;
 }
 
 .nook-snippet-copy {
   cursor: pointer;
   border-radius: 0.5rem;
-  border: 1px solid #38537a;
-  background: #1a2f50;
+  border: 1px solid #43638d;
+  background: #20365d;
   padding: 0.22rem 0.62rem;
   font-size: 0.72rem;
-  color: #d9e8f7;
+  color: #e3edff;
 }
 
 .nook-snippet-copy:hover {
-  background: #23406d;
+  background: #2a4472;
 }
 
 .nook-snippet-copy:focus-visible {
@@ -361,7 +361,7 @@
   margin: 0;
   border-radius: 0;
   border: 0;
-  background: #0d1320;
+  background: #151c2b;
 }
 
 .nook-snippet code {
@@ -369,21 +369,21 @@
 }
 
 .nook-wiki-link {
-  border-bottom: 2px dashed color-mix(in oklab, var(--primary) 65%, #111 35%);
-  color: #1078a7;
+  border-bottom: 2px dashed color-mix(in oklab, var(--primary) 74%, #1f2f2a 26%);
+  color: #146c5f;
   font-weight: 700;
   text-decoration: none;
 }
 
 .nook-wiki-link:hover {
-  border-bottom-color: #0ea5e9;
-  color: #0a6b97;
+  border-bottom-color: #2ea191;
+  color: #0a5d51;
 }
 
 .nook-wiki-missing {
   border-radius: 0.4rem;
-  border: 2px dashed color-mix(in oklab, var(--destructive) 72%, var(--border) 28%);
-  background: color-mix(in oklab, var(--destructive) 16%, white 84%);
+  border: 1px dashed color-mix(in oklab, var(--destructive) 72%, var(--border) 28%);
+  background: color-mix(in oklab, var(--destructive) 12%, white 88%);
   padding: 0.05rem 0.35rem;
-  color: #9f1e38;
+  color: #8f2136;
 }

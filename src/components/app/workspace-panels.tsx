@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpenText, Clock3, PenSquare, UserRound } from "lucide-react";
+import { BookOpenText, Clock3, Edit3, FileText, PenSquare, UserRound } from "lucide-react";
 import { ArticleContent } from "@/components/articles/article-content";
 import { ThoughtEditor } from "@/components/editor/thought-editor";
 import { type ArticleTopic } from "@/lib/content/devops-library";
@@ -10,7 +10,7 @@ const copy = {
   snapshot: "Сводка",
   allArticles: "Всего статей",
   lastUpdate: "Последнее обновление",
-  emptyValue: "Пока нет данных",
+  emptyValue: "пока нет данных",
   updated: "Обновлено",
   created: "Создано",
   author: "Автор",
@@ -19,12 +19,13 @@ const copy = {
   editor: "Редактор",
   editArticle: "Редактирование статьи",
   newNote: "Новая статья",
-  editorText: "Сохраняем в PostgreSQL. Никаких «а где был тот файл?»",
+  editorText: "Фокус на контент: заголовок, краткий смысл и полезная структура текста.",
   editButton: "Редактировать",
-  closeEditor: "К статье",
-  noAccessEmptyTitle: "Пустая категория",
-  noAccessEmptyText:
-    "Здесь пока нет материалов. Можно начать с черновика и постепенно наполнить раздел.",
+  closeEditor: "Вернуться к статье",
+  noAccessEmptyTitle: "Пока пусто",
+  noAccessEmptyText: "В этой категории еще нет материалов. Можно начать с первой заметки.",
+  sectionLabel: "Раздел",
+  categoryLabel: "Категория",
 } as const;
 
 type EditorArticle = Parameters<typeof ThoughtEditor>[0]["article"];
@@ -98,11 +99,23 @@ export function WorkspacePanels({
               {selectedArticle && closeEditorHref ? (
                 <Link
                   href={closeEditorHref}
-                  className="rounded-lg border-2 border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
+                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
                 >
+                  <FileText className="size-4" />
                   {copy.closeEditor}
                 </Link>
               ) : null}
+            </div>
+
+            <div className="mb-4 grid gap-2 sm:grid-cols-2">
+              <div className="nook-panel-soft rounded-xl px-3 py-2.5">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{copy.sectionLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-foreground">{selectedTopic}</p>
+              </div>
+              <div className="nook-panel-soft rounded-xl px-3 py-2.5">
+                <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">{copy.categoryLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-foreground">{selectedCategory}</p>
+              </div>
             </div>
 
             <ThoughtEditor
@@ -120,10 +133,10 @@ export function WorkspacePanels({
           <section className="nook-panel rounded-2xl p-5 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full border-2 border-primary/70 bg-primary/10 px-3 py-1 font-semibold text-primary">
+                <span className="rounded-full border border-primary/55 bg-primary/10 px-3 py-1 font-semibold text-primary">
                   {selectedArticle.topic}
                 </span>
-                <span className="rounded-full border-2 border-border bg-muted/50 px-3 py-1 font-semibold text-muted-foreground">
+                <span className="rounded-full border border-border bg-card px-3 py-1 font-semibold text-muted-foreground">
                   {selectedArticle.category}
                 </span>
                 <span className="inline-flex items-center gap-1 text-muted-foreground">
@@ -134,8 +147,9 @@ export function WorkspacePanels({
               {editArticleHref && canEditSelectedArticle ? (
                 <Link
                   href={editArticleHref}
-                  className="rounded-lg border-2 border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
+                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
                 >
+                  <Edit3 className="size-4" />
                   {copy.editButton}
                 </Link>
               ) : null}
@@ -172,7 +186,7 @@ export function WorkspacePanels({
               </div>
             </div>
 
-            <div className="mt-5 rounded-xl border-2 border-border bg-card/90 p-4">
+            <div className="mt-5 rounded-xl border border-border bg-card/90 p-4">
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
                 <BookOpenText className="size-4 text-primary" />
                 {copy.reading}
@@ -206,7 +220,9 @@ export function WorkspacePanels({
                 <p className="mt-1 text-xl font-semibold text-foreground">{totalArticles}</p>
               </div>
               <div className="nook-panel-soft rounded-lg px-3 py-2">
-                <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">Категория</p>
+                <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+                  {copy.categoryLabel}
+                </p>
                 <p className="mt-1 text-sm font-semibold text-foreground">{selectedCategory}</p>
               </div>
               <div className="nook-panel-soft rounded-lg px-3 py-2">

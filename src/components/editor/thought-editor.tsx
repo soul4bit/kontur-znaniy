@@ -295,7 +295,7 @@ export function ThoughtEditor({
     editorProps: {
       attributes: {
         class:
-          "nook-editor min-h-80 rounded-2xl border border-border bg-background/60 px-5 py-4 text-[15px] leading-7 text-slate-200 shadow-sm focus-visible:outline-none",
+          "nook-editor min-h-80 rounded-2xl border border-border bg-card px-5 py-4 text-[15px] leading-7 text-foreground shadow-sm focus-visible:outline-none",
       },
     },
   });
@@ -568,7 +568,7 @@ export function ThoughtEditor({
             />
           </div>
 
-          <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-border bg-card/90 p-2 backdrop-blur">
+          <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-border bg-card/95 p-2 backdrop-blur">
             <EditorButton
               active={editor.isActive("bold")}
               onClick={() => editor.chain().focus().toggleBold().run()}
@@ -663,7 +663,7 @@ export function ThoughtEditor({
                   <ArticleContent
                     html={previewHtml}
                     wikiLinks={wikiLinks}
-                    className="max-w-none space-y-4 text-sm leading-7 text-slate-200"
+                    className="max-w-none space-y-4 text-sm leading-7 text-foreground"
                   />
                 ) : (
                   <p className="text-sm leading-7 text-muted-foreground">{copy.previewBodyFallback}</p>
@@ -693,7 +693,7 @@ export function ThoughtEditor({
               <ArticleContent
                 html={previewHtml}
                 wikiLinks={wikiLinks}
-                className="max-w-none space-y-4 text-sm leading-7 text-slate-200"
+                className="max-w-none space-y-4 text-sm leading-7 text-foreground"
               />
             ) : (
               <p className="text-sm leading-7 text-muted-foreground">{copy.previewBodyFallback}</p>
@@ -707,8 +707,8 @@ export function ThoughtEditor({
           className={cn(
             "rounded-[18px] border px-4 py-3 text-sm leading-6",
             feedback.tone === "success"
-              ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
-              : "border-rose-400/45 bg-rose-500/10 text-rose-200"
+              ? "border-emerald-500/45 bg-emerald-50 text-emerald-800"
+              : "border-rose-500/45 bg-rose-50 text-rose-700"
           )}
         >
           {feedback.text}
@@ -761,7 +761,7 @@ export function ThoughtEditor({
           <Button
             type="button"
             variant="outline"
-            className="rounded-2xl border-rose-400/45 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20"
+            className="rounded-2xl border-rose-500/45 bg-rose-50 text-rose-700 hover:bg-rose-100"
             onClick={handleDelete}
             disabled={isSaving || isDeleting || isUploadingImage}
           >
