@@ -21,10 +21,11 @@ import (
 )
 
 type Application struct {
-	cfg       config.Config
-	logger    *log.Logger
-	db        *sql.DB
-	templates map[string]*template.Template
+	cfg           config.Config
+	logger        *log.Logger
+	db            *sql.DB
+	templates     map[string]*template.Template
+	staticVersion string
 }
 
 type User struct {
@@ -107,17 +108,20 @@ func New(cfg config.Config, logger *log.Logger) (*Application, error) {
 		return nil, err
 	}
 
-	templates, err := loadTemplates()
+	staticVersion := time.Now().UTC().Format("20060102150405")
+
+	templates, err := loadTemplates(staticVersion)
 	if err != nil {
 		_ = db.Close()
 		return nil, err
 	}
 
 	return &Application{
-		cfg:       cfg,
-		logger:    logger,
-		db:        db,
-		templates: templates,
+		cfg:           cfg,
+		logger:        logger,
+		db:            db,
+		templates:     templates,
+		staticVersion: staticVersion,
 	}, nil
 }
 
@@ -132,7 +136,12 @@ func (a *Application) Routes() http.Handler {
 	mux := http.NewServeMux()
 
 	staticHandler := http.FileServer(http.Dir("web/static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
+	mux.Handle("/static/", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+		staticHandler.ServeHTTP(w, r)
+	})))
 
 	mux.HandleFunc("/", a.handleRoot)
 	mux.HandleFunc("/auth/login", a.handleLogin)
@@ -150,7 +159,7 @@ func (a *Application) Routes() http.Handler {
 	return a.logRequests(mux)
 }
 
-func loadTemplates() (map[string]*template.Template, error) {
+func loadTemplates(staticVersion string) (map[string]*template.Template, error) {
 	templateDir := filepath.Join("web", "templates")
 	names := []string{
 		"login.tmpl",
@@ -162,10 +171,20 @@ func loadTemplates() (map[string]*template.Template, error) {
 		"s3_check.tmpl",
 	}
 
+	funcMap := template.FuncMap{
+		"asset": func(name string) string {
+			path := "/static/" + strings.TrimPrefix(strings.TrimSpace(name), "/")
+			if staticVersion == "" {
+				return path
+			}
+			return path + "?v=" + staticVersion
+		},
+	}
+
 	result := make(map[string]*template.Template, len(names))
 	for _, name := range names {
 		fullPath := filepath.Join(templateDir, name)
-		tmpl, err := template.ParseFiles(fullPath)
+		tmpl, err := template.New(name).Funcs(funcMap).ParseFiles(fullPath)
 		if err != nil {
 			return nil, err
 		}
@@ -245,6 +264,7 @@ func (a *Application) renderTemplate(w http.ResponseWriter, templateName string,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
 	if err := tmpl.Execute(w, data); err != nil {
 		a.logger.Printf("render template %s: %v", templateName, err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
