@@ -281,7 +281,7 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := a.sendRegistrationRequestToTelegram(request); err != nil {
+		if err := a.sendRegistrationRequestToTelegram(request, r); err != nil {
 			a.logger.Printf("send registration request to telegram: %v", err)
 			if delErr := a.deleteRegistrationRequestByEmail(email); delErr != nil {
 				a.logger.Printf("rollback registration request after telegram error: %v", delErr)

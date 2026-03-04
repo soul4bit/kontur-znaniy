@@ -20,6 +20,12 @@ import (
 
 const defaultAdminRejectReason = "Заявка отклонена модератором."
 
+type registrationClientMeta struct {
+	IP       string
+	Browser  string
+	Location string
+}
+
 func (a *Application) hasRegistrationIntegrations() bool {
 	return a.cfg.AppBaseURL != "" &&
 		a.cfg.SMTPHost != "" &&
@@ -43,20 +49,24 @@ func (a *Application) absoluteURL(path string, query url.Values) string {
 	return out
 }
 
-func (a *Application) sendRegistrationRequestToTelegram(req *registrationRequest) error {
+func (a *Application) sendRegistrationRequestToTelegram(req *registrationRequest, incomingReq *http.Request) error {
 	if a.cfg.TelegramBotToken == "" || a.cfg.TelegramAdminChatID == "" {
 		return errors.New("telegram integration is not configured")
 	}
 
+	meta := a.collectRegistrationClientMeta(incomingReq)
 	approveURL := a.absoluteURL("/admin/registration/approve", url.Values{"token": []string{req.ModerationToken}})
 	rejectURL := a.absoluteURL("/admin/registration/reject", url.Values{"token": []string{req.ModerationToken}})
 
 	text := fmt.Sprintf(
-		"Новая заявка в %s\nНик: %s\nEmail: %s\nСоздана: %s",
+		"Новая заявка в %s\nНик: %s\nEmail: %s\nСоздана: %s\nIP: %s\nБраузер: %s\nГео: %s",
 		a.cfg.AppName,
 		req.Name,
 		req.Email,
 		req.CreatedAt.Format("2006-01-02 15:04:05 UTC"),
+		meta.IP,
+		meta.Browser,
+		meta.Location,
 	)
 
 	type inlineButton struct {
@@ -129,6 +139,175 @@ func (a *Application) sendRegistrationRequestToTelegram(req *registrationRequest
 	}
 
 	return nil
+}
+
+func (a *Application) collectRegistrationClientMeta(r *http.Request) registrationClientMeta {
+	if r == nil {
+		return registrationClientMeta{
+			IP:       "unknown",
+			Browser:  "unknown",
+			Location: "не определено",
+		}
+	}
+
+	ip := extractClientIP(r)
+	if ip == "" {
+		ip = "unknown"
+	}
+
+	browser := normalizeUserAgent(r.UserAgent())
+	if browser == "" {
+		browser = "unknown"
+	}
+
+	location := "не определено"
+	if ip != "unknown" {
+		if resolved, err := a.lookupIPLocation(ip); err == nil && resolved != "" {
+			location = resolved
+		}
+	}
+
+	return registrationClientMeta{
+		IP:       ip,
+		Browser:  browser,
+		Location: location,
+	}
+}
+
+func extractClientIP(r *http.Request) string {
+	headerCandidates := []string{"CF-Connecting-IP", "X-Forwarded-For", "X-Real-IP"}
+
+	for _, key := range headerCandidates {
+		raw := strings.TrimSpace(r.Header.Get(key))
+		if raw == "" {
+			continue
+		}
+
+		if key == "X-Forwarded-For" {
+			parts := strings.Split(raw, ",")
+			for _, part := range parts {
+				if ip := normalizeIP(part); ip != "" {
+					return ip
+				}
+			}
+			continue
+		}
+
+		if ip := normalizeIP(raw); ip != "" {
+			return ip
+		}
+	}
+
+	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+	if err == nil {
+		if ip := normalizeIP(host); ip != "" {
+			return ip
+		}
+	}
+
+	return normalizeIP(strings.TrimSpace(r.RemoteAddr))
+}
+
+func normalizeIP(value string) string {
+	clean := strings.TrimSpace(strings.Trim(value, "[]"))
+	if clean == "" {
+		return ""
+	}
+
+	parsed := net.ParseIP(clean)
+	if parsed == nil {
+		return ""
+	}
+	return parsed.String()
+}
+
+func normalizeUserAgent(ua string) string {
+	clean := strings.TrimSpace(ua)
+	if clean == "" {
+		return ""
+	}
+	if len(clean) > 200 {
+		return clean[:197] + "..."
+	}
+	return clean
+}
+
+func (a *Application) lookupIPLocation(ip string) (string, error) {
+	parsed := net.ParseIP(ip)
+	if parsed == nil {
+		return "", errors.New("invalid ip")
+	}
+
+	if parsed.IsPrivate() || parsed.IsLoopback() || parsed.IsUnspecified() || parsed.IsLinkLocalMulticast() || parsed.IsLinkLocalUnicast() {
+		return "локальная/приватная сеть", nil
+	}
+
+	geoURL := fmt.Sprintf("https://ipapi.co/%s/json/", url.PathEscape(ip))
+	req, err := http.NewRequest(http.MethodGet, geoURL, nil)
+	if err != nil {
+		return "", err
+	}
+
+	client := &http.Client{Timeout: 3 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		return "", fmt.Errorf("geo lookup status: %s", resp.Status)
+	}
+
+	type geoResponse struct {
+		Error       bool   `json:"error"`
+		Reason      string `json:"reason"`
+		City        string `json:"city"`
+		Region      string `json:"region"`
+		CountryName string `json:"country_name"`
+		Org         string `json:"org"`
+		Timezone    string `json:"timezone"`
+	}
+
+	var geo geoResponse
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 16*1024)).Decode(&geo); err != nil {
+		return "", err
+	}
+
+	if geo.Error {
+		if geo.Reason == "" {
+			geo.Reason = "unknown geo provider error"
+		}
+		return "", errors.New(geo.Reason)
+	}
+
+	parts := make([]string, 0, 4)
+	if geo.City != "" {
+		parts = append(parts, geo.City)
+	}
+	if geo.Region != "" {
+		parts = append(parts, geo.Region)
+	}
+	if geo.CountryName != "" {
+		parts = append(parts, geo.CountryName)
+	}
+	if geo.Org != "" {
+		parts = append(parts, geo.Org)
+	}
+
+	location := strings.Join(parts, ", ")
+	if geo.Timezone != "" {
+		if location == "" {
+			location = geo.Timezone
+		} else {
+			location = location + " (" + geo.Timezone + ")"
+		}
+	}
+
+	if location == "" {
+		return "", errors.New("empty geo response")
+	}
+	return location, nil
 }
 
 func (a *Application) sendRegistrationApprovedEmail(req *registrationRequest) error {
@@ -231,11 +410,8 @@ func sendMailWithImplicitTLS(addr string, host string, user string, pass string,
 	}
 	defer client.Close()
 
-	if user != "" {
-		auth := smtp.PlainAuth("", user, pass, host)
-		if err := client.Auth(auth); err != nil {
-			return err
-		}
+	if err := authenticateSMTPClient(client, host, user, pass); err != nil {
+		return err
 	}
 
 	if err := client.Mail(from); err != nil {
@@ -273,11 +449,8 @@ func sendMailWithSMTP(addr string, host string, user string, pass string, from s
 		}
 	}
 
-	if user != "" {
-		auth := smtp.PlainAuth("", user, pass, host)
-		if err := client.Auth(auth); err != nil {
-			return err
-		}
+	if err := authenticateSMTPClient(client, host, user, pass); err != nil {
+		return err
 	}
 
 	if err := client.Mail(from); err != nil {
@@ -300,4 +473,89 @@ func sendMailWithSMTP(addr string, host string, user string, pass string, from s
 	}
 
 	return client.Quit()
+}
+
+func authenticateSMTPClient(client *smtp.Client, host string, user string, pass string) error {
+	if strings.TrimSpace(user) == "" {
+		return nil
+	}
+
+	plainErr := client.Auth(smtp.PlainAuth("", user, pass, host))
+	if plainErr == nil {
+		return nil
+	}
+
+	if !shouldFallbackToLoginAuth(plainErr) {
+		return plainErr
+	}
+
+	loginErr := client.Auth(newSMTPLoginAuth(user, pass))
+	if loginErr == nil {
+		return nil
+	}
+
+	return fmt.Errorf("smtp auth failed: plain=%v; login=%w", plainErr, loginErr)
+}
+
+func shouldFallbackToLoginAuth(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "plain authentication mechanism not supported") ||
+		strings.Contains(msg, "unsupported authentication mechanism") ||
+		strings.Contains(msg, "unrecognized authentication type") ||
+		strings.Contains(msg, "504")
+}
+
+type smtpLoginAuth struct {
+	username string
+	password string
+	step     int
+}
+
+func newSMTPLoginAuth(username string, password string) smtp.Auth {
+	return &smtpLoginAuth{
+		username: username,
+		password: password,
+	}
+}
+
+func (a *smtpLoginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	if !server.TLS && !isSMTPAuthLocalhost(server.Name) {
+		return "", nil, errors.New("unencrypted connection")
+	}
+	a.step = 0
+	return "LOGIN", nil, nil
+}
+
+func (a *smtpLoginAuth) Next(_ []byte, more bool) ([]byte, error) {
+	if !more {
+		return nil, nil
+	}
+
+	switch a.step {
+	case 0:
+		a.step++
+		return []byte(a.username), nil
+	case 1:
+		a.step++
+		return []byte(a.password), nil
+	default:
+		return nil, nil
+	}
+}
+
+func isSMTPAuthLocalhost(name string) bool {
+	host := strings.TrimSpace(strings.Trim(name, "[]"))
+	if host == "localhost" || strings.HasPrefix(host, "localhost.") {
+		return true
+	}
+
+	parsed := net.ParseIP(host)
+	if parsed == nil {
+		return false
+	}
+	return parsed.IsLoopback()
 }
