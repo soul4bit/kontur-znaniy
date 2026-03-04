@@ -30,6 +30,66 @@
 
     <section class="atlas-layout">
       <aside class="atlas-rail">
+        <article class="atlas-card atlas-sections-sidebar">
+          <p class="panel-label">Разделы</p>
+          <ul class="atlas-nav">
+            <li class="atlas-nav-item">
+              <span class="atlas-nav-title">Linux</span>
+              <ul class="atlas-nav-sub">
+                <li>Файловая система</li>
+                <li>systemd и сервисы</li>
+                <li>Shell и bash</li>
+                <li>Права и пользователи</li>
+              </ul>
+            </li>
+            <li class="atlas-nav-item">
+              <span class="atlas-nav-title">Docker</span>
+              <ul class="atlas-nav-sub">
+                <li>Dockerfile паттерны</li>
+                <li>Compose и окружения</li>
+                <li>Volumes и сети</li>
+                <li>Registry и образы</li>
+              </ul>
+            </li>
+            <li class="atlas-nav-item">
+              <span class="atlas-nav-title">Сети</span>
+              <ul class="atlas-nav-sub">
+                <li>DNS и домены</li>
+                <li>Nginx reverse proxy</li>
+                <li>Firewall правила</li>
+                <li>SSL и сертификаты</li>
+              </ul>
+            </li>
+            <li class="atlas-nav-item">
+              <span class="atlas-nav-title">K8s</span>
+              <ul class="atlas-nav-sub">
+                <li>Pods и Deployments</li>
+                <li>Services и Ingress</li>
+                <li>ConfigMap/Secrets</li>
+                <li>Helm chart notes</li>
+              </ul>
+            </li>
+            <li class="atlas-nav-item">
+              <span class="atlas-nav-title">CI/CD</span>
+              <ul class="atlas-nav-sub">
+                <li>GitHub Actions</li>
+                <li>Стратегии деплоя</li>
+                <li>Rollback сценарии</li>
+                <li>Release checklist</li>
+              </ul>
+            </li>
+            <li class="atlas-nav-item">
+              <span class="atlas-nav-title">Общее</span>
+              <ul class="atlas-nav-sub">
+                <li>Чеклисты дежурств</li>
+                <li>FAQ и шпаргалки</li>
+                <li>Postmortem шаблоны</li>
+                <li>Внутренние стандарты</li>
+              </ul>
+            </li>
+          </ul>
+        </article>
+
         <article class="atlas-card atlas-profile">
           <p class="panel-label">Профиль</p>
           <p class="atlas-profile-name">{{.User.Name}}</p>
@@ -73,64 +133,26 @@
         </article>
 
         <div class="atlas-grid">
-          <article class="atlas-card atlas-sections">
-            <p class="panel-label">Разделы базы знаний</p>
-            <div class="atlas-section-grid">
-              <section class="atlas-section-card">
-                <h3>Linux</h3>
-                <ul class="atlas-subsections">
-                  <li>Файловая система</li>
-                  <li>systemd и сервисы</li>
-                  <li>Shell и bash</li>
-                  <li>Права и пользователи</li>
-                </ul>
-              </section>
-              <section class="atlas-section-card">
-                <h3>Docker</h3>
-                <ul class="atlas-subsections">
-                  <li>Dockerfile паттерны</li>
-                  <li>Compose и окружения</li>
-                  <li>Volumes и сети</li>
-                  <li>Registry и образы</li>
-                </ul>
-              </section>
-              <section class="atlas-section-card">
-                <h3>Сети</h3>
-                <ul class="atlas-subsections">
-                  <li>DNS и домены</li>
-                  <li>Nginx reverse proxy</li>
-                  <li>Firewall правила</li>
-                  <li>SSL и сертификаты</li>
-                </ul>
-              </section>
-              <section class="atlas-section-card">
-                <h3>K8s</h3>
-                <ul class="atlas-subsections">
-                  <li>Pods и Deployments</li>
-                  <li>Services и Ingress</li>
-                  <li>ConfigMap/Secrets</li>
-                  <li>Helm chart notes</li>
-                </ul>
-              </section>
-              <section class="atlas-section-card">
-                <h3>CI/CD</h3>
-                <ul class="atlas-subsections">
-                  <li>GitHub Actions</li>
-                  <li>Стратегии деплоя</li>
-                  <li>Rollback сценарии</li>
-                  <li>Release checklist</li>
-                </ul>
-              </section>
-              <section class="atlas-section-card">
-                <h3>Общее</h3>
-                <ul class="atlas-subsections">
-                  <li>Чеклисты дежурств</li>
-                  <li>FAQ и шпаргалки</li>
-                  <li>Postmortem шаблоны</li>
-                  <li>Внутренние стандарты</li>
-                </ul>
-              </section>
-            </div>
+          <article class="atlas-card atlas-cheats">
+            <p class="panel-label">Свежие шпаргалки</p>
+            <ul class="atlas-cheats-list">
+              <li>
+                <span>Linux · grep/sed/awk в 10 командах</span>
+                <em>обновлено</em>
+              </li>
+              <li>
+                <span>Docker · диагностика контейнера за 2 минуты</span>
+                <em>новое</em>
+              </li>
+              <li>
+                <span>K8s · kubectl debug и быстрый triage</span>
+                <em>черновик</em>
+              </li>
+              <li>
+                <span>CI/CD · чеклист перед деплоем</span>
+                <em>готово</em>
+              </li>
+            </ul>
           </article>
 
           <article class="atlas-card atlas-terminal">
@@ -151,6 +173,15 @@ status: knowledge atlas is ready</code></pre>
             <li><span>API</span><strong>ok</strong></li>
             <li><span>PostgreSQL</span><strong>ok</strong></li>
             <li><span>Deploy pipeline</span><strong>watching</strong></li>
+          </ul>
+        </article>
+
+        <article class="atlas-card">
+          <p class="panel-label">S3 хранилище</p>
+          <ul class="atlas-list">
+            <li><span>Endpoint</span><em>beget</em></li>
+            <li><span>Bucket</span><em>kontur-znaniy-s3</em></li>
+            <li><span>Статус интеграции</span><em>next</em></li>
           </ul>
         </article>
 

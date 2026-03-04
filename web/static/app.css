@@ -720,50 +720,105 @@ body {
   gap: 14px;
 }
 
-.atlas-section-grid {
+.atlas-sections-sidebar {
+  border-color: #bfd8cf;
+  background:
+    radial-gradient(circle at 95% -6%, rgba(206, 153, 86, 0.18), transparent 34%),
+    linear-gradient(145deg, rgba(244, 251, 248, 0.96), rgba(236, 246, 242, 0.96));
+}
+
+.atlas-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-.atlas-section-card {
-  border: 1px solid #d5e2dc;
+.atlas-nav-item {
+  border: 1px solid #d4e0db;
   border-radius: 12px;
-  background: #f8fbf9;
-  padding: 11px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 9px 10px 8px;
 }
 
-.atlas-section-card h3 {
+.atlas-nav-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
+  color: #1f4942;
   font-size: 14px;
-  color: #20453f;
+  font-weight: 800;
   letter-spacing: 0.01em;
 }
 
-.atlas-subsections {
+.atlas-nav-title::before {
+  content: ">";
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+  color: #0d766d;
+  font-size: 12px;
+}
+
+.atlas-nav-sub {
   list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
+  margin: 7px 0 0;
+  padding: 0 0 0 16px;
   display: grid;
-  gap: 6px;
-  font-size: 14px;
+  gap: 5px;
 }
 
-.atlas-subsections li {
+.atlas-nav-sub li {
   position: relative;
-  padding-left: 14px;
-  color: #4d625c;
+  color: #506760;
+  font-size: 13px;
+  line-height: 1.35;
 }
 
-.atlas-subsections li::before {
+.atlas-nav-sub li::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 9px;
-  width: 5px;
-  height: 5px;
+  left: -10px;
+  top: 7px;
+  width: 4px;
+  height: 4px;
   border-radius: 999px;
-  background: #86a89f;
+  background: #88a79f;
+}
+
+.atlas-cheats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.atlas-cheats-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px dashed #d6e3de;
+  padding-bottom: 7px;
+}
+
+.atlas-cheats-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.atlas-cheats-list span {
+  color: #2d4a44;
+}
+
+.atlas-cheats-list em {
+  font-style: normal;
+  color: #5f766f;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
 }
 
 .atlas-terminal pre {
@@ -1019,9 +1074,6 @@ body {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .atlas-section-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 700px) {
@@ -1067,8 +1119,7 @@ body {
 
   .atlas-layout,
   .atlas-grid,
-  .atlas-right,
-  .atlas-section-grid {
+  .atlas-right {
     grid-template-columns: 1fr;
   }
 

@@ -72,7 +72,18 @@ MAIL_FROM="Kontur <kontur-znaniy@xn----8sbuffbvcbexxn.xn--p1ai>"
 
 TELEGRAM_BOT_TOKEN=CHANGE_ME_TELEGRAM_BOT_TOKEN
 TELEGRAM_ADMIN_CHAT_ID=CHANGE_ME_TELEGRAM_ID
+
+S3_ENDPOINT="https://s3.ru1.storage.beget.cloud"
+S3_BUCKET="156f31dd20b1-kontur-znaniy-s3"
+S3_ACCESS_KEY="CHANGE_ME_S3_ACCESS_KEY"
+S3_SECRET_KEY="CHANGE_ME_S3_SECRET_KEY"
 ```
+
+## S3 стратегия
+
+- Статьи и метаданные лучше хранить в PostgreSQL.
+- Файлы (вложения, картинки, экспорты) лучше складывать в S3.
+- Ключи доступа храните только в `.env` на сервере и в GitHub Secrets, не в репозитории.
 
 ## Как работает регистрация
 
