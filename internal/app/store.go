@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+type authStats struct {
+	UsersTotal     int
+	ActiveSessions int
+}
+
 func (a *Application) createUser(name string, email string, passwordHash string) (*User, error) {
 	nowUnix := time.Now().UTC().Unix()
 
@@ -151,6 +156,23 @@ func (a *Application) cleanupExpiredSessions() error {
 		time.Now().UTC().Unix(),
 	)
 	return err
+}
+
+func (a *Application) getAuthStats() (authStats, error) {
+	nowUnix := time.Now().UTC().Unix()
+	row := a.db.QueryRow(
+		`select
+			(select count(*) from users),
+			(select count(*) from sessions where expires_at > ?)`,
+		nowUnix,
+	)
+
+	var stats authStats
+	if err := row.Scan(&stats.UsersTotal, &stats.ActiveSessions); err != nil {
+		return authStats{}, err
+	}
+
+	return stats, nil
 }
 
 func isUniqueEmailError(err error) bool {

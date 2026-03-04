@@ -4,21 +4,50 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{.Title}} · {{.AppName}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/app.css" />
 </head>
-<body>
-  <main class="page">
-    <section class="card card-wide">
-      <div class="brand">
+<body class="auth-page">
+  <main class="auth-layout">
+    <aside class="auth-aside">
+      <p class="eyebrow">Knowledge Atlas</p>
+      <h1 class="aside-title">Контур знаний для DevOps-записей</h1>
+      <p class="aside-text">
+        Чистый входной контур с живой статистикой из базы данных.
+        После авторизации вы сразу попадаете в рабочее пространство.
+      </p>
+
+      <div class="stat-grid">
+        <article class="stat-tile">
+          <span>Пользователей</span>
+          <strong>{{.UsersTotal}}</strong>
+        </article>
+        <article class="stat-tile">
+          <span>Активных сессий</span>
+          <strong>{{.ActiveSessions}}</strong>
+        </article>
+      </div>
+
+      <ul class="aside-list">
+        <li>SQLite хранит аккаунты и сессии</li>
+        <li>Пароли защищены через bcrypt</li>
+        <li>HttpOnly cookie и безопасный redirect</li>
+      </ul>
+    </aside>
+
+    <section class="auth-card">
+      <div class="brand-row">
         <div class="brand-mark">КЗ</div>
         <div>
           <p class="brand-title">{{.AppName}}</p>
-          <p class="brand-subtitle">Full Go · Авторизация</p>
+          <p class="brand-subtitle">Вход в аккаунт</p>
         </div>
       </div>
 
-      <h1 class="title">Вход в Контур Знаний</h1>
-      <p class="subtitle">Новый старт на Full Go. Введите email и пароль, чтобы открыть workspace.</p>
+      <h2 class="auth-title">С возвращением</h2>
+      <p class="auth-subtitle">Введите email и пароль, чтобы открыть ваш контур знаний.</p>
 
       {{if .Error}}
       <div class="alert alert-error">{{.Error}}</div>
@@ -27,25 +56,25 @@
       <div class="alert alert-success">{{.Success}}</div>
       {{end}}
 
-      <form method="post" action="/auth/login" class="form">
+      <form method="post" action="/auth/login" class="auth-form">
         <input type="hidden" name="next" value="{{.Next}}" />
 
         <label class="field">
           <span>Email</span>
-          <input type="email" name="email" value="{{.Email}}" placeholder="you@example.com" required />
+          <input type="email" name="email" value="{{.Email}}" placeholder="you@example.com" autocomplete="username" required />
         </label>
 
         <label class="field">
           <span>Пароль</span>
-          <input type="password" name="password" placeholder="Минимум 10 символов" required />
+          <input type="password" name="password" placeholder="Минимум 10 символов" autocomplete="current-password" required />
         </label>
 
         <button class="button button-primary" type="submit">Войти</button>
       </form>
 
       <p class="footnote">
-        Нет аккаунта?
-        <a href="/auth/register">Зарегистрироваться</a>
+        Ещё нет аккаунта?
+        <a href="/auth/register">Создать профиль</a>
       </p>
     </section>
   </main>

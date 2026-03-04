@@ -49,6 +49,8 @@ type viewData struct {
 	Name    string
 	Email   string
 	Next    string
+	UsersTotal     int
+	ActiveSessions int
 }
 
 type contextKey string

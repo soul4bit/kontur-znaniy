@@ -4,39 +4,54 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{.Title}} · {{.AppName}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/app.css" />
 </head>
-<body>
-  <main class="page">
-    <section class="card card-wide">
-      <div class="dashboard-header">
-        <div>
-          <p class="brand-title">{{.AppName}}</p>
-          <h1 class="title">Добро пожаловать, {{.User.Name}}</h1>
-          <p class="subtitle">
-            Базовый Full Go auth-контур готов. Следующий шаг: wiki-узлы и граф знаний.
-          </p>
-        </div>
-
-        <form method="post" action="/auth/logout">
-          <button class="button button-ghost" type="submit">Выйти</button>
-        </form>
+<body class="app-page">
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">{{.AppName}}</p>
+        <h1 class="app-title">Привет, {{.User.Name}}</h1>
+        <p class="app-subtitle">Ваш atlas готов: контент, заметки и связи теперь в одном месте.</p>
       </div>
+      <form method="post" action="/auth/logout">
+        <button class="button button-ghost" type="submit">Выйти</button>
+      </form>
+    </header>
 
-      <div class="panel">
+    <section class="dashboard-grid">
+      <article class="panel panel-strong">
+        <p class="panel-label">Профиль</p>
         <p><strong>Email:</strong> {{.User.Email}}</p>
         <p><strong>User ID:</strong> {{.User.ID}}</p>
         <p><strong>Создан:</strong> {{.User.CreatedAt.Format "02.01.2006 15:04"}}</p>
-      </div>
+      </article>
 
-      <div class="panel panel-soft">
-        <p class="panel-title">Статус перезапуска</p>
+      <article class="panel panel-soft">
+        <p class="panel-label">Живая статистика БД</p>
+        <div class="stat-grid stat-grid-compact">
+          <article class="stat-tile">
+            <span>Пользователей</span>
+            <strong>{{.UsersTotal}}</strong>
+          </article>
+          <article class="stat-tile">
+            <span>Активных сессий</span>
+            <strong>{{.ActiveSessions}}</strong>
+          </article>
+        </div>
+      </article>
+
+      <article class="panel panel-soft">
+        <p class="panel-label">Что дальше</p>
         <ul>
-          <li>Done: Full Go skeleton</li>
-          <li>Done: register/login/logout + session cookie</li>
-          <li>Next: вики-структура и editor</li>
+          <li>добавить разделы и статьи</li>
+          <li>собрать карту знаний по тегам</li>
+          <li>включить ACL и роли редакторов</li>
         </ul>
-      </div>
+      </article>
     </section>
   </main>
 </body>

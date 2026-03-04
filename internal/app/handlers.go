@@ -36,6 +36,23 @@ func contextWithUser(ctx context.Context, user *User) context.Context {
 	return context.WithValue(ctx, userContextKey, user)
 }
 
+func (a *Application) authViewData(title string) viewData {
+	data := viewData{
+		AppName: a.cfg.AppName,
+		Title:   title,
+	}
+
+	stats, err := a.getAuthStats()
+	if err != nil {
+		a.logger.Printf("get auth stats: %v", err)
+		return data
+	}
+
+	data.UsersTotal = stats.UsersTotal
+	data.ActiveSessions = stats.ActiveSessions
+	return data
+}
+
 func (a *Application) handleRoot(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -76,12 +93,10 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		a.renderTemplate(w, "login.tmpl", viewData{
-			AppName: a.cfg.AppName,
-			Title:   "Вход",
-			Success: strings.TrimSpace(r.URL.Query().Get("success")),
-			Next:    strings.TrimSpace(r.URL.Query().Get("next")),
-		})
+		data := a.authViewData("Вход")
+		data.Success = strings.TrimSpace(r.URL.Query().Get("success"))
+		data.Next = strings.TrimSpace(r.URL.Query().Get("next"))
+		a.renderTemplate(w, "login.tmpl", data)
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "invalid form data", http.StatusBadRequest)
@@ -92,12 +107,9 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 		next := strings.TrimSpace(r.FormValue("next"))
 
-		data := viewData{
-			AppName: a.cfg.AppName,
-			Title:   "Вход",
-			Email:   email,
-			Next:    next,
-		}
+		data := a.authViewData("Вход")
+		data.Email = email
+		data.Next = next
 
 		if email == "" || password == "" {
 			data.Error = "Введите email и пароль."
@@ -156,10 +168,7 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		a.renderTemplate(w, "register.tmpl", viewData{
-			AppName: a.cfg.AppName,
-			Title:   "Регистрация",
-		})
+		a.renderTemplate(w, "register.tmpl", a.authViewData("Регистрация"))
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "invalid form data", http.StatusBadRequest)
@@ -171,12 +180,9 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirm_password")
 
-		data := viewData{
-			AppName: a.cfg.AppName,
-			Title:   "Регистрация",
-			Name:    name,
-			Email:   email,
-		}
+		data := a.authViewData("Регистрация")
+		data.Name = name
+		data.Email = email
 
 		if len(name) < 2 {
 			data.Error = "Имя должно быть минимум 2 символа."
@@ -247,11 +253,21 @@ func (a *Application) handleDashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.renderTemplate(w, "dashboard.tmpl", viewData{
+	data := viewData{
 		AppName: a.cfg.AppName,
 		Title:   "Рабочее пространство",
 		User:    user,
-	})
+	}
+
+	stats, err := a.getAuthStats()
+	if err != nil {
+		a.logger.Printf("get dashboard stats: %v", err)
+	} else {
+		data.UsersTotal = stats.UsersTotal
+		data.ActiveSessions = stats.ActiveSessions
+	}
+
+	a.renderTemplate(w, "dashboard.tmpl", data)
 }
 
 func (a *Application) handleLogout(w http.ResponseWriter, r *http.Request) {
