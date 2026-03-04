@@ -8,12 +8,21 @@ import (
 )
 
 type Config struct {
-	AppName           string
-	Port              string
-	DatabaseURL       string
-	SessionCookieName string
-	SessionTTL        time.Duration
-	SecureCookies     bool
+	AppName             string
+	Port                string
+	AppBaseURL          string
+	DatabaseURL         string
+	SessionCookieName   string
+	SessionTTL          time.Duration
+	SecureCookies       bool
+	SMTPHost            string
+	SMTPPort            int
+	SMTPSecure          bool
+	SMTPUser            string
+	SMTPPassword        string
+	MailFrom            string
+	TelegramBotToken    string
+	TelegramAdminChatID string
 }
 
 func Load() Config {
@@ -28,12 +37,21 @@ func Load() Config {
 	databaseURL := getEnv("DATABASE_URL", getEnv("DATABASE_DSN", defaultDatabaseURL))
 
 	return Config{
-		AppName:           getEnv("APP_NAME", "Контур Знаний"),
-		Port:              getEnv("APP_PORT", "8080"),
-		DatabaseURL:       databaseURL,
-		SessionCookieName: getEnv("SESSION_COOKIE_NAME", "kontur_session"),
-		SessionTTL:        time.Duration(ttlHours) * time.Hour,
-		SecureCookies:     getEnvBool("SECURE_COOKIES", secureByDefault),
+		AppName:             getEnv("APP_NAME", "Контур Знаний"),
+		Port:                getEnv("APP_PORT", "8080"),
+		AppBaseURL:          strings.TrimRight(getEnv("APP_BASE_URL", "http://localhost:8080"), "/"),
+		DatabaseURL:         databaseURL,
+		SessionCookieName:   getEnv("SESSION_COOKIE_NAME", "kontur_session"),
+		SessionTTL:          time.Duration(ttlHours) * time.Hour,
+		SecureCookies:       getEnvBool("SECURE_COOKIES", secureByDefault),
+		SMTPHost:            getEnv("SMTP_HOST", ""),
+		SMTPPort:            getEnvInt("SMTP_PORT", 465),
+		SMTPSecure:          getEnvBool("SMTP_SECURE", true),
+		SMTPUser:            getEnv("SMTP_USER", ""),
+		SMTPPassword:        getEnv("SMTP_PASSWORD", ""),
+		MailFrom:            getEnv("MAIL_FROM", ""),
+		TelegramBotToken:    getEnv("TELEGRAM_BOT_TOKEN", ""),
+		TelegramAdminChatID: getEnv("TELEGRAM_ADMIN_CHAT_ID", ""),
 	}
 }
 

@@ -14,6 +14,30 @@ type authStats struct {
 	ActiveSessions int
 }
 
+type registrationRequestStatus string
+
+const (
+	registrationStatusPending   registrationRequestStatus = "pending"
+	registrationStatusApproved  registrationRequestStatus = "approved"
+	registrationStatusRejected  registrationRequestStatus = "rejected"
+	registrationStatusCompleted registrationRequestStatus = "completed"
+)
+
+type registrationRequest struct {
+	ID               int64
+	Name             string
+	Email            string
+	PasswordHash     string
+	Status           registrationRequestStatus
+	ModerationToken  string
+	EmailVerifyToken sql.NullString
+	RejectionReason  sql.NullString
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	ModeratedAt      sql.NullTime
+	EmailVerifiedAt  sql.NullTime
+}
+
 func (a *Application) createUser(name string, email string, passwordHash string) (*User, error) {
 	now := time.Now().UTC()
 	row := a.db.QueryRow(
@@ -38,6 +62,20 @@ func (a *Application) getUserByID(userID int64) (*User, error) {
 	row := a.db.QueryRow(
 		`select id, email, name, created_at from users where id = $1 limit 1`,
 		userID,
+	)
+
+	var user User
+	if err := row.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (a *Application) getUserByEmail(email string) (*User, error) {
+	row := a.db.QueryRow(
+		`select id, email, name, created_at from users where email = $1 limit 1`,
+		email,
 	)
 
 	var user User
@@ -167,6 +205,313 @@ func (a *Application) getAuthStats() (authStats, error) {
 	}
 
 	return stats, nil
+}
+
+func scanRegistrationRequest(scanner interface {
+	Scan(dest ...any) error
+}) (*registrationRequest, error) {
+	var req registrationRequest
+	if err := scanner.Scan(
+		&req.ID,
+		&req.Name,
+		&req.Email,
+		&req.PasswordHash,
+		&req.Status,
+		&req.ModerationToken,
+		&req.EmailVerifyToken,
+		&req.RejectionReason,
+		&req.CreatedAt,
+		&req.UpdatedAt,
+		&req.ModeratedAt,
+		&req.EmailVerifiedAt,
+	); err != nil {
+		return nil, err
+	}
+	return &req, nil
+}
+
+func (a *Application) getRegistrationRequestByEmail(email string) (*registrationRequest, error) {
+	row := a.db.QueryRow(
+		`select
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at
+		from registration_requests
+		where email = $1
+		limit 1`,
+		email,
+	)
+	return scanRegistrationRequest(row)
+}
+
+func (a *Application) getRegistrationRequestByModerationToken(token string) (*registrationRequest, error) {
+	row := a.db.QueryRow(
+		`select
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at
+		from registration_requests
+		where moderation_token = $1
+		limit 1`,
+		token,
+	)
+	return scanRegistrationRequest(row)
+}
+
+func (a *Application) getRegistrationRequestByVerifyToken(token string) (*registrationRequest, error) {
+	row := a.db.QueryRow(
+		`select
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at
+		from registration_requests
+		where email_verify_token = $1
+		limit 1`,
+		token,
+	)
+	return scanRegistrationRequest(row)
+}
+
+func (a *Application) upsertRegistrationRequest(name string, email string, passwordHash string, moderationToken string) (*registrationRequest, error) {
+	now := time.Now().UTC()
+	row := a.db.QueryRow(
+		`insert into registration_requests (
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at
+		) values ($1, $2, $3, $4, $5, null, null, $6, $6, null, null)
+		on conflict (email) do update set
+			name = excluded.name,
+			password_hash = excluded.password_hash,
+			status = excluded.status,
+			moderation_token = excluded.moderation_token,
+			email_verify_token = null,
+			rejection_reason = null,
+			updated_at = excluded.updated_at,
+			moderated_at = null,
+			email_verified_at = null
+		returning
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at`,
+		name,
+		email,
+		passwordHash,
+		registrationStatusPending,
+		moderationToken,
+		now,
+	)
+	return scanRegistrationRequest(row)
+}
+
+func (a *Application) deleteRegistrationRequestByEmail(email string) error {
+	_, err := a.db.Exec(`delete from registration_requests where email = $1`, email)
+	return err
+}
+
+func (a *Application) approveRegistrationRequest(moderationToken string, emailVerifyToken string) (*registrationRequest, error) {
+	now := time.Now().UTC()
+	row := a.db.QueryRow(
+		`update registration_requests
+		set
+			status = $2,
+			email_verify_token = $3,
+			rejection_reason = null,
+			moderated_at = $4,
+			updated_at = $4
+		where moderation_token = $1 and status = $5
+		returning
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at`,
+		moderationToken,
+		registrationStatusApproved,
+		emailVerifyToken,
+		now,
+		registrationStatusPending,
+	)
+	return scanRegistrationRequest(row)
+}
+
+func (a *Application) rejectRegistrationRequest(moderationToken string, reason string) (*registrationRequest, error) {
+	now := time.Now().UTC()
+	row := a.db.QueryRow(
+		`update registration_requests
+		set
+			status = $2,
+			rejection_reason = $3,
+			email_verify_token = null,
+			moderated_at = $4,
+			updated_at = $4
+		where moderation_token = $1 and status = $5
+		returning
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at`,
+		moderationToken,
+		registrationStatusRejected,
+		reason,
+		now,
+		registrationStatusPending,
+	)
+	return scanRegistrationRequest(row)
+}
+
+func (a *Application) completeRegistrationByVerifyToken(verifyToken string) (*User, error) {
+	now := time.Now().UTC()
+	tx, err := a.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	var req registrationRequest
+	err = tx.QueryRow(
+		`select
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at
+		from registration_requests
+		where email_verify_token = $1 and status = $2
+		for update`,
+		verifyToken,
+		registrationStatusApproved,
+	).Scan(
+		&req.ID,
+		&req.Name,
+		&req.Email,
+		&req.PasswordHash,
+		&req.Status,
+		&req.ModerationToken,
+		&req.EmailVerifyToken,
+		&req.RejectionReason,
+		&req.CreatedAt,
+		&req.UpdatedAt,
+		&req.ModeratedAt,
+		&req.EmailVerifiedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var user User
+	err = tx.QueryRow(
+		`select id, email, name, created_at from users where email = $1 limit 1`,
+		req.Email,
+	).Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+
+		err = tx.QueryRow(
+			`insert into users (email, name, password_hash, created_at)
+			 values ($1, $2, $3, $4)
+			 returning id, email, name, created_at`,
+			req.Email,
+			req.Name,
+			req.PasswordHash,
+			now,
+		).Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	_, err = tx.Exec(
+		`update registration_requests
+		set
+			status = $2,
+			email_verified_at = $3,
+			email_verify_token = null,
+			updated_at = $3
+		where id = $1`,
+		req.ID,
+		registrationStatusCompleted,
+		now,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func isUniqueEmailError(err error) bool {

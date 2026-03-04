@@ -1,21 +1,25 @@
 # Контур Знаний (Full Go)
 
-Полный перезапуск проекта на Go без Node/Next.
+Go-приложение с авторизацией, модерацией регистрации через Telegram и подтверждением email.
 
-Текущий этап:
-- регистрация
-- вход
-- выход
-- защищенная страница `/app`
+## Что уже работает
+
+- Заявка на регистрацию (`/auth/register`)
+- Отправка заявки админу в Telegram (`Одобрить` / `Отклонить`)
+- Письмо пользователю после решения модератора
+- Подтверждение email по ссылке из письма
+- Создание аккаунта только после подтверждения email
+- Вход/выход и защищенная страница `/app`
 
 ## Стек
 
 - Go `net/http`
 - HTML templates
 - PostgreSQL
-- `database/sql` + `pgx` драйвер
+- `database/sql` + `pgx`
 - `bcrypt` для паролей
-- Сессии в БД + HttpOnly cookie
+- SMTP для писем
+- Telegram Bot API для модерации заявок
 
 ## Быстрый старт
 
@@ -25,7 +29,7 @@
 cp .env.example .env
 ```
 
-2. Поднимите PostgreSQL (локально пример):
+2. Поднимите PostgreSQL:
 
 ```bash
 docker run --name kontur-postgres \
@@ -51,71 +55,48 @@ go run ./cmd/server
 APP_NAME="Контур Знаний"
 APP_PORT=8080
 APP_ENV=development
+APP_BASE_URL="http://localhost:8080"
+
 DATABASE_URL="postgres://kontur_znaniy:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/kontur_znaniy?sslmode=disable"
+
 SESSION_COOKIE_NAME=kontur_session
 SESSION_TTL_HOURS=168
 SECURE_COOKIES=false
+
+SMTP_HOST=smtp.beget.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER="kontur-znaniy@xn----8sbuffbvcbexxn.xn--p1ai"
+SMTP_PASSWORD="CHANGE_ME_SMTP_PASSWORD"
+MAIL_FROM="Kontur <kontur-znaniy@xn----8sbuffbvcbexxn.xn--p1ai>"
+
+TELEGRAM_BOT_TOKEN=CHANGE_ME_TELEGRAM_BOT_TOKEN
+TELEGRAM_ADMIN_CHAT_ID=CHANGE_ME_TELEGRAM_ID
 ```
 
-## Очистить old `nook` и создать новую БД
+## Как работает регистрация
 
-Внимание: команды ниже удаляют старые сущности `nook`.
-
-```bash
-sudo -u postgres psql <<'SQL'
-SELECT pg_terminate_backend(pid)
-FROM pg_stat_activity
-WHERE datname IN ('nook', 'kontur_znaniy')
-  AND pid <> pg_backend_pid();
-
-DROP DATABASE IF EXISTS nook;
-DROP ROLE IF EXISTS nook;
-DROP DATABASE IF EXISTS kontur_znaniy;
-DROP ROLE IF EXISTS kontur_znaniy;
-
-CREATE ROLE kontur_znaniy WITH LOGIN PASSWORD 'CHANGE_ME_STRONG_PASSWORD';
-CREATE DATABASE kontur_znaniy OWNER kontur_znaniy;
-SQL
-```
-
-Потом проверьте `.env`:
-
-```bash
-DATABASE_URL="postgres://kontur_znaniy:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/kontur_znaniy?sslmode=disable"
-```
+1. Пользователь отправляет форму регистрации.
+2. Создается заявка со статусом `pending`.
+3. Админу в Telegram приходит сообщение с кнопками `Одобрить` / `Отклонить`.
+4. При одобрении пользователю отправляется письмо со ссылкой подтверждения email.
+5. После перехода по ссылке создается аккаунт и пользователь автоматически входит в систему.
 
 ## Структура
 
 ```text
 cmd/server/main.go        # запуск HTTP сервера
 internal/config           # конфиг из env
-internal/app              # handlers + store + auth/session
+internal/app              # handlers + store + auth/session + уведомления
 web/templates             # html шаблоны
-web/static                # css
+web/static                # css/js
 ```
-
-## Что дальше
-
-- подтверждение email
-- восстановление пароля
-- роли/ACL
-- wiki-узлы и граф знаний
 
 ## Deploy на VPS
 
 Workflow: `.github/workflows/deploy.yml`
 
-Что делает:
-- синхронизирует репозиторий в `/var/www/kontur-znaniy`
-- собирает бинарник `bin/kontur-znaniy`
-- перезапускает `kontur-znaniy` через systemd
-
-Нужные secrets в GitHub:
-- `DEPLOY_HOST`
-- `DEPLOY_USER`
-- `DEPLOY_KEY`
-
-Перед первым деплоем на сервере:
+Перед первым деплоем:
 
 ```bash
 mkdir -p /var/www/kontur-znaniy

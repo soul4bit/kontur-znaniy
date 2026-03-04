@@ -102,8 +102,11 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/", a.handleRoot)
 	mux.HandleFunc("/auth/login", a.handleLogin)
 	mux.HandleFunc("/auth/register", a.handleRegister)
+	mux.HandleFunc("/auth/verify-email", a.handleVerifyEmail)
 	mux.HandleFunc("/auth/logout", a.requireAuth(a.handleLogout))
 	mux.HandleFunc("/app", a.requireAuth(a.handleDashboard))
+	mux.HandleFunc("/admin/registration/approve", a.handleApproveRegistration)
+	mux.HandleFunc("/admin/registration/reject", a.handleRejectRegistration)
 
 	return a.logRequests(mux)
 }
@@ -142,8 +145,25 @@ func runMigrations(db *sql.DB) error {
 			expires_at timestamptz not null,
 			foreign key(user_id) references users(id) on delete cascade
 		);`,
+		`create table if not exists registration_requests (
+			id bigserial primary key,
+			email text not null unique,
+			name text not null,
+			password_hash text not null,
+			status text not null default 'pending',
+			moderation_token text not null unique,
+			email_verify_token text,
+			rejection_reason text,
+			created_at timestamptz not null default now(),
+			updated_at timestamptz not null default now(),
+			moderated_at timestamptz,
+			email_verified_at timestamptz
+		);`,
 		`create index if not exists idx_sessions_user_id on sessions(user_id);`,
 		`create index if not exists idx_sessions_expires_at on sessions(expires_at);`,
+		`create unique index if not exists idx_registration_requests_email_verify_token
+			on registration_requests(email_verify_token)
+			where email_verify_token is not null;`,
 	}
 
 	for _, stmt := range statements {

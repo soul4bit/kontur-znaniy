@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/mail"
+	"net/url"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -120,7 +122,20 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 		creds, err := a.getCredentialsByEmail(email)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				data.Error = "Неверный email или пароль."
+				if reg, regErr := a.getRegistrationRequestByEmail(email); regErr == nil {
+					switch reg.Status {
+					case registrationStatusPending:
+						data.Error = "Заявка еще на рассмотрении. Дождитесь решения в письме."
+					case registrationStatusApproved:
+						data.Error = "Заявка одобрена. Подтвердите email по ссылке из письма."
+					case registrationStatusRejected:
+						data.Error = "Заявка отклонена. Можно отправить новую регистрацию."
+					default:
+						data.Error = "Неверный email или пароль."
+					}
+				} else {
+					data.Error = "Неверный email или пароль."
+				}
 				a.renderTemplate(w, "login.tmpl", data)
 				return
 			}
@@ -184,8 +199,14 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 		data.Name = name
 		data.Email = email
 
+		if !a.hasRegistrationIntegrations() {
+			data.Error = "Регистрация временно недоступна: не настроены SMTP/Telegram интеграции."
+			a.renderTemplate(w, "register.tmpl", data)
+			return
+		}
+
 		if len(name) < 2 {
-			data.Error = "Имя должно быть минимум 2 символа."
+			data.Error = "Ник должен быть минимум 2 символа."
 			a.renderTemplate(w, "register.tmpl", data)
 			return
 		}
@@ -208,6 +229,37 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if existingUser, err := a.getUserByEmail(email); err == nil && existingUser != nil {
+			data.Error = "Аккаунт с таким email уже существует."
+			a.renderTemplate(w, "register.tmpl", data)
+			return
+		} else if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			a.logger.Printf("lookup existing user by email: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if existingReq, err := a.getRegistrationRequestByEmail(email); err == nil {
+			switch existingReq.Status {
+			case registrationStatusPending:
+				data.Error = "Заявка уже отправлена и ждет решения модератора."
+				a.renderTemplate(w, "register.tmpl", data)
+				return
+			case registrationStatusApproved:
+				data.Error = "Заявка уже одобрена. Проверьте письмо и подтвердите email."
+				a.renderTemplate(w, "register.tmpl", data)
+				return
+			case registrationStatusCompleted:
+				data.Error = "Этот email уже подтвержден и активирован. Войдите в аккаунт."
+				a.renderTemplate(w, "register.tmpl", data)
+				return
+			}
+		} else if !errors.Is(err, sql.ErrNoRows) {
+			a.logger.Printf("lookup registration request by email: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
 		passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			a.logger.Printf("hash password: %v", err)
@@ -215,30 +267,203 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		user, err := a.createUser(name, email, string(passwordHash))
+		moderationToken, err := generateSessionToken()
 		if err != nil {
-			if isUniqueEmailError(err) {
-				data.Error = "Пользователь с таким email уже существует."
-				a.renderTemplate(w, "register.tmpl", data)
-				return
+			a.logger.Printf("generate moderation token: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		request, err := a.upsertRegistrationRequest(name, email, string(passwordHash), moderationToken)
+		if err != nil {
+			a.logger.Printf("upsert registration request: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if err := a.sendRegistrationRequestToTelegram(request); err != nil {
+			a.logger.Printf("send registration request to telegram: %v", err)
+			if delErr := a.deleteRegistrationRequestByEmail(email); delErr != nil {
+				a.logger.Printf("rollback registration request after telegram error: %v", delErr)
 			}
-			a.logger.Printf("create user: %v", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			data.Error = "Не удалось отправить заявку модератору. Попробуйте еще раз чуть позже."
+			a.renderTemplate(w, "register.tmpl", data)
 			return
 		}
 
-		token, expiresAt, err := a.createSession(user.ID)
-		if err != nil {
-			a.logger.Printf("create session after register: %v", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		http.SetCookie(w, a.sessionCookie(token, expiresAt))
-		http.Redirect(w, r, "/app", http.StatusSeeOther)
+		success := url.QueryEscape("Заявка отправлена. После решения модератора придет письмо.")
+		http.Redirect(w, r, "/auth/login?success="+success, http.StatusSeeOther)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func (a *Application) handleApproveRegistration(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := strings.TrimSpace(r.URL.Query().Get("token"))
+	if token == "" {
+		a.renderPlainMessage(w, http.StatusBadRequest, "Пустой токен модерации.")
+		return
+	}
+
+	emailVerifyToken, err := generateSessionToken()
+	if err != nil {
+		a.logger.Printf("generate email verify token: %v", err)
+		a.renderPlainMessage(w, http.StatusInternalServerError, "Не удалось сгенерировать токен подтверждения email.")
+		return
+	}
+
+	req, err := a.approveRegistrationRequest(token, emailVerifyToken)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			existing, lookupErr := a.getRegistrationRequestByModerationToken(token)
+			if lookupErr != nil {
+				a.renderPlainMessage(w, http.StatusNotFound, "Заявка не найдена или ссылка устарела.")
+				return
+			}
+
+			switch existing.Status {
+			case registrationStatusApproved:
+				if existing.EmailVerifyToken.Valid && strings.TrimSpace(existing.EmailVerifyToken.String) != "" {
+					if mailErr := a.sendRegistrationApprovedEmail(existing); mailErr != nil {
+						a.logger.Printf("resend approved email: %v", mailErr)
+						a.renderPlainMessage(w, http.StatusInternalServerError, "Заявка уже одобрена, но письмо повторно отправить не удалось.")
+						return
+					}
+					a.renderPlainMessage(w, http.StatusOK, "Заявка уже была одобрена. Письмо с подтверждением отправлено повторно.")
+					return
+				}
+				a.renderPlainMessage(w, http.StatusOK, "Заявка уже одобрена.")
+			case registrationStatusRejected:
+				a.renderPlainMessage(w, http.StatusConflict, "Заявка уже отклонена.")
+			case registrationStatusCompleted:
+				a.renderPlainMessage(w, http.StatusConflict, "Email уже подтвержден, пользователь активирован.")
+			default:
+				a.renderPlainMessage(w, http.StatusConflict, "Заявка уже обработана.")
+			}
+			return
+		}
+
+		a.logger.Printf("approve registration request: %v", err)
+		a.renderPlainMessage(w, http.StatusInternalServerError, "Ошибка при одобрении заявки.")
+		return
+	}
+
+	if err := a.sendRegistrationApprovedEmail(req); err != nil {
+		a.logger.Printf("send approved email: %v", err)
+		a.renderPlainMessage(
+			w,
+			http.StatusInternalServerError,
+			"Заявка одобрена, но письмо отправить не удалось. Нажмите эту же ссылку еще раз для повторной отправки.",
+		)
+		return
+	}
+
+	a.renderPlainMessage(w, http.StatusOK, fmt.Sprintf("Заявка одобрена. На %s отправлено письмо с подтверждением.", req.Email))
+}
+
+func (a *Application) handleRejectRegistration(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := strings.TrimSpace(r.URL.Query().Get("token"))
+	if token == "" {
+		a.renderPlainMessage(w, http.StatusBadRequest, "Пустой токен модерации.")
+		return
+	}
+
+	reason := strings.TrimSpace(r.URL.Query().Get("reason"))
+	if reason == "" {
+		reason = defaultAdminRejectReason
+	}
+
+	req, err := a.rejectRegistrationRequest(token, reason)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			existing, lookupErr := a.getRegistrationRequestByModerationToken(token)
+			if lookupErr != nil {
+				a.renderPlainMessage(w, http.StatusNotFound, "Заявка не найдена или ссылка устарела.")
+				return
+			}
+
+			switch existing.Status {
+			case registrationStatusRejected:
+				rejectReason := defaultAdminRejectReason
+				if existing.RejectionReason.Valid && strings.TrimSpace(existing.RejectionReason.String) != "" {
+					rejectReason = existing.RejectionReason.String
+				}
+				if mailErr := a.sendRegistrationRejectedEmail(existing, rejectReason); mailErr != nil {
+					a.logger.Printf("resend rejected email: %v", mailErr)
+					a.renderPlainMessage(w, http.StatusInternalServerError, "Заявка уже отклонена, но повторно отправить письмо не удалось.")
+					return
+				}
+				a.renderPlainMessage(w, http.StatusOK, "Заявка уже была отклонена. Письмо отправлено повторно.")
+			case registrationStatusApproved:
+				a.renderPlainMessage(w, http.StatusConflict, "Заявка уже одобрена.")
+			case registrationStatusCompleted:
+				a.renderPlainMessage(w, http.StatusConflict, "Email уже подтвержден, пользователь активирован.")
+			default:
+				a.renderPlainMessage(w, http.StatusConflict, "Заявка уже обработана.")
+			}
+			return
+		}
+
+		a.logger.Printf("reject registration request: %v", err)
+		a.renderPlainMessage(w, http.StatusInternalServerError, "Ошибка при отклонении заявки.")
+		return
+	}
+
+	if err := a.sendRegistrationRejectedEmail(req, reason); err != nil {
+		a.logger.Printf("send rejected email: %v", err)
+		a.renderPlainMessage(
+			w,
+			http.StatusInternalServerError,
+			"Заявка отклонена, но письмо отправить не удалось. Нажмите эту же ссылку еще раз для повторной отправки.",
+		)
+		return
+	}
+
+	a.renderPlainMessage(w, http.StatusOK, fmt.Sprintf("Заявка отклонена. На %s отправлено письмо.", req.Email))
+}
+
+func (a *Application) handleVerifyEmail(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := strings.TrimSpace(r.URL.Query().Get("token"))
+	if token == "" {
+		a.renderPlainMessage(w, http.StatusBadRequest, "Пустой токен подтверждения email.")
+		return
+	}
+
+	user, err := a.completeRegistrationByVerifyToken(token)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			a.renderPlainMessage(w, http.StatusBadRequest, "Ссылка подтверждения недействительна или уже использована.")
+			return
+		}
+		a.logger.Printf("complete registration by verify token: %v", err)
+		a.renderPlainMessage(w, http.StatusInternalServerError, "Ошибка при подтверждении email.")
+		return
+	}
+
+	sessionToken, expiresAt, err := a.createSession(user.ID)
+	if err != nil {
+		a.logger.Printf("create session after email verify: %v", err)
+		a.renderPlainMessage(w, http.StatusInternalServerError, "Email подтвержден, но вход выполнить не удалось.")
+		return
+	}
+
+	http.SetCookie(w, a.sessionCookie(sessionToken, expiresAt))
+	http.Redirect(w, r, "/app", http.StatusSeeOther)
 }
 
 func (a *Application) handleDashboard(w http.ResponseWriter, r *http.Request) {
@@ -284,4 +509,10 @@ func (a *Application) handleLogout(w http.ResponseWriter, r *http.Request) {
 
 	a.clearSessionCookie(w)
 	http.Redirect(w, r, "/auth/login?success=Вы вышли из системы.", http.StatusSeeOther)
+}
+
+func (a *Application) renderPlainMessage(w http.ResponseWriter, status int, message string) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(status)
+	_, _ = w.Write([]byte(message))
 }
