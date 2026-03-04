@@ -8,6 +8,28 @@
   }
 
   const mode = (form.dataset.authMode || "login").toLowerCase();
+  const jokeNode = document.querySelector("[data-auth-joke]");
+  const jokes = [
+    "Если всё сломалось, назови это planned maintenance.",
+    "Нет ничего стабильнее, чем временный фикс в проде.",
+    "Настоящий DevOps не боится инцидентов, он просто уже сделал заметку.",
+    "Пароль должен быть сложным, как объяснение 'почему оно само починилось'.",
+    "Сначала мониторинг молчит, потом приходит сразу весь дашборд.",
+    "Кто не писал runbook ночью, тот не знает силу кофе и логов.",
+    "Если не задокументировал, значит это был квест, а не задача.",
+    "Один restart решает всё, кроме архитектурных решений.",
+    "CI любит смелых, но уважает тех, кто читает ошибки до конца.",
+    "Главный секрет надёжности: меньше магии, больше заметок в вики.",
+  ];
+
+  const renderRandomJoke = () => {
+    if (!jokeNode || jokes.length === 0) {
+      return;
+    }
+    const index = Math.floor(Math.random() * jokes.length);
+    jokeNode.textContent = `Рофл дня: ${jokes[index]}`;
+  };
+  renderRandomJoke();
 
   const nickInput = form.querySelector('input[name="name"], input[name="nick"]');
   const emailInput = form.querySelector('input[name="email"]');
