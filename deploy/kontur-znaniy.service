@@ -1,0 +1,20 @@
+[Unit]
+Description=Kontur Znaniy (Full Go)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/kontur-znaniy
+EnvironmentFile=-/var/www/kontur-znaniy/.env
+ExecStart=/var/www/kontur-znaniy/bin/kontur-znaniy
+Restart=always
+RestartSec=3
+TimeoutStopSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

@@ -19,7 +19,13 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
             set -euo pipefail
-            cd /var/www/kontur-znaniy
+            APP_DIR=/var/www/kontur-znaniy
+            SERVICE_NAME=kontur-znaniy
+            SERVICE_FILE=/etc/systemd/system/${SERVICE_NAME}.service
+            APP_USER="${{ secrets.DEPLOY_USER }}"
+            if [ -z "${APP_USER}" ]; then APP_USER="$USER"; fi
+
+            cd "${APP_DIR}"
             git fetch --prune origin main
             git reset --hard FETCH_HEAD
             mkdir -p bin data
@@ -28,10 +34,20 @@ jobs:
             GOFLAGS=-mod=mod go mod download
             GOFLAGS=-mod=mod go build -trimpath -ldflags="-s -w" -o ./bin/kontur-znaniy ./cmd/server
 
-            if systemctl list-unit-files | grep -q '^kontur-znaniy.service'; then
-              sudo systemctl restart kontur-znaniy
-              sudo systemctl status kontur-znaniy --no-pager
-            else
-              sudo systemctl restart nook
-              sudo systemctl status nook --no-pager
+            if [ ! -f "${SERVICE_FILE}" ]; then
+              sudo install -m 0644 ./deploy/kontur-znaniy.service "${SERVICE_FILE}"
+            fi
+
+            sudo sed -i "s|^User=.*$|User=${APP_USER}|g" "${SERVICE_FILE}"
+            sudo sed -i "s|^WorkingDirectory=.*$|WorkingDirectory=${APP_DIR}|g" "${SERVICE_FILE}"
+            sudo sed -i "s|^EnvironmentFile=.*$|EnvironmentFile=-${APP_DIR}/.env|g" "${SERVICE_FILE}"
+            sudo sed -i "s|^ExecStart=.*$|ExecStart=${APP_DIR}/bin/kontur-znaniy|g" "${SERVICE_FILE}"
+
+            sudo systemctl daemon-reload
+            sudo systemctl enable "${SERVICE_NAME}"
+            sudo systemctl restart "${SERVICE_NAME}"
+            sudo systemctl status "${SERVICE_NAME}" --no-pager
+
+            if systemctl list-unit-files | grep -q '^nook.service'; then
+              sudo systemctl stop nook || true
             fi

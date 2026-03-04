@@ -62,3 +62,28 @@ web/static                # css
 - восстановление пароля
 - роли/ACL
 - Wiki-узлы и граф знаний
+
+## Deploy на VPS
+
+Workflow: `.github/workflows/deploy.yml`
+
+Что делает:
+- синхронизирует репозиторий в `/var/www/kontur-znaniy`
+- собирает бинарник `bin/kontur-znaniy`
+- устанавливает/обновляет systemd unit `kontur-znaniy.service`
+- перезапускает `kontur-znaniy`
+
+Нужные secrets в GitHub:
+- `DEPLOY_HOST`
+- `DEPLOY_USER`
+- `DEPLOY_KEY`
+
+Перед первым деплоем на сервере:
+
+```bash
+mkdir -p /var/www/kontur-znaniy
+cd /var/www/kontur-znaniy
+git clone <repo-url> .
+cp .env.example .env
+# заполните .env
+```
