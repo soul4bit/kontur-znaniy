@@ -97,12 +97,14 @@ S3_ENDPOINT="https://s3.ru1.storage.beget.cloud"
 S3_BUCKET="156f31dd20b1-kontur-znaniy-s3"
 S3_ACCESS_KEY="CHANGE_ME_S3_ACCESS_KEY"
 S3_SECRET_KEY="CHANGE_ME_S3_SECRET_KEY"
+S3_PUBLIC_BASE_URL="https://files.xn----8sbuffbvcbexxn.xn--p1ai"
 ```
 
 ## S3 стратегия
 
 - Статьи и метаданные лучше хранить в PostgreSQL.
 - Файлы (вложения, картинки, экспорты) лучше складывать в S3.
+- Для удобных ссылок на скачивание используйте `S3_PUBLIC_BASE_URL` (ваш поддомен `files.*`).
 - Ключи доступа храните только в `.env` на сервере и в GitHub Secrets, не в репозитории.
 
 ## Как работает регистрация

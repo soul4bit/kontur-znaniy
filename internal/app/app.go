@@ -81,6 +81,7 @@ type viewData struct {
 	S3Check            *s3CheckResult
 	S3Endpoint         string
 	S3Bucket           string
+	S3PublicBaseURL    string
 }
 
 type contextKey string

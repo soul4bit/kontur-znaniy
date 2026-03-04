@@ -27,6 +27,7 @@ type Config struct {
 	S3Bucket            string
 	S3AccessKey         string
 	S3SecretKey         string
+	S3PublicBaseURL     string
 }
 
 func Load() Config {
@@ -60,6 +61,7 @@ func Load() Config {
 		S3Bucket:            getEnv("S3_BUCKET", ""),
 		S3AccessKey:         getEnv("S3_ACCESS_KEY", ""),
 		S3SecretKey:         getEnv("S3_SECRET_KEY", ""),
+		S3PublicBaseURL:     strings.TrimRight(getEnv("S3_PUBLIC_BASE_URL", ""), "/"),
 	}
 }
 

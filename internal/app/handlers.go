@@ -59,12 +59,13 @@ func (a *Application) authViewData(title string) viewData {
 
 func (a *Application) appViewData(user *User, title string) viewData {
 	return viewData{
-		AppName:    a.cfg.AppName,
-		Title:      title,
-		User:       user,
-		Sections:   wikiSections(),
-		S3Endpoint: a.cfg.S3Endpoint,
-		S3Bucket:   a.cfg.S3Bucket,
+		AppName:         a.cfg.AppName,
+		Title:           title,
+		User:            user,
+		Sections:        wikiSections(),
+		S3Endpoint:      a.cfg.S3Endpoint,
+		S3Bucket:        a.cfg.S3Bucket,
+		S3PublicBaseURL: a.cfg.S3PublicBaseURL,
 	}
 }
 

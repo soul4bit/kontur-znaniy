@@ -62,6 +62,7 @@
           <ul class="atlas-list">
             <li><span>Endpoint</span><em>{{.S3Endpoint}}</em></li>
             <li><span>Bucket</span><em>{{.S3Bucket}}</em></li>
+            <li><span>Публичный домен</span><em>{{if .S3PublicBaseURL}}{{.S3PublicBaseURL}}{{else}}не задан{{end}}</em></li>
           </ul>
 
           {{if .S3Check}}
@@ -72,6 +73,12 @@
             {{end}}
           {{else}}
             <p class="atlas-empty">Проверка еще не запускалась.</p>
+          {{end}}
+
+          {{if .S3PublicBaseURL}}
+            <p class="atlas-empty" style="margin-top:10px;">
+              Пример ссылки на файл: <code>{{.S3PublicBaseURL}}/articles/example.txt</code>
+            </p>
           {{end}}
         </article>
       </section>
