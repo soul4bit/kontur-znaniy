@@ -299,9 +299,15 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 				a.renderTemplate(w, "register.tmpl", data)
 				return
 			case registrationStatusCompleted:
-				data.Error = "Этот email уже подтвержден. Войдите в аккаунт."
-				a.renderTemplate(w, "register.tmpl", data)
-				return
+				if _, userErr := a.getUserByEmail(email); userErr == nil {
+					data.Error = "Этот email уже подтвержден. Войдите в аккаунт."
+					a.renderTemplate(w, "register.tmpl", data)
+					return
+				} else if !errors.Is(userErr, sql.ErrNoRows) {
+					a.logger.Printf("lookup user for completed registration request: %v", userErr)
+					http.Error(w, "internal server error", http.StatusInternalServerError)
+					return
+				}
 			}
 		} else if !errors.Is(err, sql.ErrNoRows) {
 			a.logger.Printf("lookup registration request by email: %v", err)

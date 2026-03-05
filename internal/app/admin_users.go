@@ -267,8 +267,16 @@ func (a *Application) deleteSessionsByUserID(userID int64) error {
 	return err
 }
 
-func (a *Application) deleteUserByID(userID int64) error {
-	result, err := a.db.Exec(`delete from users where id = $1`, userID)
+func (a *Application) deleteUserAndRegistrationByID(userID int64, email string) error {
+	tx, err := a.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	result, err := tx.Exec(`delete from users where id = $1`, userID)
 	if err != nil {
 		return err
 	}
@@ -279,7 +287,12 @@ func (a *Application) deleteUserByID(userID int64) error {
 	if affected == 0 {
 		return sql.ErrNoRows
 	}
-	return nil
+
+	if _, err := tx.Exec(`delete from registration_requests where email = $1`, normalizeEmail(email)); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (a *Application) countAdminUsers() (int, error) {
@@ -555,7 +568,7 @@ func (a *Application) handleAdminDeleteUser(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	if err := a.deleteUserByID(userID); err != nil {
+	if err := a.deleteUserAndRegistrationByID(userID, target.Email); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			http.Redirect(w, r, adminUsersRedirectURL("", "Пользователь не найден."), http.StatusSeeOther)
 			return
