@@ -184,6 +184,9 @@ func (a *Application) Routes() http.Handler {
 		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		staticHandler.ServeHTTP(w, r)
 	})))
+	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/static/favicon.svg", http.StatusMovedPermanently)
+	})
 
 	mux.HandleFunc("/", a.handleRoot)
 	mux.HandleFunc("/auth/login", a.handleLogin)

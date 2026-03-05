@@ -892,6 +892,7 @@ func (a *Application) renderModerationPage(w http.ResponseWriter, status int, ti
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>%s · %s</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <style>
     body { margin:0; min-height:100vh; display:grid; place-items:center; font-family: Manrope, Arial, sans-serif; background:#eef3ef; }
     .box { width:min(620px, 92%%); background:#fff; border:1px solid #d4ddd8; border-radius:18px; overflow:hidden; }
@@ -952,6 +953,7 @@ func (a *Application) renderBlockedAccessPage(w http.ResponseWriter, user *User)
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>%s · %s</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <style>
     :root { --accent:#8f2d3f; --accent-2:#d26b7c; --text:#2e3b37; --bg:#eef3ef; --line:#d5dfda; }
     * { box-sizing: border-box; }
