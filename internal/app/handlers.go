@@ -315,6 +315,26 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if existingByName, err := a.getUserByName(name); err == nil && existingByName != nil {
+			data.Error = "Ник уже занят. Выберите другой."
+			a.renderTemplate(w, "register.tmpl", data)
+			return
+		} else if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			a.logger.Printf("lookup existing user by name: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if activeReqByName, err := a.getActiveRegistrationRequestByName(name); err == nil && activeReqByName != nil {
+			data.Error = "Ник уже занят в другой заявке. Выберите другой."
+			a.renderTemplate(w, "register.tmpl", data)
+			return
+		} else if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			a.logger.Printf("lookup registration request by name: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
 		passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			a.logger.Printf("hash password: %v", err)

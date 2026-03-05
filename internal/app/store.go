@@ -91,6 +91,24 @@ func (a *Application) getUserByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
+func (a *Application) getUserByName(name string) (*User, error) {
+	row := a.db.QueryRow(
+		`select id, email, name, role, is_blocked, created_at
+		from users
+		where lower(name) = lower($1)
+		limit 1`,
+		name,
+	)
+
+	var user User
+	if err := row.Scan(&user.ID, &user.Email, &user.Name, &user.Role, &user.Blocked, &user.CreatedAt); err != nil {
+		return nil, err
+	}
+	user.Role = normalizeUserRole(user.Role)
+
+	return &user, nil
+}
+
 func (a *Application) getCredentialsByEmail(email string) (*userCredentials, error) {
 	row := a.db.QueryRow(
 		`select id, email, name, role, is_blocked, password_hash, created_at from users where email = $1 limit 1`,
@@ -507,6 +525,32 @@ func (a *Application) getRegistrationRequestByEmail(email string) (*registration
 		where email = $1
 		limit 1`,
 		email,
+	)
+	return scanRegistrationRequest(row)
+}
+
+func (a *Application) getActiveRegistrationRequestByName(name string) (*registrationRequest, error) {
+	row := a.db.QueryRow(
+		`select
+			id,
+			name,
+			email,
+			password_hash,
+			status,
+			moderation_token,
+			email_verify_token,
+			rejection_reason,
+			created_at,
+			updated_at,
+			moderated_at,
+			email_verified_at
+		from registration_requests
+		where lower(name) = lower($1) and status in ($2, $3)
+		order by created_at desc
+		limit 1`,
+		name,
+		registrationStatusPending,
+		registrationStatusApproved,
 	)
 	return scanRegistrationRequest(row)
 }
