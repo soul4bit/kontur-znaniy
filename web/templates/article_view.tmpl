@@ -21,6 +21,9 @@
       </a>
 
       <div class="atlas-topbar-meta">
+        {{if .User.IsAdmin}}
+          <a class="button button-ghost" href="/app/admin/users">Админка</a>
+        {{end}}
         <span class="atlas-user-chip">@{{.User.Name}}</span>
         <form method="post" action="/auth/logout">
           <button class="button button-ghost" type="submit">Выйти</button>
@@ -70,7 +73,7 @@
           </div>
           <div class="atlas-actions">
             <a class="button button-ghost button-compact" href="/app/section?slug={{.CurrentArticle.SectionSlug}}{{if .CurrentArticle.Subsection}}&sub={{urlquery .CurrentArticle.Subsection}}{{end}}">Назад в раздел</a>
-            {{if eq .User.ID .CurrentArticle.AuthorID}}
+            {{if and .User.CanEdit (or (eq .User.ID .CurrentArticle.AuthorID) .User.IsAdmin)}}
               <a class="button button-ghost button-compact" href="/app/article/edit?id={{.CurrentArticle.ID}}">Редактировать</a>
             {{end}}
           </div>

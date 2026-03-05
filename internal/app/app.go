@@ -32,7 +32,23 @@ type User struct {
 	ID        int64
 	Email     string
 	Name      string
+	Role      string
 	CreatedAt time.Time
+}
+
+func (u *User) IsAdmin() bool {
+	if u == nil {
+		return false
+	}
+	return normalizeUserRole(u.Role) == userRoleAdmin
+}
+
+func (u *User) CanEdit() bool {
+	if u == nil {
+		return false
+	}
+	role := normalizeUserRole(u.Role)
+	return role == userRoleEditor || role == userRoleAdmin
 }
 
 type Article struct {
@@ -95,6 +111,9 @@ type viewData struct {
 	S3Endpoint         string
 	S3Bucket           string
 	S3PublicBaseURL    string
+	AdminUsers         []adminUserListItem
+	PendingRequests    []registrationRequestListItem
+	AvailableRoles     []roleOption
 }
 
 type contextKey string
@@ -162,6 +181,11 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/article/new", a.requireAuth(a.handleArticleNew))
 	mux.HandleFunc("/app/article/edit", a.requireAuth(a.handleArticleEdit))
 	mux.HandleFunc("/app/s3", a.requireAuth(a.handleS3Check))
+	mux.HandleFunc("/app/admin/users", a.requireAuth(a.handleAdminUsers))
+	mux.HandleFunc("/app/admin/registrations/approve", a.requireAuth(a.handleAdminApproveRegistration))
+	mux.HandleFunc("/app/admin/registrations/reject", a.requireAuth(a.handleAdminRejectRegistration))
+	mux.HandleFunc("/app/admin/users/role", a.requireAuth(a.handleAdminChangeUserRole))
+	mux.HandleFunc("/app/admin/users/delete", a.requireAuth(a.handleAdminDeleteUser))
 	mux.HandleFunc("/admin/registration/approve", a.handleApproveRegistration)
 	mux.HandleFunc("/admin/registration/reject", a.handleRejectRegistration)
 
@@ -179,6 +203,7 @@ func loadTemplates(staticVersion string) (map[string]*template.Template, error) 
 		"article_new.tmpl",
 		"article_edit.tmpl",
 		"s3_check.tmpl",
+		"admin_users.tmpl",
 	}
 
 	funcMap := template.FuncMap{
@@ -213,6 +238,34 @@ func runMigrations(db *sql.DB) error {
 			password_hash text not null,
 			created_at timestamptz not null default now()
 		);`,
+		`do $$
+		begin
+			if not exists (
+				select 1
+				from information_schema.columns
+				where table_schema = 'public'
+				  and table_name = 'users'
+				  and column_name = 'role'
+			) then
+				alter table users add column role text not null default 'viewer';
+				update users set role = 'editor' where role = 'viewer';
+			end if;
+		end
+		$$;`,
+		`do $$
+		begin
+			if not exists (
+				select 1
+				from pg_constraint
+				where conname = 'users_role_check'
+			) then
+				alter table users add constraint users_role_check check (role in ('viewer', 'editor', 'admin'));
+			end if;
+		end
+		$$;`,
+		`update users
+		set role = 'viewer'
+		where role is null or role not in ('viewer', 'editor', 'admin');`,
 		`create table if not exists sessions (
 			id bigserial primary key,
 			user_id bigint not null,

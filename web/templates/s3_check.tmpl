@@ -21,7 +21,13 @@
       </a>
 
       <div class="atlas-topbar-meta">
+        {{if .User.IsAdmin}}
+          <a class="button button-ghost" href="/app/admin/users">Админка</a>
+        {{end}}
         <span class="atlas-user-chip">@{{.User.Name}}</span>
+        <form method="post" action="/auth/logout">
+          <button class="button button-ghost" type="submit">Выйти</button>
+        </form>
       </div>
     </header>
 

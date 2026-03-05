@@ -565,6 +565,10 @@ func (a *Application) handleArticleNew(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 		return
 	}
+	if !user.CanEdit() {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
 
 	switch r.Method {
 	case http.MethodGet:

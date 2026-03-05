@@ -21,6 +21,9 @@
       </a>
 
       <div class="atlas-topbar-meta">
+        {{if .User.IsAdmin}}
+          <a class="button button-ghost" href="/app/admin/users">Админка</a>
+        {{end}}
         <span class="atlas-user-chip">@{{.User.Name}}</span>
         <form method="post" action="/auth/logout">
           <button class="button button-ghost" type="submit">Выйти</button>
@@ -71,9 +74,11 @@
             {{end}}
           </div>
 
-          <div class="atlas-actions">
-            <a class="button button-new-article" href="/app/article/new?section={{.CurrentSection.Slug}}{{if .CurrentSubsection}}&sub={{urlquery .CurrentSubsection}}{{end}}">+ Новая статья</a>
-          </div>
+          {{if .User.CanEdit}}
+            <div class="atlas-actions">
+              <a class="button button-new-article" href="/app/article/new?section={{.CurrentSection.Slug}}{{if .CurrentSubsection}}&sub={{urlquery .CurrentSubsection}}{{end}}">+ Новая статья</a>
+            </div>
+          {{end}}
         </article>
 
         {{if .Success}}
@@ -95,7 +100,7 @@
                 <p class="atlas-article-body">{{.Body}}</p>
                 <div class="atlas-article-actions">
                   <a class="button button-ghost button-compact" href="/app/article?id={{.ID}}">Открыть</a>
-                  {{if eq $.User.ID .AuthorID}}
+                  {{if and $.User.CanEdit (or (eq $.User.ID .AuthorID) $.User.IsAdmin)}}
                     <a class="button button-ghost button-compact" href="/app/article/edit?id={{.ID}}">Редактировать</a>
                   {{end}}
                 </div>
@@ -104,7 +109,11 @@
           </div>
         {{else}}
           <article class="atlas-card">
-            <p class="atlas-empty">В этом разделе пока нет статей. Нажмите «Новая статья» и добавьте первую.</p>
+            {{if .User.CanEdit}}
+              <p class="atlas-empty">В этом разделе пока нет статей. Нажмите «Новая статья» и добавьте первую.</p>
+            {{else}}
+              <p class="atlas-empty">В этом разделе пока нет статей. У вас роль только на просмотр.</p>
+            {{end}}
           </article>
         {{end}}
       </section>

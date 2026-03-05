@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}} · {{.AppName}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{asset "app.css"}}" />
+</head>
+<body class="app-page">
+  <main class="atlas-shell">
+    <header class="atlas-topbar">
+      <a class="atlas-brand atlas-brand-link" href="/app">
+        <div class="atlas-mark" aria-hidden="true"><span class="atlas-mark-glyph"></span></div>
+        <div>
+          <p class="eyebrow">{{.AppName}}</p>
+          <h1 class="atlas-heading">Контур знаний</h1>
+        </div>
+      </a>
+
+      <div class="atlas-topbar-meta">
+        <a class="button button-ghost" href="/app">Дашборд</a>
+        <span class="atlas-user-chip">@{{.User.Name}}</span>
+        <form method="post" action="/auth/logout">
+          <button class="button button-ghost" type="submit">Выйти</button>
+        </form>
+      </div>
+    </header>
+
+    <section class="atlas-layout atlas-layout-two">
+      <aside class="atlas-rail">
+        <article class="atlas-card atlas-sections-sidebar">
+          <p class="panel-label">Разделы</p>
+          <label class="atlas-nav-search-wrap">
+            <input class="atlas-nav-search" type="search" placeholder="Найти раздел или тему..." />
+          </label>
+          <ul class="atlas-nav">
+            {{range .Sections}}
+              {{$section := .}}
+              <li class="atlas-nav-item {{if eq $.CurrentSectionSlug $section.Slug}}atlas-nav-item-active{{end}}">
+                <a class="atlas-nav-link {{if eq $.CurrentSectionSlug $section.Slug}}atlas-nav-link-active{{end}}" href="/app/section?slug={{$section.Slug}}">
+                  <span class="atlas-nav-title">{{$section.Name}}</span>
+                </a>
+                <ul class="atlas-nav-sub">
+                  {{range $section.Subsections}}
+                    <li>
+                      <a class="atlas-sub-link {{if and (eq $.CurrentSectionSlug $section.Slug) (eq $.CurrentSubsection .)}}atlas-sub-link-active{{end}}" href="/app/section?slug={{$section.Slug}}&sub={{urlquery .}}">{{.}}</a>
+                    </li>
+                  {{end}}
+                </ul>
+              </li>
+            {{end}}
+          </ul>
+          <p class="atlas-nav-empty" data-nav-empty hidden>Ничего не нашлось. Попробуйте другое слово.</p>
+        </article>
+      </aside>
+
+      <section class="atlas-main">
+        <article class="atlas-card atlas-main-head">
+          <p class="panel-label">Админка</p>
+          <h2 class="atlas-section-title">Пользователи и заявки</h2>
+          <p class="atlas-hero-text">Здесь можно одобрять регистрацию, менять роли и удалять пользователей.</p>
+        </article>
+
+        {{if .Error}}
+          <p class="alert alert-error">{{.Error}}</p>
+        {{end}}
+        {{if .Success}}
+          <p class="alert alert-success">{{.Success}}</p>
+        {{end}}
+
+        <article class="atlas-card atlas-admin-card">
+          <p class="panel-label">Заявки на регистрацию</p>
+          {{if .PendingRequests}}
+            <div class="atlas-admin-list">
+              {{range .PendingRequests}}
+                <article class="atlas-admin-item">
+                  <div>
+                    <h3 class="atlas-admin-title">{{.Name}}</h3>
+                    <p class="atlas-admin-meta">{{.Email}}</p>
+                    <p class="atlas-admin-meta">Создано: {{.CreatedAt.Format "02.01.2006 15:04"}}</p>
+                  </div>
+                  <div class="atlas-admin-actions">
+                    <form method="post" action="/app/admin/registrations/approve">
+                      <input type="hidden" name="request_id" value="{{.ID}}" />
+                      <button class="button button-primary button-compact" type="submit">Одобрить</button>
+                    </form>
+                    <form method="post" action="/app/admin/registrations/reject" class="atlas-admin-reject-form">
+                      <input type="hidden" name="request_id" value="{{.ID}}" />
+                      <input class="atlas-admin-inline-input" type="text" name="reason" placeholder="Причина (необязательно)" maxlength="180" />
+                      <button class="button button-ghost button-compact" type="submit">Отклонить</button>
+                    </form>
+                  </div>
+                </article>
+              {{end}}
+            </div>
+          {{else}}
+            <p class="atlas-empty">Нет заявок в ожидании.</p>
+          {{end}}
+        </article>
+
+        <article class="atlas-card atlas-admin-card">
+          <p class="panel-label">Список пользователей</p>
+          {{if .AdminUsers}}
+            <div class="atlas-admin-users-table-wrap">
+              <table class="atlas-admin-users-table">
+                <thead>
+                  <tr>
+                    <th>Пользователь</th>
+                    <th>Роль</th>
+                    <th>Статистика</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{range .AdminUsers}}
+                    {{$managed := .}}
+                    <tr>
+                      <td>
+                        <p class="atlas-admin-user-name">{{.Name}}</p>
+                        <p class="atlas-admin-user-email">{{.Email}}</p>
+                        {{if eq .ID $.User.ID}}
+                          <span class="atlas-self-chip">Это вы</span>
+                        {{end}}
+                      </td>
+                      <td>
+                        <span class="atlas-role-chip atlas-role-chip-{{.Role}}">{{.RoleLabel}}</span>
+                      </td>
+                      <td>
+                        <p class="atlas-admin-meta">Статей: {{.ArticlesCount}}</p>
+                        <p class="atlas-admin-meta">Создан: {{.CreatedAt.Format "02.01.2006"}}</p>
+                      </td>
+                      <td>
+                        <div class="atlas-admin-actions">
+                          <form method="post" action="/app/admin/users/role" class="atlas-admin-role-form">
+                            <input type="hidden" name="user_id" value="{{.ID}}" />
+                            <select class="field-select atlas-admin-role-select" name="role">
+                              {{range $.AvailableRoles}}
+                                <option value="{{.Value}}" {{if eq .Value $managed.Role}}selected{{end}}>{{.Label}}</option>
+                              {{end}}
+                            </select>
+                            <button class="button button-ghost button-compact" type="submit">Сменить роль</button>
+                          </form>
+                          {{if ne .ID $.User.ID}}
+                            <form method="post" action="/app/admin/users/delete" onsubmit="return confirm('Удалить пользователя {{.Email}}?');">
+                              <input type="hidden" name="user_id" value="{{.ID}}" />
+                              <button class="button button-ghost button-compact atlas-danger-button" type="submit">Удалить</button>
+                            </form>
+                          {{end}}
+                        </div>
+                      </td>
+                    </tr>
+                  {{end}}
+                </tbody>
+              </table>
+            </div>
+          {{else}}
+            <p class="atlas-empty">Пользователи пока отсутствуют.</p>
+          {{end}}
+        </article>
+      </section>
+    </section>
+  </main>
+  <script src="{{asset "wiki-ui.js"}}"></script>
+</body>
+</html>

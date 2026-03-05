@@ -44,6 +44,10 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 		return
 	}
+	if !user.CanEdit() {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
 
 	switch r.Method {
 	case http.MethodGet:
@@ -64,7 +68,7 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		if article.AuthorID != user.ID {
+		if article.AuthorID != user.ID && !user.IsAdmin() {
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
@@ -101,7 +105,7 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		if article.AuthorID != user.ID {
+		if article.AuthorID != user.ID && !user.IsAdmin() {
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
@@ -130,9 +134,16 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		if _, err := a.updateArticleByAuthor(articleID, user.ID, currentSubsection, title, body); err != nil {
-			a.logger.Printf("update article: %v", err)
-			if errors.Is(err, sql.ErrNoRows) {
+		var updateErr error
+		if article.AuthorID == user.ID {
+			_, updateErr = a.updateArticleByAuthor(articleID, user.ID, currentSubsection, title, body)
+		} else {
+			_, updateErr = a.updateArticleByID(articleID, currentSubsection, title, body)
+		}
+
+		if updateErr != nil {
+			a.logger.Printf("update article: %v", updateErr)
+			if errors.Is(updateErr, sql.ErrNoRows) {
 				http.Error(w, "forbidden", http.StatusForbidden)
 				return
 			}
