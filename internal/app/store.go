@@ -329,6 +329,23 @@ func (a *Application) getArticleByID(articleID int64) (*Article, error) {
 	return scanArticle(row)
 }
 
+func (a *Application) deleteArticleByID(articleID int64) error {
+	result, err := a.db.Exec(`delete from articles where id = $1`, articleID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
 func (a *Application) updateArticleByAuthor(articleID int64, authorID int64, subsection string, title string, body string) (*Article, error) {
 	now := time.Now().UTC()
 	tx, err := a.db.Begin()

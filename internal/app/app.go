@@ -195,6 +195,7 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/article/new", a.requireAuth(a.handleArticleNew))
 	mux.HandleFunc("/app/article/edit", a.requireAuth(a.handleArticleEdit))
 	mux.HandleFunc("/app/article/restore", a.requireAuth(a.handleArticleRestore))
+	mux.HandleFunc("/app/article/delete", a.requireAuth(a.handleArticleDelete))
 	mux.HandleFunc("/app/admin/users", a.requireAuth(a.handleAdminUsers))
 	mux.HandleFunc("/app/admin/registrations/approve", a.requireAuth(a.handleAdminApproveRegistration))
 	mux.HandleFunc("/app/admin/registrations/reject", a.requireAuth(a.handleAdminRejectRegistration))

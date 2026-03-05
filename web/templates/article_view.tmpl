@@ -76,6 +76,12 @@
             {{if and .User.CanEdit (or (eq .User.ID .CurrentArticle.AuthorID) .User.IsAdmin)}}
               <a class="button button-ghost button-compact" href="/app/article/edit?id={{.CurrentArticle.ID}}">Редактировать</a>
             {{end}}
+            {{if .User.CanEdit}}
+              <form method="post" action="/app/article/delete" onsubmit="return confirm('Удалить статью? Это действие необратимо.');">
+                <input type="hidden" name="article_id" value="{{.CurrentArticle.ID}}" />
+                <button class="button button-ghost button-compact atlas-danger-button" type="submit">Удалить</button>
+              </form>
+            {{end}}
           </div>
         </article>
 
@@ -109,7 +115,7 @@
                     <p class="atlas-version-subsection">Подраздел: {{.Subsection}}</p>
                   {{end}}
                   <p class="atlas-version-title-preview">{{.Title}}</p>
-                  {{if and $.User.CanEdit (or (eq $.User.ID $.CurrentArticle.AuthorID) $.User.IsAdmin)}}
+                  {{if $.User.CanEdit}}
                     <form method="post" action="/app/article/restore" onsubmit="return confirm('Восстановить версию #{{.VersionNo}}?');">
                       <input type="hidden" name="article_id" value="{{$.CurrentArticle.ID}}" />
                       <input type="hidden" name="version_id" value="{{.ID}}" />

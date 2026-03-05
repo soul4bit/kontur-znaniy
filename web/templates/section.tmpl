@@ -103,6 +103,12 @@
                   {{if and $.User.CanEdit (or (eq $.User.ID .AuthorID) $.User.IsAdmin)}}
                     <a class="button button-ghost button-compact" href="/app/article/edit?id={{.ID}}">Редактировать</a>
                   {{end}}
+                  {{if $.User.CanEdit}}
+                    <form method="post" action="/app/article/delete" onsubmit="return confirm('Удалить статью? Это действие необратимо.');">
+                      <input type="hidden" name="article_id" value="{{.ID}}" />
+                      <button class="button button-ghost button-compact atlas-danger-button" type="submit">Удалить</button>
+                    </form>
+                  {{end}}
                 </div>
               </article>
             {{end}}
