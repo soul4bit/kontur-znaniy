@@ -343,6 +343,29 @@ body {
   transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
 
+.brand-mark-image,
+.atlas-mark-image {
+  box-shadow: none;
+}
+
+.brand-mark-image::before,
+.brand-mark-image::after,
+.atlas-mark-image::before,
+.atlas-mark-image::after {
+  content: none;
+}
+
+.brand-mark-img,
+.atlas-mark-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  filter: drop-shadow(0 8px 18px rgba(11, 97, 88, 0.28));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
 .brand-mark::before,
 .atlas-mark::before {
   content: "";
@@ -726,6 +749,11 @@ body {
 .atlas-brand-link:hover .atlas-mark-glyph {
   transform: scale(1.05) translateY(-1px);
   filter: brightness(1.06);
+}
+
+.atlas-brand-link:hover .atlas-mark-img {
+  transform: scale(1.05) translateY(-1px);
+  filter: drop-shadow(0 10px 22px rgba(11, 97, 88, 0.34)) brightness(1.04);
 }
 
 .atlas-mark {
