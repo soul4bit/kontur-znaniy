@@ -33,6 +33,7 @@ type User struct {
 	Email     string
 	Name      string
 	Role      string
+	Blocked   bool
 	CreatedAt time.Time
 }
 
@@ -185,6 +186,8 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/admin/registrations/approve", a.requireAuth(a.handleAdminApproveRegistration))
 	mux.HandleFunc("/app/admin/registrations/reject", a.requireAuth(a.handleAdminRejectRegistration))
 	mux.HandleFunc("/app/admin/users/role", a.requireAuth(a.handleAdminChangeUserRole))
+	mux.HandleFunc("/app/admin/users/block", a.requireAuth(a.handleAdminBlockUser))
+	mux.HandleFunc("/app/admin/users/unblock", a.requireAuth(a.handleAdminUnblockUser))
 	mux.HandleFunc("/app/admin/users/delete", a.requireAuth(a.handleAdminDeleteUser))
 	mux.HandleFunc("/admin/registration/approve", a.handleApproveRegistration)
 	mux.HandleFunc("/admin/registration/reject", a.handleRejectRegistration)
@@ -266,6 +269,8 @@ func runMigrations(db *sql.DB) error {
 		`update users
 		set role = 'viewer'
 		where role is null or role not in ('viewer', 'editor', 'admin');`,
+		`alter table if exists users add column if not exists is_blocked boolean not null default false;`,
+		`update users set is_blocked = false where is_blocked is null;`,
 		`create table if not exists sessions (
 			id bigserial primary key,
 			user_id bigint not null,

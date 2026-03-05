@@ -1633,6 +1633,27 @@ body {
   background: rgba(255, 241, 214, 0.85);
 }
 
+.atlas-block-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid #bfd4cc;
+  background: rgba(234, 245, 241, 0.92);
+  color: #3f635b;
+  font-size: 11px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.atlas-block-chip-on {
+  border-color: #e3b7c1;
+  background: rgba(255, 238, 243, 0.95);
+  color: #8e3041;
+}
+
 .atlas-admin-role-form {
   display: flex;
   gap: 8px;
@@ -1654,6 +1675,17 @@ body {
 .atlas-danger-button:hover {
   border-color: #d48e9e;
   background: #ffe8ed;
+}
+
+.atlas-warning-button {
+  border-color: #e7ce9d;
+  color: #7a5d1b;
+  background: #fff6e4;
+}
+
+.atlas-warning-button:hover {
+  border-color: #d6b678;
+  background: #ffefcd;
 }
 
 .atlas-article-view-head {

@@ -15,6 +15,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func blockedLoginMessage() string {
+	return "Ваш аккаунт на паузе: доступ временно выключен администратором. Логи не паникуют, сервер тоже."
+}
+
 func (a *Application) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := a.currentUser(r)
@@ -27,6 +31,16 @@ func (a *Application) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 		if user == nil {
 			a.clearSessionCookie(w)
 			http.Redirect(w, r, "/auth/login?next="+r.URL.Path, http.StatusSeeOther)
+			return
+		}
+		if user.Blocked {
+			if cookie, cookieErr := r.Cookie(a.cfg.SessionCookieName); cookieErr == nil {
+				if delErr := a.deleteSessionByToken(cookie.Value); delErr != nil {
+					a.logger.Printf("delete blocked user session: %v", delErr)
+				}
+			}
+			a.clearSessionCookie(w)
+			a.renderBlockedAccessPage(w, user)
 			return
 		}
 
@@ -88,6 +102,10 @@ func (a *Application) handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if user != nil {
+		if user.Blocked {
+			a.renderBlockedAccessPage(w, user)
+			return
+		}
 		http.Redirect(w, r, "/app", http.StatusSeeOther)
 		return
 	}
@@ -105,6 +123,14 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if user != nil {
+			if user.Blocked {
+				a.clearSessionCookie(w)
+				data := a.authViewData("Вход")
+				data.Error = blockedLoginMessage()
+				data.Next = strings.TrimSpace(r.URL.Query().Get("next"))
+				a.renderTemplate(w, "login.tmpl", data)
+				return
+			}
 			http.Redirect(w, r, "/app", http.StatusSeeOther)
 			return
 		}
@@ -163,6 +189,11 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 			a.renderTemplate(w, "login.tmpl", data)
 			return
 		}
+		if creds.Blocked {
+			data.Error = blockedLoginMessage()
+			a.renderTemplate(w, "login.tmpl", data)
+			return
+		}
 
 		token, expiresAt, err := a.createSession(creds.ID)
 		if err != nil {
@@ -193,6 +224,13 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if user != nil {
+			if user.Blocked {
+				a.clearSessionCookie(w)
+				data := a.authViewData("Вход")
+				data.Error = blockedLoginMessage()
+				a.renderTemplate(w, "login.tmpl", data)
+				return
+			}
 			http.Redirect(w, r, "/app", http.StatusSeeOther)
 			return
 		}
@@ -751,4 +789,68 @@ func (a *Application) renderPlainMessage(w http.ResponseWriter, status int, mess
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(status)
 	_, _ = w.Write([]byte(message))
+}
+
+func (a *Application) renderBlockedAccessPage(w http.ResponseWriter, user *User) {
+	appName := strings.TrimSpace(a.cfg.AppName)
+	if appName == "" {
+		appName = "Контур знаний"
+	}
+
+	name := "Коллега"
+	if user != nil && strings.TrimSpace(user.Name) != "" {
+		name = strings.TrimSpace(user.Name)
+	}
+
+	title := "Доступ поставлен на паузу"
+	message := fmt.Sprintf("%s, админ включил режим \"read-only для души\": ваш аккаунт временно заблокирован. Паники ноль, просто пингните администратора.", name)
+
+	page := fmt.Sprintf(`<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>%s · %s</title>
+  <style>
+    :root { --accent:#8f2d3f; --accent-2:#d26b7c; --text:#2e3b37; --bg:#eef3ef; --line:#d5dfda; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; font-family: Manrope, Arial, sans-serif; color:var(--text); background:
+      radial-gradient(circle at 9%% 10%%, rgba(143,45,63,0.18), transparent 34%%),
+      radial-gradient(circle at 87%% 12%%, rgba(210,107,124,0.2), transparent 32%%),
+      linear-gradient(168deg, #f4f6f3 0%%, #e8ece7 100%%); padding:16px; }
+    .box { width:min(700px, 100%%); background:#fff; border:1px solid var(--line); border-radius:20px; overflow:hidden; box-shadow:0 16px 42px rgba(46,59,55,0.16); }
+    .head { padding:18px 22px; color:#fff; background:linear-gradient(135deg, var(--accent), var(--accent-2)); }
+    .head p { margin:0; font-size:12px; letter-spacing:0.13em; text-transform:uppercase; opacity:0.92; font-family: "IBM Plex Mono","Consolas",monospace; }
+    .head h1 { margin:8px 0 0; font-size:30px; line-height:1.14; }
+    .body { padding:20px 22px 24px; line-height:1.6; }
+    .msg { margin:0; font-size:17px; }
+    .note { margin:12px 0 0; font-size:14px; color:#5a6864; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; margin-top:14px; min-height:42px; padding:0 14px; border-radius:12px; border:1px solid #d6deda; color:#2b3d38; background:#f3f8f5; text-decoration:none; font-weight:700; }
+    .btn:hover { background:#eaf1ee; }
+  </style>
+</head>
+<body>
+  <main class="box">
+    <header class="head">
+      <p>%s</p>
+      <h1>%s</h1>
+    </header>
+    <section class="body">
+      <p class="msg">%s</p>
+      <p class="note">Как только админ снимет блокировку, можно снова возвращаться к runbook-магии.</p>
+      <a class="btn" href="/auth/login">К форме входа</a>
+    </section>
+  </main>
+</body>
+</html>`,
+		html.EscapeString(title),
+		html.EscapeString(appName),
+		html.EscapeString(appName),
+		html.EscapeString(title),
+		html.EscapeString(message),
+	)
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusForbidden)
+	_, _ = w.Write([]byte(page))
 }

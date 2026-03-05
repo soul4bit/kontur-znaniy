@@ -17,6 +17,7 @@ type adminUserListItem struct {
 	Name          string
 	Role          string
 	RoleLabel     string
+	Blocked       bool
 	CreatedAt     time.Time
 	ArticlesCount int
 }
@@ -85,6 +86,7 @@ func (a *Application) listUsersForAdmin() ([]adminUserListItem, error) {
 			u.email,
 			u.name,
 			u.role,
+			u.is_blocked,
 			u.created_at,
 			count(ar.id) as articles_count
 		from users u
@@ -111,6 +113,7 @@ func (a *Application) listUsersForAdmin() ([]adminUserListItem, error) {
 			&item.Email,
 			&item.Name,
 			&item.Role,
+			&item.Blocked,
 			&item.CreatedAt,
 			&item.ArticlesCount,
 		); err != nil {
@@ -228,17 +231,40 @@ func (a *Application) updateUserRoleByID(userID int64, role string) (*User, erro
 		`update users
 		set role = $2
 		where id = $1
-		returning id, email, name, role, created_at`,
+		returning id, email, name, role, is_blocked, created_at`,
 		userID,
 		role,
 	)
 
 	var user User
-	if err := row.Scan(&user.ID, &user.Email, &user.Name, &user.Role, &user.CreatedAt); err != nil {
+	if err := row.Scan(&user.ID, &user.Email, &user.Name, &user.Role, &user.Blocked, &user.CreatedAt); err != nil {
 		return nil, err
 	}
 	user.Role = normalizeUserRole(user.Role)
 	return &user, nil
+}
+
+func (a *Application) updateUserBlockedStateByID(userID int64, blocked bool) (*User, error) {
+	row := a.db.QueryRow(
+		`update users
+		set is_blocked = $2
+		where id = $1
+		returning id, email, name, role, is_blocked, created_at`,
+		userID,
+		blocked,
+	)
+
+	var user User
+	if err := row.Scan(&user.ID, &user.Email, &user.Name, &user.Role, &user.Blocked, &user.CreatedAt); err != nil {
+		return nil, err
+	}
+	user.Role = normalizeUserRole(user.Role)
+	return &user, nil
+}
+
+func (a *Application) deleteSessionsByUserID(userID int64) error {
+	_, err := a.db.Exec(`delete from sessions where user_id = $1`, userID)
+	return err
 }
 
 func (a *Application) deleteUserByID(userID int64) error {
@@ -258,6 +284,15 @@ func (a *Application) deleteUserByID(userID int64) error {
 
 func (a *Application) countAdminUsers() (int, error) {
 	row := a.db.QueryRow(`select count(*) from users where role = $1`, userRoleAdmin)
+	var total int
+	if err := row.Scan(&total); err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
+func (a *Application) countActiveAdminUsers() (int, error) {
+	row := a.db.QueryRow(`select count(*) from users where role = $1 and is_blocked = false`, userRoleAdmin)
 	var total int
 	if err := row.Scan(&total); err != nil {
 		return 0, err
@@ -531,5 +566,132 @@ func (a *Application) handleAdminDeleteUser(w http.ResponseWriter, r *http.Reque
 	}
 
 	success := fmt.Sprintf("Пользователь %s удален.", target.Email)
+	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
+}
+
+func (a *Application) handleAdminBlockUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	currentUser := a.requireAdmin(w, r)
+	if currentUser == nil {
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	userID, err := parsePositiveID(r.FormValue("user_id"))
+	if err != nil {
+		http.Redirect(w, r, adminUsersRedirectURL("", "Некорректный ID пользователя."), http.StatusSeeOther)
+		return
+	}
+
+	if userID == currentUser.ID {
+		http.Redirect(w, r, adminUsersRedirectURL("", "Себя блокировать нельзя."), http.StatusSeeOther)
+		return
+	}
+
+	target, err := a.getUserByID(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Redirect(w, r, adminUsersRedirectURL("", "Пользователь не найден."), http.StatusSeeOther)
+			return
+		}
+		a.logger.Printf("admin get target user for block: %v", err)
+		http.Redirect(w, r, adminUsersRedirectURL("", "Не удалось заблокировать пользователя."), http.StatusSeeOther)
+		return
+	}
+
+	if target.Blocked {
+		http.Redirect(w, r, adminUsersRedirectURL("", "Этот пользователь уже заблокирован."), http.StatusSeeOther)
+		return
+	}
+
+	if target.Role == userRoleAdmin {
+		adminsCount, err := a.countActiveAdminUsers()
+		if err != nil {
+			a.logger.Printf("admin count active admins before block: %v", err)
+			http.Redirect(w, r, adminUsersRedirectURL("", "Не удалось заблокировать пользователя."), http.StatusSeeOther)
+			return
+		}
+		if adminsCount <= 1 {
+			http.Redirect(w, r, adminUsersRedirectURL("", "Нельзя блокировать последнего активного админа."), http.StatusSeeOther)
+			return
+		}
+	}
+
+	updated, err := a.updateUserBlockedStateByID(userID, true)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Redirect(w, r, adminUsersRedirectURL("", "Пользователь не найден."), http.StatusSeeOther)
+			return
+		}
+		a.logger.Printf("admin block user: %v", err)
+		http.Redirect(w, r, adminUsersRedirectURL("", "Не удалось заблокировать пользователя."), http.StatusSeeOther)
+		return
+	}
+
+	if err := a.deleteSessionsByUserID(updated.ID); err != nil {
+		a.logger.Printf("admin delete sessions for blocked user: %v", err)
+	}
+
+	success := fmt.Sprintf("Пользователь %s заблокирован.", updated.Email)
+	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
+}
+
+func (a *Application) handleAdminUnblockUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if a.requireAdmin(w, r) == nil {
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	userID, err := parsePositiveID(r.FormValue("user_id"))
+	if err != nil {
+		http.Redirect(w, r, adminUsersRedirectURL("", "Некорректный ID пользователя."), http.StatusSeeOther)
+		return
+	}
+
+	target, err := a.getUserByID(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Redirect(w, r, adminUsersRedirectURL("", "Пользователь не найден."), http.StatusSeeOther)
+			return
+		}
+		a.logger.Printf("admin get target user for unblock: %v", err)
+		http.Redirect(w, r, adminUsersRedirectURL("", "Не удалось разблокировать пользователя."), http.StatusSeeOther)
+		return
+	}
+
+	if !target.Blocked {
+		http.Redirect(w, r, adminUsersRedirectURL("", "Этот пользователь и так активен."), http.StatusSeeOther)
+		return
+	}
+
+	updated, err := a.updateUserBlockedStateByID(userID, false)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Redirect(w, r, adminUsersRedirectURL("", "Пользователь не найден."), http.StatusSeeOther)
+			return
+		}
+		a.logger.Printf("admin unblock user: %v", err)
+		http.Redirect(w, r, adminUsersRedirectURL("", "Не удалось разблокировать пользователя."), http.StatusSeeOther)
+		return
+	}
+
+	success := fmt.Sprintf("Пользователь %s разблокирован.", updated.Email)
 	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
 }

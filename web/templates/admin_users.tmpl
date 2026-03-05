@@ -127,6 +127,11 @@
                       </td>
                       <td>
                         <span class="atlas-role-chip atlas-role-chip-{{.Role}}">{{.RoleLabel}}</span>
+                        {{if .Blocked}}
+                          <p class="atlas-admin-meta"><span class="atlas-block-chip atlas-block-chip-on">Заблокирован</span></p>
+                        {{else}}
+                          <p class="atlas-admin-meta"><span class="atlas-block-chip">Активен</span></p>
+                        {{end}}
                       </td>
                       <td>
                         <p class="atlas-admin-meta">Статей: {{.ArticlesCount}}</p>
@@ -134,6 +139,19 @@
                       </td>
                       <td>
                         <div class="atlas-admin-actions">
+                          {{if ne .ID $.User.ID}}
+                            {{if .Blocked}}
+                              <form method="post" action="/app/admin/users/unblock">
+                                <input type="hidden" name="user_id" value="{{.ID}}" />
+                                <button class="button button-ghost button-compact" type="submit">Разблокировать</button>
+                              </form>
+                            {{else}}
+                              <form method="post" action="/app/admin/users/block" onsubmit="return confirm('Заблокировать пользователя {{.Email}}?');">
+                                <input type="hidden" name="user_id" value="{{.ID}}" />
+                                <button class="button button-ghost button-compact atlas-warning-button" type="submit">Блокировать</button>
+                              </form>
+                            {{end}}
+                          {{end}}
                           <form method="post" action="/app/admin/users/role" class="atlas-admin-role-form">
                             <input type="hidden" name="user_id" value="{{.ID}}" />
                             <select class="field-select atlas-admin-role-select" name="role">
