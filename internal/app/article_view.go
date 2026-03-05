@@ -48,11 +48,13 @@ func (a *Application) handleArticleView(w http.ResponseWriter, r *http.Request) 
 	data.ArticleTitle = article.Title
 	data.ArticleBody = article.Body
 
-	versions, err := a.listArticleVersions(article.ID, 25)
-	if err != nil {
-		a.logger.Printf("list article versions: %v", err)
-	} else {
-		data.ArticleVersions = versions
+	if user.IsAdmin() {
+		versions, err := a.listArticleVersions(article.ID, 25)
+		if err != nil {
+			a.logger.Printf("list article versions: %v", err)
+		} else {
+			data.ArticleVersions = versions
+		}
 	}
 
 	if section, ok := findWikiSection(article.SectionSlug); ok {
@@ -75,7 +77,7 @@ func (a *Application) handleArticleRestore(w http.ResponseWriter, r *http.Reques
 		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 		return
 	}
-	if !user.CanEdit() {
+	if !user.IsAdmin() {
 		http.Error(w, "forbidden", http.StatusForbidden)
 		return
 	}

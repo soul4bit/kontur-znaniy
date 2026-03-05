@@ -96,6 +96,7 @@
           <div class="atlas-article-view-body">{{.CurrentArticle.Body}}</div>
         </article>
 
+        {{if .User.IsAdmin}}
         <article class="atlas-card atlas-version-card">
           <div class="atlas-recent-head">
             <p class="panel-label">История версий</p>
@@ -115,7 +116,7 @@
                     <p class="atlas-version-subsection">Подраздел: {{.Subsection}}</p>
                   {{end}}
                   <p class="atlas-version-title-preview">{{.Title}}</p>
-                  {{if $.User.CanEdit}}
+                  {{if $.User.IsAdmin}}
                     <form method="post" action="/app/article/restore" onsubmit="return confirm('Восстановить версию #{{.VersionNo}}?');">
                       <input type="hidden" name="article_id" value="{{$.CurrentArticle.ID}}" />
                       <input type="hidden" name="version_id" value="{{.ID}}" />
@@ -129,6 +130,7 @@
             <p class="atlas-empty">История версий пока пуста.</p>
           {{end}}
         </article>
+        {{end}}
       </section>
     </section>
   </main>
