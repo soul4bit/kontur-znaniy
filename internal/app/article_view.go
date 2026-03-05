@@ -58,6 +58,13 @@ func (a *Application) handleArticleView(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
+	comments, commentErr := a.listArticleComments(article.ID, 200)
+	if commentErr != nil {
+		a.logger.Printf("list article comments: %v", commentErr)
+	} else {
+		data.ArticleComments = a.markCommentsDeletePermissions(comments, user)
+	}
+
 	if section, ok := findWikiSection(article.SectionSlug); ok {
 		data.CurrentSection = &section
 		data.CurrentSectionSlug = section.Slug

@@ -76,6 +76,29 @@ type ArticleVersion struct {
 	CreatedAt    time.Time
 }
 
+type ArticleDraft struct {
+	ID          int64
+	UserID      int64
+	ArticleID   int64
+	DraftKey    string
+	SectionSlug string
+	Subsection  string
+	Title       string
+	Body        string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type ArticleComment struct {
+	ID        int64
+	ArticleID int64
+	AuthorID  int64
+	Author    string
+	Body      string
+	CreatedAt time.Time
+	CanDelete bool
+}
+
 type adminAuditEntry struct {
 	ID           int64
 	Action       string
@@ -125,6 +148,8 @@ type viewData struct {
 	ArticleBody        string
 	ArticleBodyHTML    template.HTML
 	ArticleVersions    []ArticleVersion
+	ArticleComments    []ArticleComment
+	DraftLoaded        bool
 	AdminUsers         []adminUserListItem
 	PendingRequests    []registrationRequestListItem
 	AdminAuditEntries  []adminAuditEntry
@@ -198,8 +223,11 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/article", a.requireAuth(a.handleArticleView))
 	mux.HandleFunc("/app/article/new", a.requireAuth(a.handleArticleNew))
 	mux.HandleFunc("/app/article/edit", a.requireAuth(a.handleArticleEdit))
+	mux.HandleFunc("/app/article/draft/save", a.requireAuth(a.handleArticleDraftSave))
 	mux.HandleFunc("/app/article/restore", a.requireAuth(a.handleArticleRestore))
 	mux.HandleFunc("/app/article/delete", a.requireAuth(a.handleArticleDelete))
+	mux.HandleFunc("/app/article/comment/add", a.requireAuth(a.handleArticleCommentAdd))
+	mux.HandleFunc("/app/article/comment/delete", a.requireAuth(a.handleArticleCommentDelete))
 	mux.HandleFunc("/app/admin/users", a.requireAuth(a.handleAdminUsers))
 	mux.HandleFunc("/app/admin/registrations/approve", a.requireAuth(a.handleAdminApproveRegistration))
 	mux.HandleFunc("/app/admin/registrations/reject", a.requireAuth(a.handleAdminRejectRegistration))
@@ -369,6 +397,35 @@ func runMigrations(db *sql.DB) error {
 		`alter table if exists articles add column if not exists subsection text not null default '';`,
 		`create unique index if not exists idx_article_versions_article_version_no on article_versions(article_id, version_no);`,
 		`create index if not exists idx_article_versions_article_created_at on article_versions(article_id, created_at desc);`,
+		`create table if not exists article_drafts (
+			id bigserial primary key,
+			user_id bigint not null,
+			draft_key text not null,
+			article_id bigint,
+			section_slug text not null default '',
+			subsection text not null default '',
+			title text not null default '',
+			body text not null default '',
+			created_at timestamptz not null default now(),
+			updated_at timestamptz not null default now(),
+			foreign key(user_id) references users(id) on delete cascade,
+			foreign key(article_id) references articles(id) on delete cascade,
+			unique(user_id, draft_key)
+		);`,
+		`create index if not exists idx_article_drafts_user_updated_at on article_drafts(user_id, updated_at desc);`,
+		`create index if not exists idx_article_drafts_article_id on article_drafts(article_id);`,
+		`create table if not exists article_comments (
+			id bigserial primary key,
+			article_id bigint not null,
+			user_id bigint,
+			body text not null,
+			created_at timestamptz not null default now(),
+			updated_at timestamptz not null default now(),
+			foreign key(article_id) references articles(id) on delete cascade,
+			foreign key(user_id) references users(id) on delete set null
+		);`,
+		`create index if not exists idx_article_comments_article_created_at on article_comments(article_id, created_at asc);`,
+		`create index if not exists idx_article_comments_user_id on article_comments(user_id);`,
 		`insert into article_versions (article_id, version_no, edited_by, title, body, subsection, created_at)
 		select
 			a.id,

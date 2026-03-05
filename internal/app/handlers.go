@@ -787,6 +787,16 @@ func (a *Application) handleArticleNew(w http.ResponseWriter, r *http.Request) {
 		data.CurrentSection = &section
 		data.CurrentSectionSlug = section.Slug
 		data.CurrentSubsection = currentSubsection
+		draft, draftErr := a.resolveDraftForNewArticle(user.ID, section.Slug, currentSubsection)
+		if draftErr != nil {
+			a.logger.Printf("resolve draft for article new: %v", draftErr)
+		} else if draft != nil {
+			data.ArticleTitle = draft.Title
+			data.ArticleBody = draft.Body
+			if strings.TrimSpace(draft.Title) != "" || strings.TrimSpace(draft.Body) != "" {
+				data.DraftLoaded = true
+			}
+		}
 		a.renderTemplate(w, "article_new.tmpl", data)
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
@@ -829,6 +839,9 @@ func (a *Application) handleArticleNew(w http.ResponseWriter, r *http.Request) {
 			a.logger.Printf("create article: %v", err)
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
+		}
+		if err := a.deleteArticleDraftByKey(user.ID, articleDraftKeyForNew(section.Slug, currentSubsection)); err != nil {
+			a.logger.Printf("delete article new draft: %v", err)
 		}
 
 		success := url.QueryEscape("Статья сохранена.")

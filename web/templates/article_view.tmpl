@@ -97,6 +97,49 @@
           <div class="atlas-article-view-body">{{.ArticleBodyHTML}}</div>
         </article>
 
+        <article class="atlas-card atlas-comments-card">
+          <div class="atlas-recent-head">
+            <p class="panel-label">Team Comments</p>
+            {{if .ArticleComments}}
+              <span class="atlas-recent-count">{{len .ArticleComments}}</span>
+            {{end}}
+          </div>
+
+          <form class="atlas-comment-form" method="post" action="/app/article/comment/add">
+            <input type="hidden" name="article_id" value="{{.CurrentArticle.ID}}" />
+            <label class="field">
+              <span>Add comment</span>
+              <textarea name="body" rows="4" maxlength="2000" placeholder="Write concise context for the team: resolution, root cause, caveats..." required></textarea>
+            </label>
+            <div class="atlas-actions">
+              <button class="button button-primary button-compact" type="submit">Send</button>
+            </div>
+          </form>
+
+          {{if .ArticleComments}}
+            <div class="atlas-comment-list">
+              {{range .ArticleComments}}
+                <article class="atlas-comment-item">
+                  <div class="atlas-comment-head">
+                    <p class="atlas-comment-author">{{.Author}}</p>
+                    <p class="atlas-comment-meta">{{.CreatedAt.Format "02.01.2006 15:04"}}</p>
+                  </div>
+                  <div class="atlas-comment-body">{{markdown .Body}}</div>
+                  {{if .CanDelete}}
+                    <form method="post" action="/app/article/comment/delete" onsubmit="return confirm('Delete this comment?');">
+                      <input type="hidden" name="article_id" value="{{$.CurrentArticle.ID}}" />
+                      <input type="hidden" name="comment_id" value="{{.ID}}" />
+                      <button class="button button-ghost button-compact atlas-danger-button" type="submit">Delete</button>
+                    </form>
+                  {{end}}
+                </article>
+              {{end}}
+            </div>
+          {{else}}
+            <p class="atlas-empty">No comments yet. Add the first note for your team.</p>
+          {{end}}
+        </article>
+
         {{if .User.IsAdmin}}
         <article class="atlas-card atlas-version-card">
           <div class="atlas-recent-head">

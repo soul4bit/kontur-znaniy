@@ -81,6 +81,16 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 		currentSubsection := normalizeSubsection(section, article.Subsection)
 
 		data := a.articleEditViewData(user, section, currentSubsection, article.ID, article.Title, article.Body)
+		draft, draftErr := a.resolveDraftForExistingArticle(user.ID, article.ID)
+		if draftErr != nil {
+			a.logger.Printf("resolve draft for article edit: %v", draftErr)
+		} else if draft != nil {
+			data.ArticleTitle = draft.Title
+			data.ArticleBody = draft.Body
+			if strings.TrimSpace(draft.Title) != "" || strings.TrimSpace(draft.Body) != "" {
+				data.DraftLoaded = true
+			}
+		}
 		a.renderTemplate(w, "article_edit.tmpl", data)
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
@@ -149,6 +159,9 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 			}
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
+		}
+		if err := a.deleteArticleDraftByKey(user.ID, articleDraftKeyForArticle(articleID)); err != nil {
+			a.logger.Printf("delete article edit draft: %v", err)
 		}
 
 		success := url.QueryEscape("Статья обновлена.")

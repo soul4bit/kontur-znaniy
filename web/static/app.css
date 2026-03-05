@@ -2126,6 +2126,68 @@ body {
   margin-right: 6px;
 }
 
+.atlas-comments-card {
+  border-color: #bcd5cd;
+  background:
+    radial-gradient(circle at 100% -10%, rgba(204, 151, 86, 0.12), transparent 34%),
+    linear-gradient(145deg, rgba(239, 248, 245, 0.95), rgba(251, 253, 252, 0.95));
+}
+
+.atlas-comment-form {
+  margin-top: 8px;
+}
+
+.atlas-comment-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 11px;
+}
+
+.atlas-comment-item {
+  border: 1px solid #c6dad3;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  padding: 11px;
+  display: grid;
+  gap: 8px;
+}
+
+.atlas-comment-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.atlas-comment-author {
+  margin: 0;
+  color: #204a41;
+  font-weight: 700;
+}
+
+.atlas-comment-meta {
+  margin: 0;
+  color: #57726b;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-comment-body {
+  color: #2c4741;
+  line-height: 1.62;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.atlas-comment-body :first-child {
+  margin-top: 0;
+}
+
+.atlas-comment-body :last-child {
+  margin-bottom: 0;
+}
+
 .atlas-version-card {
   border-color: #bfd6cf;
   background:
@@ -2257,6 +2319,26 @@ body {
 .article-form {
   display: grid;
   gap: 13px;
+}
+
+.atlas-autosave-status {
+  margin: 2px 0 0;
+  min-height: 20px;
+  color: #5f7771;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-autosave-status.is-saving {
+  color: #406c63;
+}
+
+.atlas-autosave-status.is-ok {
+  color: #256458;
+}
+
+.atlas-autosave-status.is-error {
+  color: #8f2d3f;
 }
 
 .field textarea {

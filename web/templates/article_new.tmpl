@@ -71,9 +71,12 @@
         {{if .Error}}
           <p class="alert alert-error">{{.Error}}</p>
         {{end}}
+        {{if .DraftLoaded}}
+          <p class="alert alert-success">Autosaved draft restored.</p>
+        {{end}}
 
         <article class="atlas-card">
-          <form class="article-form" method="post" action="/app/article/new">
+          <form class="article-form" method="post" action="/app/article/new" data-article-autosave data-autosave-endpoint="/app/article/draft/save" data-autosave-section="{{.CurrentSection.Slug}}" data-autosave-subsection="{{.CurrentSubsection}}">
             <input type="hidden" name="section" value="{{.CurrentSection.Slug}}" />
             <input type="hidden" name="subsection" value="{{.CurrentSubsection}}" />
 
@@ -92,6 +95,7 @@
               <button class="button button-primary" type="submit">Сохранить статью</button>
               <a class="button button-ghost" href="/app/section?slug={{.CurrentSection.Slug}}{{if .CurrentSubsection}}&sub={{urlquery .CurrentSubsection}}{{end}}">Отмена</a>
             </div>
+            <p class="atlas-autosave-status" data-autosave-status aria-live="polite"></p>
           </form>
         </article>
       </section>
@@ -103,5 +107,6 @@
   </footer>
   <script src="{{asset "wiki-ui.js"}}"></script>
   <script src="{{asset "markdown-editor.js"}}"></script>
+  <script src="{{asset "editor-autosave.js"}}"></script>
 </body>
 </html>
