@@ -3,7 +3,10 @@
   <rect x="42" y="42" width="1516" height="836" rx="28" fill="#FFFFFF" stroke="#CBD9D3"/>
 
   <rect x="88" y="92" width="62" height="62" rx="16" fill="#0D766D"/>
-  <text x="119" y="131" fill="#E9FBF6" font-family="IBM Plex Mono, monospace" font-size="30" font-weight="700" text-anchor="middle">KZ</text>
+  <rect x="103" y="108" width="31" height="22" rx="5" stroke="#E9FBF6" stroke-width="3" fill="none"/>
+  <path d="M111 118L116 123L111 128" stroke="#E9FBF6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M119 128H124" stroke="#E9FBF6" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="132" cy="132" r="4" fill="#F2CA84" stroke="#E9FBF6" stroke-width="2"/>
   <text x="176" y="120" fill="#64857D" font-family="IBM Plex Mono, monospace" font-size="16" letter-spacing="4">KONTUR ZNANIY</text>
   <text x="176" y="160" fill="#1C342F" font-family="Manrope, sans-serif" font-size="58" font-weight="800">Контур знаний</text>
 
