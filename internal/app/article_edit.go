@@ -138,7 +138,7 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 		if article.AuthorID == user.ID {
 			_, updateErr = a.updateArticleByAuthor(articleID, user.ID, currentSubsection, title, body)
 		} else {
-			_, updateErr = a.updateArticleByID(articleID, currentSubsection, title, body)
+			_, updateErr = a.updateArticleByID(articleID, user.ID, currentSubsection, title, body)
 		}
 
 		if updateErr != nil {

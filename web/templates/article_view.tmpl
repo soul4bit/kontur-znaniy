@@ -79,8 +79,49 @@
           </div>
         </article>
 
+        {{if .Error}}
+          <p class="alert alert-error">{{.Error}}</p>
+        {{end}}
+        {{if .Success}}
+          <p class="alert alert-success">{{.Success}}</p>
+        {{end}}
+
         <article class="atlas-card">
           <div class="atlas-article-view-body">{{.CurrentArticle.Body}}</div>
+        </article>
+
+        <article class="atlas-card atlas-version-card">
+          <div class="atlas-recent-head">
+            <p class="panel-label">История версий</p>
+            {{if .ArticleVersions}}
+              <span class="atlas-recent-count">{{len .ArticleVersions}} версий</span>
+            {{end}}
+          </div>
+          {{if .ArticleVersions}}
+            <div class="atlas-version-list">
+              {{range .ArticleVersions}}
+                <article class="atlas-version-item">
+                  <div class="atlas-version-head">
+                    <p class="atlas-version-title">Версия #{{.VersionNo}}</p>
+                    <p class="atlas-version-meta">{{.CreatedAt.Format "02.01.2006 15:04"}} · {{.EditedByName}}</p>
+                  </div>
+                  {{if .Subsection}}
+                    <p class="atlas-version-subsection">Подраздел: {{.Subsection}}</p>
+                  {{end}}
+                  <p class="atlas-version-title-preview">{{.Title}}</p>
+                  {{if and $.User.CanEdit (or (eq $.User.ID $.CurrentArticle.AuthorID) $.User.IsAdmin)}}
+                    <form method="post" action="/app/article/restore" onsubmit="return confirm('Восстановить версию #{{.VersionNo}}?');">
+                      <input type="hidden" name="article_id" value="{{$.CurrentArticle.ID}}" />
+                      <input type="hidden" name="version_id" value="{{.ID}}" />
+                      <button class="button button-ghost button-compact" type="submit">Восстановить</button>
+                    </form>
+                  {{end}}
+                </article>
+              {{end}}
+            </div>
+          {{else}}
+            <p class="atlas-empty">История версий пока пуста.</p>
+          {{end}}
         </article>
       </section>
     </section>

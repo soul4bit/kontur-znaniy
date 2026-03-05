@@ -39,6 +39,10 @@ type registrationRequest struct {
 	EmailVerifiedAt  sql.NullTime
 }
 
+var errRegistrationNameTaken = errors.New("registration nickname already taken")
+
+const registrationNameTakenReason = "Ник уже занят другим пользователем. Отправьте новую заявку с другим ником."
+
 func (a *Application) createUser(name string, email string, passwordHash string) (*User, error) {
 	now := time.Now().UTC()
 	row := a.db.QueryRow(
@@ -260,7 +264,15 @@ func scanArticle(scanner interface {
 
 func (a *Application) createArticle(authorID int64, sectionSlug string, subsection string, title string, body string) (*Article, error) {
 	now := time.Now().UTC()
-	row := a.db.QueryRow(
+	tx, err := a.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	row := tx.QueryRow(
 		`insert into articles (author_id, section_slug, subsection, title, body, created_at, updated_at)
 		 values ($1, $2, $3, $4, $5, $6, $6)
 		 returning
@@ -280,7 +292,20 @@ func (a *Application) createArticle(authorID int64, sectionSlug string, subsecti
 		body,
 		now,
 	)
-	return scanArticle(row)
+	article, err := scanArticle(row)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := a.appendArticleVersionTx(tx, article, authorID, now); err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return article, nil
 }
 
 func (a *Application) getArticleByID(articleID int64) (*Article, error) {
@@ -306,7 +331,15 @@ func (a *Application) getArticleByID(articleID int64) (*Article, error) {
 
 func (a *Application) updateArticleByAuthor(articleID int64, authorID int64, subsection string, title string, body string) (*Article, error) {
 	now := time.Now().UTC()
-	row := a.db.QueryRow(
+	tx, err := a.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	row := tx.QueryRow(
 		`update articles
 		set
 			subsection = $3,
@@ -331,12 +364,33 @@ func (a *Application) updateArticleByAuthor(articleID int64, authorID int64, sub
 		body,
 		now,
 	)
-	return scanArticle(row)
+	article, err := scanArticle(row)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := a.appendArticleVersionTx(tx, article, authorID, now); err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return article, nil
 }
 
-func (a *Application) updateArticleByID(articleID int64, subsection string, title string, body string) (*Article, error) {
+func (a *Application) updateArticleByID(articleID int64, editorID int64, subsection string, title string, body string) (*Article, error) {
 	now := time.Now().UTC()
-	row := a.db.QueryRow(
+	tx, err := a.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	row := tx.QueryRow(
 		`update articles
 		set
 			subsection = $2,
@@ -360,7 +414,20 @@ func (a *Application) updateArticleByID(articleID int64, subsection string, titl
 		body,
 		now,
 	)
-	return scanArticle(row)
+	article, err := scanArticle(row)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := a.appendArticleVersionTx(tx, article, editorID, now); err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return article, nil
 }
 
 func (a *Application) getArticlesBySection(sectionSlug string, subsection string, limit int) ([]Article, error) {
@@ -731,6 +798,23 @@ func (a *Application) completeRegistrationByVerifyToken(verifyToken string) (*Us
 		_ = tx.Rollback()
 	}()
 
+	rejectRequestBecauseNameTaken := func(requestID int64) error {
+		_, updateErr := tx.Exec(
+			`update registration_requests
+			set
+				status = $2,
+				rejection_reason = $3,
+				email_verify_token = null,
+				updated_at = $4
+			where id = $1`,
+			requestID,
+			registrationStatusRejected,
+			registrationNameTakenReason,
+			now,
+		)
+		return updateErr
+	}
+
 	var req registrationRequest
 	err = tx.QueryRow(
 		`select
@@ -779,6 +863,24 @@ func (a *Application) completeRegistrationByVerifyToken(verifyToken string) (*Us
 			return nil, err
 		}
 
+		var existingNameUserID int64
+		nameLookupErr := tx.QueryRow(
+			`select id from users where lower(name) = lower($1) limit 1`,
+			req.Name,
+		).Scan(&existingNameUserID)
+		if nameLookupErr == nil {
+			if err := rejectRequestBecauseNameTaken(req.ID); err != nil {
+				return nil, err
+			}
+			if commitErr := tx.Commit(); commitErr != nil {
+				return nil, commitErr
+			}
+			return nil, errRegistrationNameTaken
+		}
+		if !errors.Is(nameLookupErr, sql.ErrNoRows) {
+			return nil, nameLookupErr
+		}
+
 		err = tx.QueryRow(
 			`insert into users (email, name, password_hash, role, created_at)
 			 values ($1, $2, $3, $4, $5)
@@ -790,6 +892,15 @@ func (a *Application) completeRegistrationByVerifyToken(verifyToken string) (*Us
 			now,
 		).Scan(&user.ID, &user.Email, &user.Name, &user.Role, &user.Blocked, &user.CreatedAt)
 		if err != nil {
+			if isUniqueNameError(err) {
+				if updateErr := rejectRequestBecauseNameTaken(req.ID); updateErr != nil {
+					return nil, updateErr
+				}
+				if commitErr := tx.Commit(); commitErr != nil {
+					return nil, commitErr
+				}
+				return nil, errRegistrationNameTaken
+			}
 			return nil, err
 		}
 	}
@@ -839,4 +950,29 @@ func isUniqueEmailError(err error) bool {
 	text := strings.ToLower(err.Error())
 	return strings.Contains(text, "users_email_key") ||
 		(strings.Contains(text, "duplicate key") && strings.Contains(text, "email"))
+}
+
+func isUniqueNameError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		if pgErr.Code != "23505" {
+			return false
+		}
+
+		constraint := strings.ToLower(pgErr.ConstraintName)
+		if constraint == "idx_users_name_ci_unique" || constraint == "idx_registration_requests_name_active_unique" {
+			return true
+		}
+
+		return strings.Contains(strings.ToLower(pgErr.Message), "name")
+	}
+
+	text := strings.ToLower(err.Error())
+	return strings.Contains(text, "idx_users_name_ci_unique") ||
+		strings.Contains(text, "idx_registration_requests_name_active_unique") ||
+		(strings.Contains(text, "duplicate key") && strings.Contains(text, "name"))
 }

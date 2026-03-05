@@ -65,6 +65,29 @@ type Article struct {
 	UpdatedAt   time.Time
 }
 
+type ArticleVersion struct {
+	ID           int64
+	ArticleID    int64
+	VersionNo    int
+	Title        string
+	Body         string
+	Subsection   string
+	EditedByName string
+	CreatedAt    time.Time
+}
+
+type adminAuditEntry struct {
+	ID           int64
+	Action       string
+	ActionLabel  string
+	AdminName    string
+	TargetEmail  string
+	Details      string
+	CreatedAt    time.Time
+	TargetUserID sql.NullInt64
+	AdminUserID  sql.NullInt64
+}
+
 type sectionOverview struct {
 	Slug  string
 	Name  string
@@ -100,8 +123,10 @@ type viewData struct {
 	ArticleID          int64
 	ArticleTitle       string
 	ArticleBody        string
+	ArticleVersions    []ArticleVersion
 	AdminUsers         []adminUserListItem
 	PendingRequests    []registrationRequestListItem
+	AdminAuditEntries  []adminAuditEntry
 	AvailableRoles     []roleOption
 }
 
@@ -169,6 +194,7 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/article", a.requireAuth(a.handleArticleView))
 	mux.HandleFunc("/app/article/new", a.requireAuth(a.handleArticleNew))
 	mux.HandleFunc("/app/article/edit", a.requireAuth(a.handleArticleEdit))
+	mux.HandleFunc("/app/article/restore", a.requireAuth(a.handleArticleRestore))
 	mux.HandleFunc("/app/admin/users", a.requireAuth(a.handleAdminUsers))
 	mux.HandleFunc("/app/admin/registrations/approve", a.requireAuth(a.handleAdminApproveRegistration))
 	mux.HandleFunc("/app/admin/registrations/reject", a.requireAuth(a.handleAdminRejectRegistration))
@@ -257,6 +283,17 @@ func runMigrations(db *sql.DB) error {
 		where role is null or role not in ('viewer', 'editor', 'admin');`,
 		`alter table if exists users add column if not exists is_blocked boolean not null default false;`,
 		`update users set is_blocked = false where is_blocked is null;`,
+		`with ranked as (
+			select
+				id,
+				row_number() over (partition by lower(name) order by created_at, id) as rn
+			from users
+		)
+		update users u
+		set name = concat(u.name, '_', u.id)
+		from ranked r
+		where u.id = r.id and r.rn > 1;`,
+		`create unique index if not exists idx_users_name_ci_unique on users ((lower(name)));`,
 		`create table if not exists sessions (
 			id bigserial primary key,
 			user_id bigint not null,
@@ -279,6 +316,25 @@ func runMigrations(db *sql.DB) error {
 			moderated_at timestamptz,
 			email_verified_at timestamptz
 		);`,
+		`with ranked as (
+			select
+				id,
+				row_number() over (partition by lower(name) order by created_at, id) as rn
+			from registration_requests
+			where status in ('pending', 'approved')
+		)
+		update registration_requests rr
+		set
+			status = 'rejected',
+			rejection_reason = coalesce(nullif(rr.rejection_reason, ''), 'Автоотклонение: ник уже занят.'),
+			email_verify_token = null,
+			updated_at = now(),
+			moderated_at = coalesce(rr.moderated_at, now())
+		from ranked r
+		where rr.id = r.id and r.rn > 1 and rr.status in ('pending', 'approved');`,
+		`create unique index if not exists idx_registration_requests_name_active_unique
+			on registration_requests ((lower(name)))
+			where status in ('pending', 'approved');`,
 		`create table if not exists articles (
 			id bigserial primary key,
 			author_id bigint not null,
@@ -290,7 +346,59 @@ func runMigrations(db *sql.DB) error {
 			updated_at timestamptz not null default now(),
 			foreign key(author_id) references users(id) on delete cascade
 		);`,
+		`create table if not exists article_versions (
+			id bigserial primary key,
+			article_id bigint not null,
+			version_no integer not null,
+			edited_by bigint,
+			title text not null,
+			body text not null,
+			subsection text not null default '',
+			created_at timestamptz not null default now(),
+			foreign key(article_id) references articles(id) on delete cascade,
+			foreign key(edited_by) references users(id) on delete set null
+		);`,
 		`alter table if exists articles add column if not exists subsection text not null default '';`,
+		`create unique index if not exists idx_article_versions_article_version_no on article_versions(article_id, version_no);`,
+		`create index if not exists idx_article_versions_article_created_at on article_versions(article_id, created_at desc);`,
+		`insert into article_versions (article_id, version_no, edited_by, title, body, subsection, created_at)
+		select
+			a.id,
+			1,
+			a.author_id,
+			a.title,
+			a.body,
+			a.subsection,
+			a.created_at
+		from articles a
+		where not exists (
+			select 1
+			from article_versions v
+			where v.article_id = a.id
+		);`,
+		`create table if not exists admin_audit_log (
+			id bigserial primary key,
+			admin_user_id bigint,
+			action text not null,
+			target_user_id bigint,
+			target_email text not null default '',
+			details text not null default '',
+			created_at timestamptz not null default now(),
+			foreign key(admin_user_id) references users(id) on delete set null,
+			foreign key(target_user_id) references users(id) on delete set null
+		);`,
+		`create index if not exists idx_admin_audit_log_created_at on admin_audit_log(created_at desc);`,
+		`create index if not exists idx_admin_audit_log_action_created_at on admin_audit_log(action, created_at desc);`,
+		`create table if not exists auth_rate_limits (
+			action text not null,
+			identifier text not null,
+			attempts integer not null default 0,
+			window_started_at timestamptz not null,
+			blocked_until timestamptz,
+			updated_at timestamptz not null default now(),
+			primary key (action, identifier)
+		);`,
+		`create index if not exists idx_auth_rate_limits_blocked_until on auth_rate_limits(blocked_until);`,
 		`create index if not exists idx_sessions_user_id on sessions(user_id);`,
 		`create index if not exists idx_sessions_expires_at on sessions(expires_at);`,
 		`create index if not exists idx_articles_author_id on articles(author_id);`,

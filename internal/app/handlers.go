@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"net"
 	"net/http"
 	"net/mail"
 	"net/url"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"golang.org/x/crypto/bcrypt"
@@ -19,6 +21,66 @@ func blockedLoginMessage() string {
 	return "Ваш аккаунт на паузе: доступ временно выключен администратором. Логи не паникуют, сервер тоже."
 }
 
+const (
+	rateLimitActionLoginIP    = "login_ip"
+	rateLimitActionLoginEmail = "login_email"
+	rateLimitActionRegisterIP = "register_ip"
+
+	loginRateLimitWindow      = 15 * time.Minute
+	loginRateLimitBlockFor    = 20 * time.Minute
+	loginRateLimitMaxAttempts = 5
+
+	registerRateLimitWindow      = 40 * time.Minute
+	registerRateLimitBlockFor    = 45 * time.Minute
+	registerRateLimitMaxAttempts = 8
+)
+
+func requestClientIdentifier(r *http.Request) string {
+	if r == nil {
+		return ""
+	}
+
+	if forwarded := strings.TrimSpace(r.Header.Get("X-Forwarded-For")); forwarded != "" {
+		parts := strings.Split(forwarded, ",")
+		if len(parts) > 0 {
+			if value := strings.TrimSpace(parts[0]); value != "" {
+				return value
+			}
+		}
+	}
+
+	if realIP := strings.TrimSpace(r.Header.Get("X-Real-IP")); realIP != "" {
+		return realIP
+	}
+
+	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+	if err == nil {
+		return strings.TrimSpace(host)
+	}
+
+	return strings.TrimSpace(r.RemoteAddr)
+}
+
+func rateLimitMessage(until time.Time, now time.Time) string {
+	if until.IsZero() {
+		return "Слишком много попыток. Повторите чуть позже."
+	}
+
+	remaining := until.Sub(now)
+	if remaining <= 0 {
+		return "Слишком много попыток. Повторите чуть позже."
+	}
+
+	minutes := int(remaining.Minutes())
+	if remaining%time.Minute != 0 {
+		minutes++
+	}
+	if minutes < 1 {
+		minutes = 1
+	}
+
+	return fmt.Sprintf("Слишком много попыток. Попробуйте снова через %d мин.", minutes)
+}
 func (a *Application) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := a.currentUser(r)
@@ -145,35 +207,81 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 		email := normalizeEmail(r.FormValue("email"))
 		password := r.FormValue("password")
 		next := strings.TrimSpace(r.FormValue("next"))
+		now := time.Now().UTC()
+		clientKey := requestClientIdentifier(r)
 
 		data := a.authViewData("Вход")
 		data.Email = email
 		data.Next = next
 
-		if email == "" || password == "" {
-			data.Error = "Введите email и пароль."
+		maxBlockUntil := time.Time{}
+		if until, blocked, err := a.getRateLimitBlockUntil(rateLimitActionLoginIP, clientKey, now); err != nil {
+			a.logger.Printf("check login ip rate limit: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		} else if blocked {
+			maxBlockUntil = until
+		}
+		if email != "" {
+			if until, blocked, err := a.getRateLimitBlockUntil(rateLimitActionLoginEmail, email, now); err != nil {
+				a.logger.Printf("check login email rate limit: %v", err)
+				http.Error(w, "internal server error", http.StatusInternalServerError)
+				return
+			} else if blocked && until.After(maxBlockUntil) {
+				maxBlockUntil = until
+			}
+		}
+		if !maxBlockUntil.IsZero() {
+			data.Error = rateLimitMessage(maxBlockUntil, now)
 			a.renderTemplate(w, "login.tmpl", data)
+			return
+		}
+
+		renderFailedLogin := func(message string) {
+			blockUntil := time.Time{}
+
+			if until, blocked, err := a.registerRateLimitFailure(rateLimitActionLoginIP, clientKey, now, loginRateLimitWindow, loginRateLimitMaxAttempts, loginRateLimitBlockFor); err != nil {
+				a.logger.Printf("register login ip rate limit failure: %v", err)
+			} else if blocked {
+				blockUntil = until
+			}
+
+			if email != "" {
+				if until, blocked, err := a.registerRateLimitFailure(rateLimitActionLoginEmail, email, now, loginRateLimitWindow, loginRateLimitMaxAttempts, loginRateLimitBlockFor); err != nil {
+					a.logger.Printf("register login email rate limit failure: %v", err)
+				} else if blocked && until.After(blockUntil) {
+					blockUntil = until
+				}
+			}
+
+			if !blockUntil.IsZero() {
+				message = rateLimitMessage(blockUntil, now)
+			}
+
+			data.Error = message
+			a.renderTemplate(w, "login.tmpl", data)
+		}
+
+		if email == "" || password == "" {
+			renderFailedLogin("Введите email и пароль.")
 			return
 		}
 
 		creds, err := a.getCredentialsByEmail(email)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
+				message := "Неверный email или пароль."
 				if reg, regErr := a.getRegistrationRequestByEmail(email); regErr == nil {
 					switch reg.Status {
 					case registrationStatusPending:
-						data.Error = "Заявка еще на рассмотрении. Дождитесь решения по почте."
+						message = "Заявка еще на рассмотрении. Дождитесь решения по почте."
 					case registrationStatusApproved:
-						data.Error = "Заявка уже одобрена. Подтвердите email из письма."
+						message = "Заявка уже одобрена. Подтвердите email из письма."
 					case registrationStatusRejected:
-						data.Error = "Заявка отклонена. Можно отправить новую."
-					default:
-						data.Error = "Неверный email или пароль."
+						message = "Заявка отклонена. Можно отправить новую."
 					}
-				} else {
-					data.Error = "Неверный email или пароль."
 				}
-				a.renderTemplate(w, "login.tmpl", data)
+				renderFailedLogin(message)
 				return
 			}
 			a.logger.Printf("get credentials by email: %v", err)
@@ -182,8 +290,7 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(creds.PasswordHash), []byte(password)); err != nil {
-			data.Error = "Неверный email или пароль."
-			a.renderTemplate(w, "login.tmpl", data)
+			renderFailedLogin("Неверный email или пароль.")
 			return
 		}
 		if creds.Blocked {
@@ -197,6 +304,15 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 			a.logger.Printf("create session: %v", err)
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
+		}
+
+		if err := a.clearRateLimit(rateLimitActionLoginIP, clientKey); err != nil {
+			a.logger.Printf("clear login ip rate limit: %v", err)
+		}
+		if email != "" {
+			if err := a.clearRateLimit(rateLimitActionLoginEmail, email); err != nil {
+				a.logger.Printf("clear login email rate limit: %v", err)
+			}
 		}
 
 		http.SetCookie(w, a.sessionCookie(token, expiresAt))
@@ -243,44 +359,63 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 		email := normalizeEmail(r.FormValue("email"))
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirm_password")
+		now := time.Now().UTC()
+		clientKey := requestClientIdentifier(r)
 
 		data := a.authViewData("Регистрация")
 		data.Name = name
 		data.Email = email
 
-		if !a.hasRegistrationIntegrations() {
-			data.Error = "Регистрация временно недоступна: не настроены SMTP/Telegram интеграции."
+		if until, blocked, err := a.getRateLimitBlockUntil(rateLimitActionRegisterIP, clientKey, now); err != nil {
+			a.logger.Printf("check register ip rate limit: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		} else if blocked {
+			data.Error = rateLimitMessage(until, now)
 			a.renderTemplate(w, "register.tmpl", data)
+			return
+		}
+
+		renderRegisterFailure := func(message string, countFailure bool) {
+			if countFailure {
+				if until, blocked, err := a.registerRateLimitFailure(rateLimitActionRegisterIP, clientKey, now, registerRateLimitWindow, registerRateLimitMaxAttempts, registerRateLimitBlockFor); err != nil {
+					a.logger.Printf("register ip rate limit failure: %v", err)
+				} else if blocked {
+					message = rateLimitMessage(until, now)
+				}
+			}
+
+			data.Error = message
+			a.renderTemplate(w, "register.tmpl", data)
+		}
+
+		if !a.hasRegistrationIntegrations() {
+			renderRegisterFailure("Регистрация временно недоступна: не настроены SMTP/Telegram интеграции.", false)
 			return
 		}
 
 		if len(name) < 2 {
-			data.Error = "Ник должен быть минимум 2 символа."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Ник должен быть минимум 2 символа.", true)
 			return
 		}
 
 		if _, err := mail.ParseAddress(email); err != nil {
-			data.Error = "Введите корректный email."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Введите корректный email.", true)
 			return
 		}
 
 		if len(password) < 10 {
-			data.Error = "Пароль должен быть не короче 10 символов."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Пароль должен быть не короче 10 символов.", true)
 			return
 		}
 
 		if password != confirmPassword {
-			data.Error = "Пароли не совпадают."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Пароли не совпадают.", true)
 			return
 		}
 
 		if existingUser, err := a.getUserByEmail(email); err == nil && existingUser != nil {
-			data.Error = "Аккаунт с таким email уже существует."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Аккаунт с таким email уже существует.", true)
 			return
 		} else if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			a.logger.Printf("lookup existing user by email: %v", err)
@@ -291,17 +426,14 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 		if existingReq, err := a.getRegistrationRequestByEmail(email); err == nil {
 			switch existingReq.Status {
 			case registrationStatusPending:
-				data.Error = "Заявка уже отправлена и ожидает решения."
-				a.renderTemplate(w, "register.tmpl", data)
+				renderRegisterFailure("Заявка уже отправлена и ожидает решения.", true)
 				return
 			case registrationStatusApproved:
-				data.Error = "Заявка уже одобрена. Подтвердите email из письма."
-				a.renderTemplate(w, "register.tmpl", data)
+				renderRegisterFailure("Заявка уже одобрена. Подтвердите email из письма.", true)
 				return
 			case registrationStatusCompleted:
 				if _, userErr := a.getUserByEmail(email); userErr == nil {
-					data.Error = "Этот email уже подтвержден. Войдите в аккаунт."
-					a.renderTemplate(w, "register.tmpl", data)
+					renderRegisterFailure("Этот email уже подтвержден. Войдите в аккаунт.", true)
 					return
 				} else if !errors.Is(userErr, sql.ErrNoRows) {
 					a.logger.Printf("lookup user for completed registration request: %v", userErr)
@@ -316,8 +448,7 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if existingByName, err := a.getUserByName(name); err == nil && existingByName != nil {
-			data.Error = "Ник уже занят. Выберите другой."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Ник уже занят. Выберите другой.", true)
 			return
 		} else if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			a.logger.Printf("lookup existing user by name: %v", err)
@@ -326,8 +457,7 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if activeReqByName, err := a.getActiveRegistrationRequestByName(name); err == nil && activeReqByName != nil {
-			data.Error = "Ник уже занят в другой заявке. Выберите другой."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Ник уже занят в другой заявке. Выберите другой.", true)
 			return
 		} else if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			a.logger.Printf("lookup registration request by name: %v", err)
@@ -351,6 +481,10 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 		request, err := a.upsertRegistrationRequest(name, email, string(passwordHash), moderationToken)
 		if err != nil {
+			if isUniqueNameError(err) {
+				renderRegisterFailure("Ник уже занят. Выберите другой.", true)
+				return
+			}
 			a.logger.Printf("upsert registration request: %v", err)
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
@@ -361,9 +495,12 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 			if delErr := a.deleteRegistrationRequestByEmail(email); delErr != nil {
 				a.logger.Printf("rollback registration request after telegram error: %v", delErr)
 			}
-			data.Error = "Не удалось отправить заявку модератору. Попробуйте еще раз позже."
-			a.renderTemplate(w, "register.tmpl", data)
+			renderRegisterFailure("Не удалось отправить заявку модератору. Попробуйте еще раз позже.", false)
 			return
+		}
+
+		if err := a.clearRateLimit(rateLimitActionRegisterIP, clientKey); err != nil {
+			a.logger.Printf("clear register ip rate limit: %v", err)
 		}
 
 		success := url.QueryEscape("Заявка отправлена. После решения модератора придет письмо.")
@@ -515,6 +652,10 @@ func (a *Application) handleVerifyEmail(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			a.renderPlainMessage(w, http.StatusBadRequest, "Ссылка подтверждения недействительна или уже использована.")
+			return
+		}
+		if errors.Is(err, errRegistrationNameTaken) {
+			a.renderPlainMessage(w, http.StatusConflict, "Ник уже занят другим пользователем. Отправьте новую заявку с другим ником.")
 			return
 		}
 		a.logger.Printf("complete registration by verify token: %v", err)

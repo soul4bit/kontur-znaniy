@@ -178,6 +178,31 @@
             <p class="atlas-empty">Пользователи пока отсутствуют.</p>
           {{end}}
         </article>
+
+        <article class="atlas-card atlas-admin-card">
+          <p class="panel-label">Журнал действий админа</p>
+          {{if .AdminAuditEntries}}
+            <div class="atlas-admin-audit-list">
+              {{range .AdminAuditEntries}}
+                <article class="atlas-admin-audit-item">
+                  <div class="atlas-admin-audit-head">
+                    <p class="atlas-admin-audit-action">{{.ActionLabel}}</p>
+                    <p class="atlas-admin-audit-time">{{.CreatedAt.Format "02.01.2006 15:04"}}</p>
+                  </div>
+                  <p class="atlas-admin-meta">Админ: {{.AdminName}}</p>
+                  {{if .TargetEmail}}
+                    <p class="atlas-admin-meta">Цель: {{.TargetEmail}}</p>
+                  {{end}}
+                  {{if .Details}}
+                    <p class="atlas-admin-meta">{{.Details}}</p>
+                  {{end}}
+                </article>
+              {{end}}
+            </div>
+          {{else}}
+            <p class="atlas-empty">Журнал пока пуст.</p>
+          {{end}}
+        </article>
       </section>
     </section>
   </main>

@@ -346,6 +346,13 @@ func (a *Application) handleAdminUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	data.PendingRequests = requests
 
+	auditEntries, err := a.listAdminAuditEntries(20)
+	if err != nil {
+		a.logger.Printf("admin list audit entries: %v", err)
+	} else {
+		data.AdminAuditEntries = auditEntries
+	}
+
 	a.renderTemplate(w, "admin_users.tmpl", data)
 }
 
@@ -355,7 +362,8 @@ func (a *Application) handleAdminApproveRegistration(w http.ResponseWriter, r *h
 		return
 	}
 
-	if a.requireAdmin(w, r) == nil {
+	currentUser := a.requireAdmin(w, r)
+	if currentUser == nil {
 		return
 	}
 
@@ -394,6 +402,14 @@ func (a *Application) handleAdminApproveRegistration(w http.ResponseWriter, r *h
 		return
 	}
 
+	a.addAdminAuditEntry(
+		currentUser.ID,
+		adminAuditActionApproveRegistration,
+		nil,
+		req.Email,
+		fmt.Sprintf("request_id=%d", requestID),
+	)
+
 	success := fmt.Sprintf("Заявка для %s одобрена.", req.Email)
 	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
 }
@@ -404,7 +420,8 @@ func (a *Application) handleAdminRejectRegistration(w http.ResponseWriter, r *ht
 		return
 	}
 
-	if a.requireAdmin(w, r) == nil {
+	currentUser := a.requireAdmin(w, r)
+	if currentUser == nil {
 		return
 	}
 
@@ -440,6 +457,14 @@ func (a *Application) handleAdminRejectRegistration(w http.ResponseWriter, r *ht
 		http.Redirect(w, r, adminUsersRedirectURL("", "Заявка отклонена, но письмо отправить не удалось."), http.StatusSeeOther)
 		return
 	}
+
+	a.addAdminAuditEntry(
+		currentUser.ID,
+		adminAuditActionRejectRegistration,
+		nil,
+		req.Email,
+		fmt.Sprintf("request_id=%d reason=%s", requestID, reason),
+	)
 
 	success := fmt.Sprintf("Заявка для %s отклонена.", req.Email)
 	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
@@ -513,6 +538,15 @@ func (a *Application) handleAdminChangeUserRole(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	targetUserID := updated.ID
+	a.addAdminAuditEntry(
+		currentUser.ID,
+		adminAuditActionChangeUserRole,
+		&targetUserID,
+		updated.Email,
+		fmt.Sprintf("old_role=%s new_role=%s", roleLabel(target.Role), roleLabel(updated.Role)),
+	)
+
 	success := fmt.Sprintf("Роль пользователя %s обновлена: %s.", updated.Email, roleLabel(updated.Role))
 	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
 }
@@ -577,6 +611,14 @@ func (a *Application) handleAdminDeleteUser(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, adminUsersRedirectURL("", "Не удалось удалить пользователя."), http.StatusSeeOther)
 		return
 	}
+
+	a.addAdminAuditEntry(
+		currentUser.ID,
+		adminAuditActionDeleteUser,
+		nil,
+		target.Email,
+		fmt.Sprintf("user_id=%d", userID),
+	)
 
 	success := fmt.Sprintf("Пользователь %s удален.", target.Email)
 	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
@@ -653,6 +695,15 @@ func (a *Application) handleAdminBlockUser(w http.ResponseWriter, r *http.Reques
 		a.logger.Printf("admin delete sessions for blocked user: %v", err)
 	}
 
+	targetUserID := updated.ID
+	a.addAdminAuditEntry(
+		currentUser.ID,
+		adminAuditActionBlockUser,
+		&targetUserID,
+		updated.Email,
+		"",
+	)
+
 	success := fmt.Sprintf("Пользователь %s заблокирован.", updated.Email)
 	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)
 }
@@ -663,7 +714,8 @@ func (a *Application) handleAdminUnblockUser(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if a.requireAdmin(w, r) == nil {
+	currentUser := a.requireAdmin(w, r)
+	if currentUser == nil {
 		return
 	}
 
@@ -704,6 +756,15 @@ func (a *Application) handleAdminUnblockUser(w http.ResponseWriter, r *http.Requ
 		http.Redirect(w, r, adminUsersRedirectURL("", "Не удалось разблокировать пользователя."), http.StatusSeeOther)
 		return
 	}
+
+	targetUserID := updated.ID
+	a.addAdminAuditEntry(
+		currentUser.ID,
+		adminAuditActionUnblockUser,
+		&targetUserID,
+		updated.Email,
+		"",
+	)
 
 	success := fmt.Sprintf("Пользователь %s разблокирован.", updated.Email)
 	http.Redirect(w, r, adminUsersRedirectURL(success, ""), http.StatusSeeOther)

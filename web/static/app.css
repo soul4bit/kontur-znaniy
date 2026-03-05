@@ -1914,6 +1914,98 @@ body {
   color: #2b3f3a;
 }
 
+.atlas-version-card {
+  border-color: #bfd6cf;
+  background:
+    radial-gradient(circle at 100% -8%, rgba(204, 151, 86, 0.14), transparent 34%),
+    linear-gradient(145deg, rgba(238, 248, 244, 0.95), rgba(250, 252, 251, 0.95));
+}
+
+.atlas-version-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.atlas-version-item {
+  border: 1px solid #c7dbd3;
+  border-radius: 12px;
+  padding: 11px;
+  background: rgba(255, 255, 255, 0.84);
+  display: grid;
+  gap: 8px;
+}
+
+.atlas-version-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.atlas-version-title {
+  margin: 0;
+  color: #21473f;
+  font-weight: 700;
+}
+
+.atlas-version-meta {
+  margin: 0;
+  color: #4f6963;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-version-subsection {
+  margin: 0;
+  color: #4b6b64;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-version-title-preview {
+  margin: 0;
+  color: #2d4943;
+}
+
+.atlas-admin-audit-list {
+  display: grid;
+  gap: 10px;
+}
+
+.atlas-admin-audit-item {
+  border: 1px solid #c7dbd3;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.84);
+  padding: 10px 11px;
+  display: grid;
+  gap: 4px;
+}
+
+.atlas-admin-audit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.atlas-admin-audit-action {
+  margin: 0;
+  color: #21473f;
+  font-weight: 700;
+}
+
+.atlas-admin-audit-time {
+  margin: 0;
+  color: #567068;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
 .atlas-shift-card {
   border-color: #bfd6cf;
   background:
