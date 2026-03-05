@@ -67,40 +67,30 @@
           </p>
         </article>
 
-        <article class="atlas-card atlas-control-card">
-          <div class="atlas-control-head">
-            <p class="panel-label">Оперативный пульт</p>
-          </div>
-          <div class="atlas-control-grid">
-            {{range .SectionOverviews}}
-              <a class="atlas-control-tile" href="/app/section?slug={{.Slug}}">
-                <span class="atlas-control-name">{{.Name}}</span>
-                <span class="atlas-control-lead">{{.Lead}}</span>
-                <span class="atlas-control-count">{{.Count}} статей</span>
-              </a>
-            {{end}}
-          </div>
-        </article>
-
         {{if .Success}}
           <p class="alert alert-success">{{.Success}}</p>
         {{end}}
 
-        <article class="atlas-card">
-          <p class="panel-label">Последние статьи</p>
+        <article class="atlas-card atlas-recent-card">
+          <div class="atlas-recent-head">
+            <p class="panel-label">Последние статьи</p>
+            {{if .RecentArticles}}
+              <span class="atlas-recent-count">{{len .RecentArticles}}</span>
+            {{end}}
+          </div>
           {{if .RecentArticles}}
-            <div class="atlas-article-list">
+            <div class="atlas-article-list atlas-recent-list">
               {{range .RecentArticles}}
-                <article class="atlas-article-card">
+                <article class="atlas-article-card atlas-recent-item">
                   <div class="atlas-article-meta">
-                    <span>{{.SectionName}}{{if .Subsection}} / {{.Subsection}}{{end}}</span>
-                    <span>{{.UpdatedAt.Format "02.01.2006 15:04"}}</span>
+                    <span class="atlas-recent-path">{{.SectionName}}{{if .Subsection}} / {{.Subsection}}{{end}}</span>
+                    <span class="atlas-recent-date">{{.UpdatedAt.Format "02.01.2006 15:04"}}</span>
                   </div>
                   <h3><a class="atlas-article-title-link" href="/app/article?id={{.ID}}">{{.Title}}</a></h3>
-                  <p class="atlas-article-author">Автор: {{.AuthorName}}</p>
-                  <p class="atlas-article-body">{{.Body}}</p>
-                  <div class="atlas-article-actions">
-                    <a class="button button-ghost button-compact" href="/app/article?id={{.ID}}">Открыть статью</a>
+                  <p class="atlas-article-body atlas-recent-body">{{.Body}}</p>
+                  <div class="atlas-article-actions atlas-recent-actions">
+                    <p class="atlas-article-author atlas-recent-author">Автор: {{.AuthorName}}</p>
+                    <a class="button button-ghost button-compact" href="/app/article?id={{.ID}}">Открыть</a>
                   </div>
                 </article>
               {{end}}

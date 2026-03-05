@@ -1297,72 +1297,112 @@ body {
   line-height: 1.6;
 }
 
-.atlas-control-card {
-  border-color: #b7d1c8;
+.atlas-recent-card {
+  border-color: #b7d2c9;
   background:
-    radial-gradient(circle at 100% 0%, rgba(203, 150, 84, 0.16), transparent 34%),
-    linear-gradient(145deg, rgba(233, 246, 240, 0.94), rgba(249, 252, 251, 0.94));
+    radial-gradient(circle at 100% -8%, rgba(204, 151, 86, 0.18), transparent 34%),
+    linear-gradient(145deg, rgba(236, 247, 242, 0.95), rgba(250, 252, 251, 0.95));
 }
 
-.atlas-control-head {
+.atlas-recent-head {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.atlas-control-head .panel-label {
+.atlas-recent-head .panel-label {
   margin: 0;
 }
 
-.atlas-control-grid {
-  margin-top: 12px;
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+.atlas-recent-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid #b7d1c8;
+  background: rgba(255, 255, 255, 0.84);
+  color: #2f5e56;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
 }
 
-.atlas-control-tile {
-  display: grid;
-  gap: 7px;
-  border: 1px solid #c7dbd3;
-  border-radius: 12px;
-  padding: 11px;
-  background: rgba(255, 255, 255, 0.78);
+.atlas-recent-list {
+  margin-top: 12px;
+  gap: 14px;
+}
+
+.atlas-recent-item {
+  position: relative;
+  padding: 14px 14px 14px 18px;
+  border: 1px solid #c5d8d0;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(245, 250, 248, 0.93));
+  box-shadow: 0 8px 22px rgba(24, 58, 49, 0.08);
   transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
-.atlas-control-tile:hover {
-  transform: translateY(-1px);
-  border-color: #9ec4b8;
-  box-shadow: 0 10px 24px rgba(17, 69, 58, 0.1);
+.atlas-recent-item::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #0d766d, #0a5b54);
 }
 
-.atlas-control-name {
-  color: #173f38;
-  font-size: 16px;
-  font-weight: 800;
+.atlas-recent-item:hover {
+  transform: translateY(-2px);
+  border-color: #a8c8be;
+  box-shadow: 0 14px 30px rgba(18, 66, 56, 0.12);
 }
 
-.atlas-control-lead {
-  color: #52726a;
-  font-size: 13px;
-  line-height: 1.4;
+.atlas-recent-item h3 {
+  margin-top: 11px;
+  font-size: 20px;
 }
 
-.atlas-control-count {
-  justify-self: start;
+.atlas-recent-item .atlas-article-meta {
+  gap: 7px;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 11px;
+}
+
+.atlas-recent-path,
+.atlas-recent-date {
   display: inline-flex;
   align-items: center;
-  min-height: 26px;
+  min-height: 25px;
   padding: 0 9px;
   border-radius: 999px;
-  border: 1px solid #bad4cb;
+  border: 1px solid #c4d8d0;
   background: rgba(255, 255, 255, 0.84);
-  color: #35645c;
+  color: #456860;
+}
+
+.atlas-recent-body {
+  margin-top: 11px;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  line-clamp: 3;
+}
+
+.atlas-recent-actions {
+  margin-top: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.atlas-recent-author {
+  margin: 0;
   font-size: 12px;
-  font-family: "IBM Plex Mono", "Consolas", monospace;
 }
 
 .atlas-article-view-head {
@@ -1667,6 +1707,14 @@ body {
   .atlas-article-meta {
     display: grid;
     gap: 4px;
+  }
+
+  .atlas-recent-item {
+    padding: 13px 12px 13px 16px;
+  }
+
+  .atlas-recent-actions {
+    justify-content: flex-start;
   }
 
   .atlas-heading {
