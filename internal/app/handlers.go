@@ -68,13 +68,10 @@ func (a *Application) authViewData(title string) viewData {
 
 func (a *Application) appViewData(user *User, title string) viewData {
 	return viewData{
-		AppName:         a.cfg.AppName,
-		Title:           title,
-		User:            user,
-		Sections:        wikiSections(),
-		S3Endpoint:      a.cfg.S3Endpoint,
-		S3Bucket:        a.cfg.S3Bucket,
-		S3PublicBaseURL: a.cfg.S3PublicBaseURL,
+		AppName:  a.cfg.AppName,
+		Title:    title,
+		User:     user,
+		Sections: wikiSections(),
 	}
 }
 
@@ -677,29 +674,6 @@ func (a *Application) handleArticleNew(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
-}
-
-func (a *Application) handleS3Check(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	user := userFromContext(r.Context())
-	if user == nil {
-		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
-		return
-	}
-
-	data := a.appViewData(user, "Проверка S3")
-	data.CurrentPage = "s3"
-
-	if strings.TrimSpace(r.URL.Query().Get("run")) == "1" {
-		result := a.checkS3(r.Context())
-		data.S3Check = &result
-	}
-
-	a.renderTemplate(w, "s3_check.tmpl", data)
 }
 
 func (a *Application) handleLogout(w http.ResponseWriter, r *http.Request) {

@@ -65,14 +65,6 @@ type Article struct {
 	UpdatedAt   time.Time
 }
 
-type s3CheckResult struct {
-	Checked  bool
-	OK       bool
-	Message  string
-	Endpoint string
-	Bucket   string
-}
-
 type sectionOverview struct {
 	Slug  string
 	Name  string
@@ -108,10 +100,6 @@ type viewData struct {
 	ArticleID          int64
 	ArticleTitle       string
 	ArticleBody        string
-	S3Check            *s3CheckResult
-	S3Endpoint         string
-	S3Bucket           string
-	S3PublicBaseURL    string
 	AdminUsers         []adminUserListItem
 	PendingRequests    []registrationRequestListItem
 	AvailableRoles     []roleOption
@@ -181,7 +169,6 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/article", a.requireAuth(a.handleArticleView))
 	mux.HandleFunc("/app/article/new", a.requireAuth(a.handleArticleNew))
 	mux.HandleFunc("/app/article/edit", a.requireAuth(a.handleArticleEdit))
-	mux.HandleFunc("/app/s3", a.requireAuth(a.handleS3Check))
 	mux.HandleFunc("/app/admin/users", a.requireAuth(a.handleAdminUsers))
 	mux.HandleFunc("/app/admin/registrations/approve", a.requireAuth(a.handleAdminApproveRegistration))
 	mux.HandleFunc("/app/admin/registrations/reject", a.requireAuth(a.handleAdminRejectRegistration))
@@ -205,7 +192,6 @@ func loadTemplates(staticVersion string) (map[string]*template.Template, error) 
 		"article_view.tmpl",
 		"article_new.tmpl",
 		"article_edit.tmpl",
-		"s3_check.tmpl",
 		"admin_users.tmpl",
 	}
 
