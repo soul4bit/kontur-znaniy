@@ -20,22 +20,16 @@
           <h1 class="atlas-heading">Контур знаний</h1>
         </div>
       </a>
-      <div class="atlas-topbar-aux" aria-label="Page context">
-        <span class="atlas-topbar-badge atlas-topbar-badge-live"><span class="atlas-live-dot" aria-hidden="true"></span>System healthy</span>
-        <span class="atlas-topbar-badge atlas-topbar-badge-context">{{.Title}}</span>
-      </div>
 
       <div class="atlas-topbar-meta">
         {{if .User.IsAdmin}}
           <a class="button button-ghost" href="/app/admin/users">Админка</a>
         {{end}}
-        <div class="atlas-account-zone">
-          <span class="atlas-user-chip">@{{.User.Name}}</span>
-          <form method="post" action="/auth/logout">
-            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
-            <button class="button button-ghost" type="submit">Выйти</button>
-          </form>
-        </div>
+        <span class="atlas-user-chip">@{{.User.Name}}</span>
+        <form method="post" action="/auth/logout">
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+          <button class="button button-ghost" type="submit">Выйти</button>
+        </form>
       </div>
     </header>
 

@@ -2761,16 +2761,12 @@ body {
 }
 
 .atlas-topbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "brand meta"
-    "aux meta";
-  column-gap: 14px;
-  row-gap: 10px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 14px;
   position: relative;
-  padding: 11px 12px 14px;
+  padding: 12px 14px;
   border: 1px solid rgba(183, 209, 201, 0.82);
   border-radius: 18px;
   background:
@@ -2779,68 +2775,17 @@ body {
   box-shadow: 0 10px 24px rgba(17, 66, 57, 0.11);
 }
 
-.atlas-topbar .atlas-brand {
-  grid-area: brand;
-}
-
 .atlas-brand-link {
   padding: 4px 6px;
 }
 
-.atlas-topbar-aux {
-  grid-area: aux;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
-.atlas-topbar-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  border: 1px solid #c2d8d0;
-  background: rgba(255, 255, 255, 0.86);
-  color: #35635a;
-  font-size: 13px;
-  line-height: 1;
-  font-family: "IBM Plex Mono", "Consolas", monospace;
-}
-
-.atlas-topbar-badge-live {
-  border-color: #a7cbbe;
-  background: linear-gradient(150deg, rgba(240, 255, 250, 0.94), rgba(228, 248, 241, 0.94));
-  color: #15584d;
-}
-
-.atlas-topbar-badge-context {
-  max-width: min(54vw, 560px);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.atlas-live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: #0e9a84;
-  box-shadow: 0 0 0 0 rgba(14, 154, 132, 0.45);
-  animation: live-dot-pulse 2.2s ease-in-out infinite;
-}
-
 .atlas-topbar-meta {
-  grid-area: meta;
-  justify-self: end;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: nowrap;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .atlas-topbar-meta form {
@@ -2848,63 +2793,30 @@ body {
 }
 
 .atlas-topbar-meta .button {
-  height: 40px;
-  padding: 0 14px;
+  height: 38px;
+  padding: 0 13px;
   border-radius: 10px;
   font-size: 14px;
 }
 
-.atlas-account-zone {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 4px;
-  border: 1px solid #b6d0c7;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 100% 0, rgba(222, 161, 91, 0.16), transparent 38%),
-    linear-gradient(155deg, #f6fcf9, #eaf5f1);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.65),
-    0 8px 18px rgba(19, 63, 54, 0.12);
-}
-
-.atlas-account-zone form {
-  margin: 0;
-}
-
-.atlas-account-zone .button {
-  height: 34px;
-  border-radius: 999px;
-  border-color: #aac6bc;
-  background: #fdfefe;
-  padding: 0 13px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
 .atlas-heading {
   color: #142f29;
-  font-size: clamp(31px, 3.4vw, 46px);
+  font-size: clamp(30px, 3.1vw, 44px);
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .atlas-user-chip {
-  height: 34px;
-  border-color: transparent;
-  background: transparent;
-  color: #1f554b;
-  padding: 0 11px;
-  font-size: 14px;
-}
-
-.atlas-topbar-meta > .atlas-user-chip {
-  height: 40px;
-  border-color: #b8d1c9;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #b8d1c9;
+  border-radius: 999px;
   background: linear-gradient(160deg, #fbfffd, #eaf5f1);
   color: #2f5d54;
+  padding: 0 13px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .button-new-article {
@@ -3103,18 +3015,6 @@ body {
   }
 }
 
-@keyframes live-dot-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(14, 154, 132, 0.45);
-    opacity: 1;
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(14, 154, 132, 0);
-    opacity: 0.92;
-  }
-}
-
 @keyframes scene-shell-float {
   0%,
   100% {
@@ -3256,26 +3156,13 @@ body {
   }
 
   .atlas-topbar {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "brand"
-      "aux"
-      "meta";
     padding: 10px;
   }
 
-  .atlas-topbar-badge-context {
-    max-width: 100%;
-  }
-
   .atlas-topbar-meta {
-    justify-self: start;
-    width: 100%;
+    width: auto;
+    justify-content: flex-end;
     flex-wrap: wrap;
-  }
-
-  .atlas-account-zone {
-    margin-left: auto;
   }
 
   .atlas-user-chip {
@@ -3325,33 +3212,25 @@ body {
   }
 
   .atlas-topbar {
-    row-gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
     border-radius: 14px;
     padding: 8px;
   }
 
   .atlas-topbar-meta {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .atlas-topbar-meta .button {
     height: 34px;
   }
 
-  .atlas-topbar-badge {
-    min-height: 26px;
-    font-size: 11px;
-  }
-
-  .atlas-account-zone {
-    width: 100%;
-    margin-left: 0;
-    justify-content: space-between;
-  }
-
   .atlas-user-chip {
-    max-width: calc(100% - 128px);
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
