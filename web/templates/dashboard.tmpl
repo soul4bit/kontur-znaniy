@@ -86,7 +86,7 @@
                   <a class="button button-ghost button-compact" href="/app/section?slug={{(index .SectionOverviews 0).Slug}}">Открыть базу</a>
                 {{end}}
                 {{if .User.CanEdit}}
-                  <a class="button button-new-article button-compact" href="/app/article/new">+ Новая статья</a>
+                  <a class="button button-new-article button-compact" href="/app/article/new{{if .SectionOverviews}}?section={{(index .SectionOverviews 0).Slug}}{{end}}">+ Новая статья</a>
                 {{end}}
               </div>
             </div>

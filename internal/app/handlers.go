@@ -872,6 +872,14 @@ func (a *Application) handleSection(w http.ResponseWriter, r *http.Request) {
 	a.renderTemplate(w, r, "section.tmpl", data)
 }
 
+func defaultWikiSection() (wikiSection, bool) {
+	sections := wikiSections()
+	if len(sections) == 0 {
+		return wikiSection{}, false
+	}
+	return sections[0], true
+}
+
 func (a *Application) handleArticleNew(w http.ResponseWriter, r *http.Request) {
 	user := userFromContext(r.Context())
 	if user == nil {
@@ -888,7 +896,17 @@ func (a *Application) handleArticleNew(w http.ResponseWriter, r *http.Request) {
 		sectionSlug := strings.TrimSpace(r.URL.Query().Get("section"))
 		section, ok := findWikiSection(sectionSlug)
 		if !ok {
-			http.Redirect(w, r, "/app", http.StatusSeeOther)
+			fallbackSection, fallbackOK := defaultWikiSection()
+			if !fallbackOK {
+				http.Error(w, "no wiki sections configured", http.StatusInternalServerError)
+				return
+			}
+
+			target := "/app/article/new?section=" + url.QueryEscape(fallbackSection.Slug)
+			if sub := strings.TrimSpace(r.URL.Query().Get("sub")); sub != "" {
+				target += "&sub=" + url.QueryEscape(sub)
+			}
+			http.Redirect(w, r, target, http.StatusSeeOther)
 			return
 		}
 		currentSubsection := normalizeSubsection(section, r.URL.Query().Get("sub"))
@@ -918,8 +936,17 @@ func (a *Application) handleArticleNew(w http.ResponseWriter, r *http.Request) {
 		sectionSlug := strings.TrimSpace(r.FormValue("section"))
 		section, ok := findWikiSection(sectionSlug)
 		if !ok {
-			http.Error(w, "unknown section", http.StatusBadRequest)
-			return
+			if sectionSlug != "" {
+				http.Error(w, "unknown section", http.StatusBadRequest)
+				return
+			}
+
+			fallbackSection, fallbackOK := defaultWikiSection()
+			if !fallbackOK {
+				http.Error(w, "no wiki sections configured", http.StatusInternalServerError)
+				return
+			}
+			section = fallbackSection
 		}
 		currentSubsection := normalizeSubsection(section, r.FormValue("subsection"))
 
