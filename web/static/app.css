@@ -2730,6 +2730,8 @@ body {
 .atlas-shell {
   position: relative;
   overflow: hidden;
+  width: min(1880px, 100%);
+  padding: 22px;
   border-color: rgba(166, 196, 187, 0.88);
   background:
     linear-gradient(160deg, rgba(254, 255, 252, 0.88), rgba(244, 250, 247, 0.85));
@@ -2737,6 +2739,10 @@ body {
     0 30px 72px rgba(12, 43, 37, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(10px);
+}
+
+.app-page {
+  font-size: 17px;
 }
 
 .atlas-shell::before,
@@ -2809,7 +2815,7 @@ body {
   border: 1px solid #c2d8d0;
   background: rgba(255, 255, 255, 0.86);
   color: #35635a;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   font-family: "IBM Plex Mono", "Consolas", monospace;
 }
@@ -2842,8 +2848,8 @@ body {
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 10px;
+  flex-wrap: nowrap;
 }
 
 .atlas-topbar-meta form {
@@ -2851,20 +2857,60 @@ body {
 }
 
 .atlas-topbar-meta .button {
-  height: 36px;
-  padding: 0 12px;
+  height: 40px;
+  padding: 0 14px;
   border-radius: 10px;
+  font-size: 14px;
+}
+
+.atlas-account-zone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px;
+  border: 1px solid #b6d0c7;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(222, 161, 91, 0.16), transparent 38%),
+    linear-gradient(155deg, #f6fcf9, #eaf5f1);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+    0 8px 18px rgba(19, 63, 54, 0.12);
+}
+
+.atlas-account-zone form {
+  margin: 0;
+}
+
+.atlas-account-zone .button {
+  height: 34px;
+  border-radius: 999px;
+  border-color: #aac6bc;
+  background: #fdfefe;
+  padding: 0 13px;
   font-size: 13px;
+  font-weight: 700;
 }
 
 .atlas-heading {
   color: #142f29;
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(31px, 3.4vw, 46px);
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .atlas-user-chip {
+  height: 34px;
+  border-color: transparent;
+  background: transparent;
+  color: #1f554b;
+  padding: 0 11px;
+  font-size: 14px;
+}
+
+.atlas-topbar-meta > .atlas-user-chip {
+  height: 40px;
   border-color: #b8d1c9;
   background: linear-gradient(160deg, #fbfffd, #eaf5f1);
   color: #2f5d54;
@@ -2913,12 +2959,15 @@ body {
 .atlas-hero-title {
   max-width: 22ch;
   color: #102e28;
+  font-size: clamp(38px, 4vw, 58px);
+  line-height: 1.06;
   text-wrap: balance;
 }
 
 .atlas-hero-text {
   color: #2f534b;
-  font-size: 15px;
+  font-size: clamp(17px, 0.9vw + 13px, 21px);
+  line-height: 1.74;
 }
 
 .atlas-hero-motto {
@@ -2947,6 +2996,8 @@ body {
 
 .atlas-section-title {
   color: #14362f;
+  font-size: clamp(34px, 3.2vw, 50px);
+  line-height: 1.08;
   letter-spacing: -0.02em;
 }
 
@@ -2979,6 +3030,16 @@ body {
   box-shadow: 0 10px 24px rgba(20, 58, 49, 0.08);
 }
 
+.atlas-article-card h3 {
+  font-size: clamp(26px, 2.1vw, 36px);
+  line-height: 1.16;
+}
+
+.atlas-article-body {
+  font-size: 16px;
+  line-height: 1.72;
+}
+
 .atlas-main .atlas-article-card:hover {
   border-color: #9ec2b7;
   box-shadow: 0 16px 32px rgba(16, 56, 47, 0.14);
@@ -2988,10 +3049,29 @@ body {
   gap: 16px;
 }
 
+.panel-label {
+  font-size: 14px;
+}
+
+.atlas-nav-title {
+  font-size: 15px;
+}
+
+.atlas-sub-link {
+  font-size: 14px;
+}
+
+.atlas-recent-note,
+.atlas-empty {
+  font-size: 16px;
+  line-height: 1.66;
+}
+
 .article-form .field input,
 .article-form .field textarea {
   border-color: #bdd4cc;
   background: rgba(255, 255, 255, 0.98);
+  font-size: 16px;
 }
 
 .article-form .field input:focus,
@@ -3199,6 +3279,12 @@ body {
 
   .atlas-topbar-meta {
     justify-self: start;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .atlas-account-zone {
+    margin-left: auto;
   }
 
   .atlas-user-chip {
@@ -3255,7 +3341,8 @@ body {
   }
 
   .atlas-topbar-meta {
-    justify-content: flex-start;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .atlas-topbar-meta .button {
@@ -3265,6 +3352,19 @@ body {
   .atlas-topbar-badge {
     min-height: 26px;
     font-size: 11px;
+  }
+
+  .atlas-account-zone {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .atlas-user-chip {
+    max-width: calc(100% - 128px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .atlas-mark {

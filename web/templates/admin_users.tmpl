@@ -27,11 +27,13 @@
 
       <div class="atlas-topbar-meta">
         <a class="button button-ghost" href="/app">Дашборд</a>
-        <span class="atlas-user-chip">@{{.User.Name}}</span>
-        <form method="post" action="/auth/logout">
-          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
-          <button class="button button-ghost" type="submit">Выйти</button>
-        </form>
+        <div class="atlas-account-zone">
+          <span class="atlas-user-chip">@{{.User.Name}}</span>
+          <form method="post" action="/auth/logout">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+            <button class="button button-ghost" type="submit">Выйти</button>
+          </form>
+        </div>
       </div>
     </header>
 
