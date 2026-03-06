@@ -2764,6 +2764,14 @@ body {
 }
 
 .atlas-topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "brand meta"
+    "aux meta";
+  column-gap: 14px;
+  row-gap: 10px;
+  align-items: center;
   position: relative;
   padding: 11px 12px 14px;
   border: 1px solid rgba(183, 209, 201, 0.82);
@@ -2774,8 +2782,79 @@ body {
   box-shadow: 0 10px 24px rgba(17, 66, 57, 0.11);
 }
 
+.atlas-topbar .atlas-brand {
+  grid-area: brand;
+}
+
 .atlas-brand-link {
   padding: 4px 6px;
+}
+
+.atlas-topbar-aux {
+  grid-area: aux;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.atlas-topbar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid #c2d8d0;
+  background: rgba(255, 255, 255, 0.86);
+  color: #35635a;
+  font-size: 12px;
+  line-height: 1;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-topbar-badge-live {
+  border-color: #a7cbbe;
+  background: linear-gradient(150deg, rgba(240, 255, 250, 0.94), rgba(228, 248, 241, 0.94));
+  color: #15584d;
+}
+
+.atlas-topbar-badge-context {
+  max-width: min(54vw, 560px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atlas-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #0e9a84;
+  box-shadow: 0 0 0 0 rgba(14, 154, 132, 0.45);
+  animation: live-dot-pulse 2.2s ease-in-out infinite;
+}
+
+.atlas-topbar-meta {
+  grid-area: meta;
+  justify-self: end;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.atlas-topbar-meta form {
+  margin: 0;
+}
+
+.atlas-topbar-meta .button {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 13px;
 }
 
 .atlas-heading {
@@ -2928,7 +3007,7 @@ body {
 }
 
 .atlas-autosave-status::before {
-  content: "●";
+  content: "*";
   color: #6d8981;
   font-size: 10px;
 }
@@ -2950,6 +3029,18 @@ body {
   50% {
     transform: translateY(18px) scale(1.06);
     opacity: 0.72;
+  }
+}
+
+@keyframes live-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 154, 132, 0.45);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(14, 154, 132, 0);
+    opacity: 0.92;
   }
 }
 
@@ -3094,7 +3185,20 @@ body {
   }
 
   .atlas-topbar {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "brand"
+      "aux"
+      "meta";
     padding: 10px;
+  }
+
+  .atlas-topbar-badge-context {
+    max-width: 100%;
+  }
+
+  .atlas-topbar-meta {
+    justify-self: start;
   }
 
   .atlas-user-chip {
@@ -3145,15 +3249,22 @@ body {
   }
 
   .atlas-topbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
+    row-gap: 8px;
     border-radius: 14px;
     padding: 8px;
   }
 
   .atlas-topbar-meta {
-    justify-content: space-between;
+    justify-content: flex-start;
+  }
+
+  .atlas-topbar-meta .button {
+    height: 34px;
+  }
+
+  .atlas-topbar-badge {
+    min-height: 26px;
+    font-size: 11px;
   }
 
   .atlas-mark {

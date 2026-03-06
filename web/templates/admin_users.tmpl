@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{.Title}} · {{.AppName}}</title>
+  <title>{{.Title}} - {{.AppName}}</title>
   <link rel="icon" href="{{asset "favicon.svg"}}" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,6 +20,10 @@
           <h1 class="atlas-heading">Контур знаний</h1>
         </div>
       </a>
+      <div class="atlas-topbar-aux" aria-label="Page context">
+        <span class="atlas-topbar-badge atlas-topbar-badge-live"><span class="atlas-live-dot" aria-hidden="true"></span>System healthy</span>
+        <span class="atlas-topbar-badge atlas-topbar-badge-context">{{.Title}}</span>
+      </div>
 
       <div class="atlas-topbar-meta">
         <a class="button button-ghost" href="/app">Дашборд</a>
