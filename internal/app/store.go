@@ -260,15 +260,7 @@ func scanArticle(scanner interface {
 
 func (a *Application) createArticle(authorID int64, sectionSlug string, subsection string, title string, body string) (*Article, error) {
 	now := time.Now().UTC()
-	tx, err := a.db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
-
-	row := tx.QueryRow(
+	row := a.db.QueryRow(
 		`insert into articles (author_id, section_slug, subsection, title, body, created_at, updated_at)
 		 values ($1, $2, $3, $4, $5, $6, $6)
 		 returning
@@ -290,14 +282,6 @@ func (a *Application) createArticle(authorID int64, sectionSlug string, subsecti
 	)
 	article, err := scanArticle(row)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := a.appendArticleVersionTx(tx, article, authorID, now); err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
@@ -344,15 +328,7 @@ func (a *Application) deleteArticleByID(articleID int64) error {
 
 func (a *Application) updateArticleByAuthor(articleID int64, authorID int64, subsection string, title string, body string) (*Article, error) {
 	now := time.Now().UTC()
-	tx, err := a.db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
-
-	row := tx.QueryRow(
+	row := a.db.QueryRow(
 		`update articles
 		set
 			subsection = $3,
@@ -382,28 +358,12 @@ func (a *Application) updateArticleByAuthor(articleID int64, authorID int64, sub
 		return nil, err
 	}
 
-	if err := a.appendArticleVersionTx(tx, article, authorID, now); err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
 	return article, nil
 }
 
-func (a *Application) updateArticleByID(articleID int64, editorID int64, subsection string, title string, body string) (*Article, error) {
+func (a *Application) updateArticleByID(articleID int64, _ int64, subsection string, title string, body string) (*Article, error) {
 	now := time.Now().UTC()
-	tx, err := a.db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
-
-	row := tx.QueryRow(
+	row := a.db.QueryRow(
 		`update articles
 		set
 			subsection = $2,
@@ -429,14 +389,6 @@ func (a *Application) updateArticleByID(articleID int64, editorID int64, subsect
 	)
 	article, err := scanArticle(row)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := a.appendArticleVersionTx(tx, article, editorID, now); err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 

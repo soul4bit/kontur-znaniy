@@ -68,17 +68,6 @@ type Article struct {
 	UpdatedAt   time.Time
 }
 
-type ArticleVersion struct {
-	ID           int64
-	ArticleID    int64
-	VersionNo    int
-	Title        string
-	Body         string
-	Subsection   string
-	EditedByName string
-	CreatedAt    time.Time
-}
-
 type ArticleDraft struct {
 	ID          int64
 	UserID      int64
@@ -152,7 +141,6 @@ type viewData struct {
 	ArticleTitle        string
 	ArticleBody         string
 	ArticleBodyHTML     template.HTML
-	ArticleVersions     []ArticleVersion
 	ArticleComments     []ArticleComment
 	DraftLoaded         bool
 	AdminUsers          []adminUserListItem
@@ -254,7 +242,6 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/article/edit", a.requireAuth(a.withCSRF(a.handleArticleEdit)))
 	mux.HandleFunc("/app/article/draft/save", a.requireAuth(a.withCSRF(a.handleArticleDraftSave)))
 	mux.HandleFunc("/app/media/upload", a.requireAuth(a.withCSRF(a.handleMediaUpload)))
-	mux.HandleFunc("/app/article/restore", a.requireAuth(a.withCSRF(a.handleArticleRestore)))
 	mux.HandleFunc("/app/article/delete", a.requireAuth(a.withCSRF(a.handleArticleDelete)))
 	mux.HandleFunc("/app/article/comment/add", a.requireAuth(a.withCSRF(a.handleArticleCommentAdd)))
 	mux.HandleFunc("/app/article/comment/delete", a.requireAuth(a.withCSRF(a.handleArticleCommentDelete)))
@@ -476,21 +463,8 @@ func runMigrations(db *sql.DB) error {
 			updated_at timestamptz not null default now(),
 			foreign key(author_id) references users(id) on delete cascade
 		);`,
-		`create table if not exists article_versions (
-			id bigserial primary key,
-			article_id bigint not null,
-			version_no integer not null,
-			edited_by bigint,
-			title text not null,
-			body text not null,
-			subsection text not null default '',
-			created_at timestamptz not null default now(),
-			foreign key(article_id) references articles(id) on delete cascade,
-			foreign key(edited_by) references users(id) on delete set null
-		);`,
 		`alter table if exists articles add column if not exists subsection text not null default '';`,
-		`create unique index if not exists idx_article_versions_article_version_no on article_versions(article_id, version_no);`,
-		`create index if not exists idx_article_versions_article_created_at on article_versions(article_id, created_at desc);`,
+		`drop table if exists article_versions;`,
 		`create table if not exists article_drafts (
 			id bigserial primary key,
 			user_id bigint not null,
@@ -520,21 +494,6 @@ func runMigrations(db *sql.DB) error {
 		);`,
 		`create index if not exists idx_article_comments_article_created_at on article_comments(article_id, created_at asc);`,
 		`create index if not exists idx_article_comments_user_id on article_comments(user_id);`,
-		`insert into article_versions (article_id, version_no, edited_by, title, body, subsection, created_at)
-		select
-			a.id,
-			1,
-			a.author_id,
-			a.title,
-			a.body,
-			a.subsection,
-			a.created_at
-		from articles a
-		where not exists (
-			select 1
-			from article_versions v
-			where v.article_id = a.id
-		);`,
 		`create table if not exists admin_audit_log (
 			id bigserial primary key,
 			admin_user_id bigint,
