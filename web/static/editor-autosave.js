@@ -42,7 +42,8 @@
     const statusNode = form.querySelector("[data-autosave-status]");
     const articleID = (form.dataset.autosaveArticleId || "").trim();
     const section = (form.dataset.autosaveSection || "").trim();
-    const subsection = (form.dataset.autosaveSubsection || "").trim();
+    const sectionInput = form.querySelector("input[name='section']");
+    const subsectionInput = form.querySelector("[name='subsection']");
     const csrfInput = form.querySelector("input[name='csrf_token']");
     const csrfToken = csrfInput instanceof HTMLInputElement ? csrfInput.value.trim() : "";
 
@@ -64,8 +65,13 @@
       if (articleID !== "") {
         params.set("article_id", articleID);
       } else {
-        params.set("section", section);
-        params.set("subsection", subsection);
+        const currentSection = sectionInput instanceof HTMLInputElement ? sectionInput.value.trim() : section;
+        const currentSubsection =
+          subsectionInput instanceof HTMLInputElement || subsectionInput instanceof HTMLSelectElement
+            ? subsectionInput.value.trim()
+            : "";
+        params.set("section", currentSection);
+        params.set("subsection", currentSubsection);
       }
       if (csrfToken !== "") {
         params.set("csrf_token", csrfToken);
@@ -142,6 +148,9 @@
 
     titleInput.addEventListener("input", scheduleSave);
     bodyInput.addEventListener("input", scheduleSave);
+    if (subsectionInput instanceof HTMLInputElement || subsectionInput instanceof HTMLSelectElement) {
+      subsectionInput.addEventListener("change", () => void saveNow(true));
+    }
     titleInput.addEventListener("blur", () => void saveNow(true));
     bodyInput.addEventListener("blur", () => void saveNow(true));
 
