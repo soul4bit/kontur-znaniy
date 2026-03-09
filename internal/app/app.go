@@ -133,6 +133,12 @@ type viewData struct {
 	CurrentSection      *wikiSection
 	CurrentSectionSlug  string
 	CurrentSubsection   string
+	SearchQuery         string
+	SearchSectionSlug   string
+	SearchSubsection    string
+	SearchPerformed     bool
+	SearchResults       []Article
+	SearchResultsCount  int
 	CurrentPage         string
 	SectionOverviews    []sectionOverview
 	RecentArticles      []Article
@@ -238,6 +244,7 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/auth/logout", a.requireAuth(a.withCSRF(a.handleLogout)))
 	mux.HandleFunc("/app", a.requireAuth(a.withCSRF(a.handleDashboard)))
 	mux.HandleFunc("/app/section", a.requireAuth(a.withCSRF(a.handleSection)))
+	mux.HandleFunc("/app/search", a.requireAuth(a.withCSRF(a.handleSearch)))
 	mux.HandleFunc("/app/article", a.requireAuth(a.withCSRF(a.handleArticleView)))
 	mux.HandleFunc("/app/article/new", a.requireAuth(a.withCSRF(a.handleArticleNew)))
 	mux.HandleFunc("/app/article/edit", a.requireAuth(a.withCSRF(a.handleArticleEdit)))
@@ -266,6 +273,7 @@ func loadTemplates(staticVersion string) (map[string]*template.Template, error) 
 		"register.tmpl",
 		"dashboard.tmpl",
 		"section.tmpl",
+		"search.tmpl",
 		"article_view.tmpl",
 		"article_new.tmpl",
 		"article_edit.tmpl",
@@ -523,6 +531,7 @@ func runMigrations(db *sql.DB) error {
 		`create index if not exists idx_articles_author_id on articles(author_id);`,
 		`create index if not exists idx_articles_section_updated_at on articles(section_slug, updated_at desc);`,
 		`create index if not exists idx_articles_section_subsection_updated_at on articles(section_slug, subsection, updated_at desc);`,
+		`create index if not exists idx_articles_search_tsv on articles using gin (to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(body, '')));`,
 		`create unique index if not exists idx_registration_requests_email_verify_token
 			on registration_requests(email_verify_token)
 			where email_verify_token is not null;`,

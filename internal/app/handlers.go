@@ -872,6 +872,69 @@ func (a *Application) handleSection(w http.ResponseWriter, r *http.Request) {
 	a.renderTemplate(w, r, "section.tmpl", data)
 }
 
+func (a *Application) handleSearch(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	user := userFromContext(r.Context())
+	if user == nil {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
+	data := a.appViewData(user, "Поиск статей")
+	data.CurrentPage = "search"
+
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
+	sectionSlug := strings.TrimSpace(r.URL.Query().Get("section"))
+	selectedSection, sectionFound := findWikiSection(sectionSlug)
+	if sectionSlug != "" && !sectionFound {
+		data.Error = "Выбран неизвестный раздел для фильтра поиска."
+		sectionSlug = ""
+	}
+	if sectionFound {
+		sectionSlug = selectedSection.Slug
+		data.CurrentSection = &selectedSection
+		data.CurrentSectionSlug = selectedSection.Slug
+	}
+
+	currentSubsection := ""
+	if sectionFound {
+		currentSubsection = normalizeSubsection(selectedSection, r.URL.Query().Get("sub"))
+		data.CurrentSubsection = currentSubsection
+	}
+
+	data.SearchQuery = query
+	data.SearchSectionSlug = sectionSlug
+	data.SearchSubsection = currentSubsection
+
+	if query == "" {
+		a.renderTemplate(w, r, "search.tmpl", data)
+		return
+	}
+	if utf8.RuneCountInString(query) < 2 {
+		data.Error = "Поисковый запрос должен быть не короче 2 символов."
+		a.renderTemplate(w, r, "search.tmpl", data)
+		return
+	}
+
+	results, err := a.searchArticles(query, sectionSlug, currentSubsection, 100)
+	if err != nil {
+		a.logger.Printf("search articles: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	decorateArticles(results)
+	data.SearchPerformed = true
+	data.SearchResults = results
+	data.SearchResultsCount = len(results)
+
+	a.renderTemplate(w, r, "search.tmpl", data)
+}
+
 func defaultWikiSection() (wikiSection, bool) {
 	sections := wikiSections()
 	if len(sections) == 0 {

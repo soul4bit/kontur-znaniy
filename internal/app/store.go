@@ -444,6 +444,71 @@ func (a *Application) getArticlesBySection(sectionSlug string, subsection string
 	return result, nil
 }
 
+func (a *Application) searchArticles(searchQuery string, sectionSlug string, subsection string, limit int) ([]Article, error) {
+	if limit < 1 {
+		limit = 1
+	}
+
+	normalizedQuery := strings.TrimSpace(searchQuery)
+	if normalizedQuery == "" {
+		return []Article{}, nil
+	}
+
+	const (
+		tsVectorExpr = "to_tsvector('simple', coalesce(a.title, '') || ' ' || coalesce(a.body, ''))"
+		tsQueryExpr  = "plainto_tsquery('simple', $1)"
+	)
+
+	query := `select
+			a.id,
+			a.author_id,
+			u.name as author_name,
+			a.section_slug,
+			a.subsection,
+			a.title,
+			a.body,
+			a.created_at,
+			a.updated_at
+		from articles a
+		join users u on u.id = a.author_id
+		where ` + tsVectorExpr + ` @@ ` + tsQueryExpr
+	args := []any{normalizedQuery}
+
+	if section := strings.TrimSpace(sectionSlug); section != "" {
+		args = append(args, section)
+		query += fmt.Sprintf(" and a.section_slug = $%d", len(args))
+	}
+	if sub := strings.TrimSpace(subsection); sub != "" {
+		args = append(args, sub)
+		query += fmt.Sprintf(" and a.subsection = $%d", len(args))
+	}
+
+	query += ` order by ts_rank_cd(` + tsVectorExpr + `, ` + tsQueryExpr + `) desc, a.updated_at desc`
+	query += fmt.Sprintf(" limit $%d", len(args)+1)
+	args = append(args, limit)
+
+	rows, err := a.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]Article, 0, limit)
+	for rows.Next() {
+		article, scanErr := scanArticle(rows)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		result = append(result, *article)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (a *Application) getRecentArticles(limit int) ([]Article, error) {
 	if limit < 1 {
 		limit = 1

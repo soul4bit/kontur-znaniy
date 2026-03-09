@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}} - {{.AppName}}</title>
+  <link rel="icon" href="{{asset "favicon.svg"}}" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{asset "app.css"}}" />
+</head>
+<body class="app-page">
+  <main class="atlas-shell">
+    <header class="atlas-topbar">
+      <a class="atlas-brand atlas-brand-link" href="/app">
+        <div class="atlas-mark atlas-mark-image" aria-hidden="true"><img class="atlas-mark-img" src="{{asset "logo-mark.svg"}}" alt="" /></div>
+        <div>
+          <p class="eyebrow">{{.AppName}}</p>
+          <h1 class="atlas-heading">Контур знаний</h1>
+        </div>
+      </a>
+
+      <div class="atlas-topbar-meta">
+        <a class="button button-ghost" href="/app">Дашборд</a>
+        {{if .CurrentSection}}
+          <a class="button button-ghost" href="/app/section?slug={{.CurrentSection.Slug}}{{if .CurrentSubsection}}&sub={{urlquery .CurrentSubsection}}{{end}}">К разделу</a>
+        {{end}}
+        {{if .User.IsAdmin}}
+          <a class="button button-ghost" href="/app/admin/users">Админка</a>
+        {{end}}
+        <span class="atlas-user-chip">@{{.User.Name}}</span>
+        <form method="post" action="/auth/logout">
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+          <button class="button button-ghost" type="submit">Выйти</button>
+        </form>
+      </div>
+    </header>
+
+    <section class="atlas-layout atlas-layout-two">
+      <aside class="atlas-rail">
+        <article class="atlas-card atlas-sections-sidebar">
+          <p class="panel-label">Разделы</p>
+          <label class="atlas-nav-search-wrap">
+            <input class="atlas-nav-search" type="search" placeholder="Найти раздел или тему..." />
+          </label>
+          <ul class="atlas-nav">
+            {{range .Sections}}
+              {{$section := .}}
+              <li class="atlas-nav-item {{if eq $.CurrentSectionSlug $section.Slug}}atlas-nav-item-active{{end}}">
+                <a class="atlas-nav-link {{if eq $.CurrentSectionSlug $section.Slug}}atlas-nav-link-active{{end}}" href="/app/section?slug={{$section.Slug}}">
+                  <span class="atlas-nav-title">{{$section.Name}}</span>
+                </a>
+                <ul class="atlas-nav-sub">
+                  {{range $section.Subsections}}
+                    <li>
+                      <a class="atlas-sub-link {{if and (eq $.CurrentSectionSlug $section.Slug) (eq $.CurrentSubsection .)}}atlas-sub-link-active{{end}}" href="/app/section?slug={{$section.Slug}}&sub={{urlquery .}}">{{.}}</a>
+                    </li>
+                  {{end}}
+                </ul>
+              </li>
+            {{end}}
+          </ul>
+          <p class="atlas-nav-empty" data-nav-empty hidden>Ничего не нашлось. Попробуйте другое слово.</p>
+        </article>
+      </aside>
+
+      <section class="atlas-main">
+        <article class="atlas-card atlas-main-head">
+          <p class="panel-label">Поиск</p>
+          <h2 class="atlas-section-title">Поиск по статьям</h2>
+          <p class="atlas-hero-text">Ищем сразу в заголовках и тексте статьи. Фильтры позволяют сузить выдачу до нужного раздела и подраздела.</p>
+        </article>
+
+        {{if .Error}}
+          <p class="alert alert-error">{{.Error}}</p>
+        {{end}}
+
+        <article class="atlas-card">
+          <form class="article-form" method="get" action="/app/search">
+            <label class="field">
+              <span>Запрос</span>
+              <input name="q" type="search" minlength="2" maxlength="120" value="{{.SearchQuery}}" placeholder="Например: systemd unit restart" required />
+            </label>
+
+            <label class="field">
+              <span>Раздел</span>
+              <select class="field-select" name="section">
+                <option value="">Все разделы</option>
+                {{range .Sections}}
+                  <option value="{{.Slug}}" {{if eq $.SearchSectionSlug .Slug}}selected{{end}}>{{.Name}}</option>
+                {{end}}
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Подраздел</span>
+              <select class="field-select" name="sub">
+                <option value="">Все подразделы</option>
+                {{if .CurrentSection}}
+                  {{range .CurrentSection.Subsections}}
+                    <option value="{{.}}" {{if eq $.SearchSubsection .}}selected{{end}}>{{.}}</option>
+                  {{end}}
+                {{else}}
+                  <option value="" disabled>Сначала выберите раздел</option>
+                {{end}}
+              </select>
+            </label>
+
+            <div class="atlas-actions">
+              <button class="button button-primary" type="submit">Найти</button>
+              <a class="button button-ghost" href="/app/search">Сбросить</a>
+            </div>
+          </form>
+        </article>
+
+        {{if .SearchPerformed}}
+          <article class="atlas-card atlas-recent-card">
+            <div class="atlas-recent-head">
+              <div class="atlas-recent-title-wrap">
+                <p class="panel-label">Результаты</p>
+                <p class="atlas-recent-note">Запрос: {{.SearchQuery}}</p>
+              </div>
+              <span class="atlas-recent-count">{{.SearchResultsCount}}</span>
+            </div>
+
+            {{if .SearchResults}}
+              <div class="atlas-article-list atlas-recent-list">
+                {{range .SearchResults}}
+                  <article class="atlas-article-card atlas-recent-item">
+                    <div class="atlas-article-meta">
+                      <span class="atlas-recent-path">{{.SectionName}}{{if .Subsection}} / {{.Subsection}}{{end}}</span>
+                      <span class="atlas-recent-date">{{.UpdatedAt.Format "02.01.2006 15:04"}}</span>
+                    </div>
+                    <h3><a class="atlas-article-title-link" href="/app/article?id={{.ID}}">{{.Title}}</a></h3>
+                    <div class="atlas-article-body atlas-recent-body atlas-md-snippet">{{markdown .Body}}</div>
+                    <div class="atlas-article-actions atlas-recent-actions">
+                      <p class="atlas-article-author atlas-recent-author">Автор: {{.AuthorName}}</p>
+                      <a class="button button-ghost button-compact" href="/app/article?id={{.ID}}">Открыть</a>
+                      {{if and $.User.CanEdit (or (eq $.User.ID .AuthorID) $.User.IsAdmin)}}
+                        <a class="button button-ghost button-compact" href="/app/article/edit?id={{.ID}}">Редактировать</a>
+                      {{end}}
+                    </div>
+                  </article>
+                {{end}}
+              </div>
+            {{else}}
+              <p class="atlas-empty">По вашему запросу ничего не найдено. Попробуйте изменить формулировку или убрать часть фильтров.</p>
+            {{end}}
+          </article>
+        {{else}}
+          <article class="atlas-card">
+            <p class="atlas-empty">Введите запрос и запустите поиск. Минимальная длина запроса: 2 символа.</p>
+          </article>
+        {{end}}
+      </section>
+    </section>
+  </main>
+  <footer class="atlas-site-footer">
+    <span>© Контур знаний, все права защищены.</span>
+    <a class="atlas-site-footer-link" href="https://github.com/soul4bit/kontur-znaniy" target="_blank" rel="noopener noreferrer">GitHub: soul4bit/kontur-znaniy</a>
+  </footer>
+  <script src="{{asset "wiki-ui.js"}}"></script>
+</body>
+</html>

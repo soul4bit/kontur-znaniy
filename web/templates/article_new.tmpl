@@ -23,6 +23,7 @@
 
       <div class="atlas-topbar-meta">
         <a class="button button-ghost" href="/app/section?slug={{.CurrentSection.Slug}}{{if .CurrentSubsection}}&sub={{urlquery .CurrentSubsection}}{{end}}">Назад в раздел</a>
+        <a class="button button-ghost" href="/app/search?section={{.CurrentSection.Slug}}{{if .CurrentSubsection}}&sub={{urlquery .CurrentSubsection}}{{end}}">Поиск</a>
         {{if .User.IsAdmin}}
           <a class="button button-ghost" href="/app/admin/users">Админка</a>
         {{end}}
