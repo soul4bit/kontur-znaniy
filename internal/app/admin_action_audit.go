@@ -32,8 +32,14 @@ func (w *statusCapturingResponseWriter) Write(payload []byte) (int, error) {
 	return w.ResponseWriter.Write(payload)
 }
 
-func parseAdminActionResult(location string, statusCode int) (tab string, result string, message string) {
+func parseAdminActionResult(r *http.Request, location string, statusCode int) (tab string, result string, message string) {
 	tab = adminTabUsers
+	if r != nil {
+		tab = normalizeAdminTab(r.URL.Query().Get("tab"))
+		if formTab := strings.TrimSpace(r.FormValue("tab")); formTab != "" {
+			tab = normalizeAdminTab(formTab)
+		}
+	}
 	if statusCode >= http.StatusBadRequest {
 		result = "error"
 	} else {
@@ -102,7 +108,9 @@ func buildAdminActionDetails(r *http.Request, statusCode int, tab string, result
 	parts = appendAdminAuditDetail(parts, "section_slug", r.FormValue("section_slug"))
 	parts = appendAdminAuditDetail(parts, "subsection_title", r.FormValue("subsection_title"))
 	parts = appendAdminAuditDetail(parts, "new_title", r.FormValue("new_title"))
+	parts = appendAdminAuditDetail(parts, "new_name", r.FormValue("new_name"))
 	parts = appendAdminAuditDetail(parts, "direction", r.FormValue("direction"))
+	parts = appendAdminAuditDetail(parts, "order", r.FormValue("order"))
 	parts = appendAdminAuditDetail(parts, "slug", r.FormValue("slug"))
 	parts = appendAdminAuditDetail(parts, "role", r.FormValue("role"))
 	parts = appendAdminAuditDetail(parts, "name", r.FormValue("name"))
@@ -122,7 +130,7 @@ func (a *Application) withAdminActionAudit(action string, next http.HandlerFunc)
 			return
 		}
 
-		tab, result, message := parseAdminActionResult(recorder.Header().Get("Location"), recorder.statusCode)
+		tab, result, message := parseAdminActionResult(r, recorder.Header().Get("Location"), recorder.statusCode)
 		details := buildAdminActionDetails(r, recorder.statusCode, tab, result, message)
 		a.addAdminAuditEntry(currentUser.ID, action, nil, "", details)
 	}

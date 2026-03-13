@@ -280,6 +280,134 @@ func (a *Application) createWikiSection(slug string, name string) error {
 	return a.reloadWikiCatalog()
 }
 
+func normalizeWikiSectionName(raw string) string {
+	return strings.TrimSpace(raw)
+}
+
+func (a *Application) renameWikiSection(sectionSlug string, newName string) error {
+	if a == nil || a.db == nil {
+		return errors.New("application database is not initialized")
+	}
+
+	cleanSectionSlug := normalizeWikiSectionSlug(sectionSlug)
+	cleanNewName := normalizeWikiSectionName(newName)
+	if !isValidWikiSectionSlug(cleanSectionSlug) {
+		return errors.New("invalid section slug")
+	}
+	if utf8.RuneCountInString(cleanNewName) < 2 || utf8.RuneCountInString(cleanNewName) > 80 {
+		return errors.New("invalid section name")
+	}
+
+	result, err := a.db.Exec(
+		`update wiki_sections
+		set name = $2
+		where slug = $1`,
+		cleanSectionSlug,
+		cleanNewName,
+	)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return a.reloadWikiCatalog()
+}
+
+func (a *Application) reorderWikiSections(sectionSlugs []string) error {
+	if a == nil || a.db == nil {
+		return errors.New("application database is not initialized")
+	}
+	if len(sectionSlugs) == 0 {
+		return errors.New("section order is empty")
+	}
+
+	normalizedOrder := make([]string, 0, len(sectionSlugs))
+	seen := make(map[string]struct{}, len(sectionSlugs))
+	for _, rawSlug := range sectionSlugs {
+		slug := normalizeWikiSectionSlug(rawSlug)
+		if !isValidWikiSectionSlug(slug) {
+			return errors.New("invalid section slug in order")
+		}
+		if _, exists := seen[slug]; exists {
+			return errors.New("duplicate section slug in order")
+		}
+		seen[slug] = struct{}{}
+		normalizedOrder = append(normalizedOrder, slug)
+	}
+
+	tx, err := a.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	rows, err := tx.Query(
+		`select slug
+		from wiki_sections
+		order by position asc, id asc
+		for update`,
+	)
+	if err != nil {
+		return err
+	}
+
+	currentSlugs := make([]string, 0)
+	currentSet := map[string]struct{}{}
+	for rows.Next() {
+		var slug string
+		if scanErr := rows.Scan(&slug); scanErr != nil {
+			_ = rows.Close()
+			return scanErr
+		}
+		cleanSlug := normalizeWikiSectionSlug(slug)
+		currentSlugs = append(currentSlugs, cleanSlug)
+		currentSet[cleanSlug] = struct{}{}
+	}
+	if err := rows.Err(); err != nil {
+		_ = rows.Close()
+		return err
+	}
+	if err := rows.Close(); err != nil {
+		return err
+	}
+
+	if len(currentSlugs) != len(normalizedOrder) {
+		return errors.New("section order size mismatch")
+	}
+	for _, slug := range normalizedOrder {
+		if _, exists := currentSet[slug]; !exists {
+			return sql.ErrNoRows
+		}
+	}
+
+	for index, slug := range normalizedOrder {
+		if _, err := tx.Exec(
+			`update wiki_sections
+			set position = $2
+			where slug = $1`,
+			slug,
+			index+1,
+		); err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return a.reloadWikiCatalog()
+}
+
 func (a *Application) createWikiSubsection(sectionSlug string, title string) error {
 	if a == nil || a.db == nil {
 		return errors.New("application database is not initialized")

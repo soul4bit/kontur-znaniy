@@ -271,6 +271,8 @@ func (a *Application) Routes() http.Handler {
 	mux.HandleFunc("/app/admin/registrations/approve", a.requireAuth(a.withAdminActionAudit(adminAuditActionApproveRegistration, a.withCSRF(a.handleAdminApproveRegistration))))
 	mux.HandleFunc("/app/admin/registrations/reject", a.requireAuth(a.withAdminActionAudit(adminAuditActionRejectRegistration, a.withCSRF(a.handleAdminRejectRegistration))))
 	mux.HandleFunc("/app/admin/wiki/sections/add", a.requireAuth(a.withAdminActionAudit(adminAuditActionCreateWikiSection, a.withCSRF(a.handleAdminAddWikiSection))))
+	mux.HandleFunc("/app/admin/wiki/sections/rename", a.requireAuth(a.withAdminActionAudit(adminAuditActionRenameWikiSection, a.withCSRF(a.handleAdminRenameWikiSection))))
+	mux.HandleFunc("/app/admin/wiki/sections/reorder", a.requireAuth(a.withAdminActionAudit(adminAuditActionReorderWikiSections, a.withCSRF(a.handleAdminReorderWikiSections))))
 	mux.HandleFunc("/app/admin/wiki/subsections/add", a.requireAuth(a.withAdminActionAudit(adminAuditActionCreateWikiSubsection, a.withCSRF(a.handleAdminAddWikiSubsection))))
 	mux.HandleFunc("/app/admin/wiki/sections/delete", a.requireAuth(a.withAdminActionAudit(adminAuditActionDeleteWikiSection, a.withCSRF(a.handleAdminDeleteWikiSection))))
 	mux.HandleFunc("/app/admin/wiki/subsections/rename", a.requireAuth(a.withAdminActionAudit(adminAuditActionRenameWikiSubsection, a.withCSRF(a.handleAdminRenameWikiSubsection))))

@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -35,6 +36,11 @@ const (
 	adminTabUsers   = "users"
 	adminTabAudit   = "audit"
 )
+
+type adminJSONResponse struct {
+	OK    bool   `json:"ok"`
+	Error string `json:"error,omitempty"`
+}
 
 func normalizeAdminTab(raw string) string {
 	switch strings.ToLower(strings.TrimSpace(raw)) {
@@ -88,6 +94,48 @@ func adminUsersRedirectURLForTab(tab string, success string, failure string) str
 
 func adminUsersRedirectURL(success string, failure string) string {
 	return adminUsersRedirectURLForTab(adminTabUsers, success, failure)
+}
+
+func writeAdminJSON(w http.ResponseWriter, status int, payload adminJSONResponse) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(payload)
+}
+
+func wantsJSONResponse(r *http.Request) bool {
+	if r == nil {
+		return false
+	}
+
+	if strings.EqualFold(strings.TrimSpace(r.Header.Get("X-Requested-With")), "fetch") {
+		return true
+	}
+
+	accept := strings.ToLower(strings.TrimSpace(r.Header.Get("Accept")))
+	return strings.Contains(accept, "application/json")
+}
+
+func parseSectionOrder(raw string) []string {
+	clean := strings.TrimSpace(raw)
+	if clean == "" {
+		return nil
+	}
+
+	parts := strings.Split(clean, ",")
+	result := make([]string, 0, len(parts))
+	seen := make(map[string]struct{}, len(parts))
+	for _, part := range parts {
+		slug := normalizeWikiSectionSlug(part)
+		if slug == "" {
+			continue
+		}
+		if _, exists := seen[slug]; exists {
+			continue
+		}
+		seen[slug] = struct{}{}
+		result = append(result, slug)
+	}
+	return result
 }
 
 func (a *Application) requireAdmin(w http.ResponseWriter, r *http.Request) *User {
@@ -559,6 +607,109 @@ func (a *Application) handleAdminAddWikiSection(w http.ResponseWriter, r *http.R
 	}
 
 	http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "Раздел добавлен.", ""), http.StatusSeeOther)
+}
+
+func (a *Application) handleAdminRenameWikiSection(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if a.requireAdmin(w, r) == nil {
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	sectionSlug := normalizeWikiSectionSlug(r.FormValue("section_slug"))
+	newName := normalizeWikiSectionName(r.FormValue("new_name"))
+	if !isValidWikiSectionSlug(sectionSlug) {
+		http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "", "Некорректный slug раздела."), http.StatusSeeOther)
+		return
+	}
+	if utf8.RuneCountInString(newName) < 2 || utf8.RuneCountInString(newName) > 80 {
+		http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "", "Название раздела: от 2 до 80 символов."), http.StatusSeeOther)
+		return
+	}
+
+	if err := a.renameWikiSection(sectionSlug, newName); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "", "Раздел не найден."), http.StatusSeeOther)
+			return
+		}
+		if isWikiSectionDuplicateError(err) {
+			http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "", "Раздел с таким названием уже существует."), http.StatusSeeOther)
+			return
+		}
+
+		a.logger.Printf("admin rename wiki section: %v", err)
+		http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "", "Не удалось переименовать раздел."), http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "Раздел переименован.", ""), http.StatusSeeOther)
+}
+
+func (a *Application) handleAdminReorderWikiSections(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if a.requireAdmin(w, r) == nil {
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		if wantsJSONResponse(r) {
+			writeAdminJSON(w, http.StatusBadRequest, adminJSONResponse{
+				OK:    false,
+				Error: "invalid form data",
+			})
+			return
+		}
+
+		http.Error(w, "invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	order := parseSectionOrder(r.FormValue("order"))
+	if len(order) == 0 {
+		if wantsJSONResponse(r) {
+			writeAdminJSON(w, http.StatusBadRequest, adminJSONResponse{
+				OK:    false,
+				Error: "section order is empty",
+			})
+			return
+		}
+
+		http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "", "Не удалось сохранить порядок разделов."), http.StatusSeeOther)
+		return
+	}
+
+	if err := a.reorderWikiSections(order); err != nil {
+		if wantsJSONResponse(r) {
+			writeAdminJSON(w, http.StatusBadRequest, adminJSONResponse{
+				OK:    false,
+				Error: "failed to reorder sections",
+			})
+			return
+		}
+
+		a.logger.Printf("admin reorder wiki sections: %v", err)
+		http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "", "Не удалось сохранить порядок разделов."), http.StatusSeeOther)
+		return
+	}
+
+	if wantsJSONResponse(r) {
+		writeAdminJSON(w, http.StatusOK, adminJSONResponse{OK: true})
+		return
+	}
+
+	http.Redirect(w, r, adminUsersRedirectURLForTab(adminTabCatalog, "Порядок разделов обновлен.", ""), http.StatusSeeOther)
 }
 
 func (a *Application) handleAdminAddWikiSubsection(w http.ResponseWriter, r *http.Request) {

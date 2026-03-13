@@ -2034,12 +2034,92 @@ body {
   gap: 8px;
 }
 
+.atlas-admin-section-card {
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
+}
+
+.atlas-admin-section-card:hover {
+  transform: translateY(-1px);
+  border-color: #a9c8bf;
+  box-shadow: 0 8px 18px rgba(24, 60, 51, 0.12);
+}
+
+.atlas-admin-section-card.is-dragging {
+  opacity: 0.62;
+  transform: scale(0.99);
+}
+
+.atlas-admin-section-card.is-drop-target {
+  border-color: #6fa698;
+  box-shadow: 0 0 0 3px rgba(111, 166, 152, 0.2);
+}
+
 .atlas-admin-wiki-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.atlas-admin-section-head-main {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.atlas-admin-section-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.atlas-admin-section-drag {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #bfd5cd;
+  border-radius: 9px;
+  background: rgba(243, 250, 247, 0.94);
+  color: #2f5a50;
+  font-size: 17px;
+  line-height: 1;
+  cursor: grab;
+  transition: border-color 0.16s ease, background-color 0.16s ease, transform 0.16s ease;
+}
+
+.atlas-admin-section-drag:hover {
+  border-color: #9fc0b6;
+  background: rgba(232, 244, 239, 0.96);
+  transform: translateY(-1px);
+}
+
+.atlas-admin-section-drag:active {
+  cursor: grabbing;
+}
+
+.atlas-admin-section-rename {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.atlas-admin-sort-status {
+  margin: 8px 0 0;
+  min-height: 20px;
+  color: #55726a;
+  font-size: 12px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+}
+
+.atlas-admin-sort-status.is-ok {
+  color: #236655;
+}
+
+.atlas-admin-sort-status.is-error {
+  color: #8d3042;
 }
 
 .atlas-admin-wiki-sub-list {
@@ -3408,6 +3488,14 @@ body {
   }
 
   .atlas-admin-wiki-sub-rename .button {
+    width: 100%;
+  }
+
+  .atlas-admin-section-rename {
+    grid-template-columns: 1fr;
+  }
+
+  .atlas-admin-section-rename .button {
     width: 100%;
   }
 

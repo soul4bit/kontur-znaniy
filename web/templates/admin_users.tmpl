@@ -117,21 +117,31 @@
           </div>
 
           {{if .Sections}}
-            <div class="atlas-admin-wiki-list">
+            <div class="atlas-admin-wiki-list" data-admin-section-sort data-sort-endpoint="/app/admin/wiki/sections/reorder" data-csrf-token="{{$.CSRFToken}}">
               {{range .Sections}}
                 {{$section := .}}
-                <article class="atlas-admin-wiki-item">
+                <article class="atlas-admin-wiki-item atlas-admin-section-card" data-section-item data-section-slug="{{$section.Slug}}" draggable="true">
                   <div class="atlas-admin-wiki-head">
-                    <div>
+                    <div class="atlas-admin-section-head-main">
+                      <button class="atlas-admin-section-drag" type="button" data-section-drag-handle aria-label="Перетащить раздел" title="Перетащить раздел">↕</button>
                       <h3 class="atlas-admin-title">{{.Name}}</h3>
                       <p class="atlas-admin-meta">slug: {{.Slug}}</p>
                     </div>
-                    <form method="post" action="/app/admin/wiki/sections/delete" onsubmit="return confirm('Удалить раздел {{.Name}} ({{.Slug}})? Подразделы тоже удалятся.');">
-                      <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
-                      <input type="hidden" name="section_slug" value="{{.Slug}}" />
-                      <button class="button button-ghost button-compact atlas-danger-button" type="submit">Удалить раздел</button>
-                    </form>
+                    <div class="atlas-admin-section-head-actions">
+                      <form method="post" action="/app/admin/wiki/sections/delete" onsubmit="return confirm('Удалить раздел {{.Name}} ({{.Slug}})? Подразделы тоже удалятся.');">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
+                        <input type="hidden" name="section_slug" value="{{.Slug}}" />
+                        <button class="button button-ghost button-compact atlas-danger-button" type="submit">Удалить раздел</button>
+                      </form>
+                    </div>
                   </div>
+                  <form method="post" action="/app/admin/wiki/sections/rename" class="atlas-admin-section-rename">
+                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
+                    <input type="hidden" name="tab" value="catalog" />
+                    <input type="hidden" name="section_slug" value="{{$section.Slug}}" />
+                    <input class="atlas-admin-inline-input" type="text" name="new_name" value="{{$section.Name}}" maxlength="80" required />
+                    <button class="button button-ghost button-compact" type="submit">Переименовать раздел</button>
+                  </form>
                   {{if .Subsections}}
                     <ul class="atlas-admin-wiki-sub-list">
                       {{range .Subsections}}
@@ -178,6 +188,7 @@
                 </article>
               {{end}}
             </div>
+            <p class="atlas-admin-sort-status" data-section-sort-status aria-live="polite" aria-atomic="true">Перетаскивайте разделы мышкой за кнопку ↕, порядок сохранится автоматически.</p>
           {{else}}
             <p class="atlas-empty">Разделы пока не добавлены.</p>
           {{end}}
@@ -334,5 +345,6 @@
     <a class="atlas-site-footer-link" href="https://github.com/soul4bit/kontur-znaniy" target="_blank" rel="noopener noreferrer">GitHub: soul4bit/kontur-znaniy</a>
   </footer>
   <script src="{{asset "wiki-ui.js"}}"></script>
+  <script src="{{asset "admin-wiki-sort.js"}}"></script>
 </body>
 </html>

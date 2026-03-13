@@ -15,6 +15,8 @@ const (
 	adminAuditActionCreateWikiSection    = "wiki_section_create"
 	adminAuditActionCreateWikiSubsection = "wiki_subsection_create"
 	adminAuditActionDeleteWikiSection    = "wiki_section_delete"
+	adminAuditActionRenameWikiSection    = "wiki_section_rename"
+	adminAuditActionReorderWikiSections  = "wiki_sections_reorder"
 	adminAuditActionRenameWikiSubsection = "wiki_subsection_rename"
 	adminAuditActionMoveWikiSubsection   = "wiki_subsection_move"
 	adminAuditActionDeleteWikiSubsection = "wiki_subsection_delete"
@@ -40,6 +42,10 @@ func adminAuditActionLabel(action string) string {
 		return "Создание подраздела wiki"
 	case adminAuditActionDeleteWikiSection:
 		return "Удаление раздела wiki"
+	case adminAuditActionRenameWikiSection:
+		return "Переименование раздела wiki"
+	case adminAuditActionReorderWikiSections:
+		return "Изменение порядка разделов wiki"
 	case adminAuditActionRenameWikiSubsection:
 		return "Переименование подраздела wiki"
 	case adminAuditActionMoveWikiSubsection:
