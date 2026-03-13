@@ -102,6 +102,10 @@ func (a *Application) handleArticleDelete(w http.ResponseWriter, r *http.Request
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+	if !canManageArticle(user, article) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
 
 	if err := a.deleteArticleByID(articleID); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

@@ -11,6 +11,7 @@ type Config struct {
 	AppName             string
 	Port                string
 	AppBaseURL          string
+	TrustedProxyCIDRs   string
 	DatabaseURL         string
 	DBMaxOpenConns      int
 	DBMaxIdleConns      int
@@ -49,6 +50,7 @@ func Load() Config {
 		AppName:             getEnv("APP_NAME", "Контур Знаний"),
 		Port:                getEnv("APP_PORT", "8080"),
 		AppBaseURL:          strings.TrimRight(getEnv("APP_BASE_URL", "http://localhost:8080"), "/"),
+		TrustedProxyCIDRs:   getEnv("TRUSTED_PROXY_CIDRS", ""),
 		DatabaseURL:         databaseURL,
 		DBMaxOpenConns:      getEnvInt("DB_MAX_OPEN_CONNS", 20),
 		DBMaxIdleConns:      getEnvInt("DB_MAX_IDLE_CONNS", 10),

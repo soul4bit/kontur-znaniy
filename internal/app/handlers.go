@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"html"
-	"net"
 	"net/http"
 	"net/mail"
 	"net/url"
@@ -35,32 +34,6 @@ const (
 	registerRateLimitBlockFor    = 45 * time.Minute
 	registerRateLimitMaxAttempts = 8
 )
-
-func requestClientIdentifier(r *http.Request) string {
-	if r == nil {
-		return ""
-	}
-
-	if forwarded := strings.TrimSpace(r.Header.Get("X-Forwarded-For")); forwarded != "" {
-		parts := strings.Split(forwarded, ",")
-		if len(parts) > 0 {
-			if value := strings.TrimSpace(parts[0]); value != "" {
-				return value
-			}
-		}
-	}
-
-	if realIP := strings.TrimSpace(r.Header.Get("X-Real-IP")); realIP != "" {
-		return realIP
-	}
-
-	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
-	if err == nil {
-		return strings.TrimSpace(host)
-	}
-
-	return strings.TrimSpace(r.RemoteAddr)
-}
 
 func rateLimitMessage(until time.Time, now time.Time) string {
 	if until.IsZero() {
@@ -210,7 +183,7 @@ func (a *Application) handleLogin(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 		next := strings.TrimSpace(r.FormValue("next"))
 		now := time.Now().UTC()
-		clientKey := requestClientIdentifier(r)
+		clientKey := a.requestClientIdentifier(r)
 
 		data := a.authViewData("Вход")
 		data.Email = email
@@ -362,7 +335,7 @@ func (a *Application) handleRegister(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirm_password")
 		now := time.Now().UTC()
-		clientKey := requestClientIdentifier(r)
+		clientKey := a.requestClientIdentifier(r)
 
 		data := a.authViewData("Регистрация")
 		data.Name = name

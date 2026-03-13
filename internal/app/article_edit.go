@@ -68,7 +68,7 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		if article.AuthorID != user.ID && !user.IsAdmin() {
+		if !canManageArticle(user, article) {
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
@@ -115,7 +115,7 @@ func (a *Application) handleArticleEdit(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		if article.AuthorID != user.ID && !user.IsAdmin() {
+		if !canManageArticle(user, article) {
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}

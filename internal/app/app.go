@@ -11,6 +11,7 @@ import (
 	"errors"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -22,14 +23,15 @@ import (
 )
 
 type Application struct {
-	cfg           config.Config
-	logger        *log.Logger
-	db            *sql.DB
-	objectStorage *objectStorage
-	templates     map[string]*template.Template
-	staticVersion string
-	stopCh        chan struct{}
-	doneCh        chan struct{}
+	cfg            config.Config
+	logger         *log.Logger
+	db             *sql.DB
+	objectStorage  *objectStorage
+	templates      map[string]*template.Template
+	trustedProxies []*net.IPNet
+	staticVersion  string
+	stopCh         chan struct{}
+	doneCh         chan struct{}
 }
 
 type User struct {
@@ -192,15 +194,22 @@ func New(cfg config.Config, logger *log.Logger) (*Application, error) {
 		return nil, err
 	}
 
+	trustedProxies, err := parseTrustedProxyCIDRs(cfg.TrustedProxyCIDRs)
+	if err != nil {
+		_ = db.Close()
+		return nil, err
+	}
+
 	application := &Application{
-		cfg:           cfg,
-		logger:        logger,
-		db:            db,
-		objectStorage: objectStorage,
-		templates:     templates,
-		staticVersion: staticVersion,
-		stopCh:        make(chan struct{}),
-		doneCh:        make(chan struct{}),
+		cfg:            cfg,
+		logger:         logger,
+		db:             db,
+		objectStorage:  objectStorage,
+		templates:      templates,
+		trustedProxies: trustedProxies,
+		staticVersion:  staticVersion,
+		stopCh:         make(chan struct{}),
+		doneCh:         make(chan struct{}),
 	}
 
 	application.startBackgroundJobs()

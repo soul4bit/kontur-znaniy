@@ -151,7 +151,7 @@ func (a *Application) collectRegistrationClientMeta(r *http.Request) registratio
 		}
 	}
 
-	ip := extractClientIP(r)
+	ip := a.extractClientIP(r)
 	if ip == "" {
 		ip = "unknown"
 	}
@@ -173,53 +173,6 @@ func (a *Application) collectRegistrationClientMeta(r *http.Request) registratio
 		Browser:  browser,
 		Location: location,
 	}
-}
-
-func extractClientIP(r *http.Request) string {
-	headerCandidates := []string{"CF-Connecting-IP", "X-Forwarded-For", "X-Real-IP"}
-
-	for _, key := range headerCandidates {
-		raw := strings.TrimSpace(r.Header.Get(key))
-		if raw == "" {
-			continue
-		}
-
-		if key == "X-Forwarded-For" {
-			parts := strings.Split(raw, ",")
-			for _, part := range parts {
-				if ip := normalizeIP(part); ip != "" {
-					return ip
-				}
-			}
-			continue
-		}
-
-		if ip := normalizeIP(raw); ip != "" {
-			return ip
-		}
-	}
-
-	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
-	if err == nil {
-		if ip := normalizeIP(host); ip != "" {
-			return ip
-		}
-	}
-
-	return normalizeIP(strings.TrimSpace(r.RemoteAddr))
-}
-
-func normalizeIP(value string) string {
-	clean := strings.TrimSpace(strings.Trim(value, "[]"))
-	if clean == "" {
-		return ""
-	}
-
-	parsed := net.ParseIP(clean)
-	if parsed == nil {
-		return ""
-	}
-	return parsed.String()
 }
 
 func normalizeUserAgent(ua string) string {

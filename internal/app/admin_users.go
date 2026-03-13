@@ -193,6 +193,35 @@ func (a *Application) approveRegistrationRequestByID(requestID int64, emailVerif
 	return scanRegistrationRequest(row)
 }
 
+func (a *Application) rollbackApprovedRegistrationRequestByID(requestID int64, emailVerifyToken string) (bool, error) {
+	now := time.Now().UTC()
+	result, err := a.db.Exec(
+		`update registration_requests
+		set
+			status = $2,
+			email_verify_token = null,
+			rejection_reason = null,
+			moderated_at = null,
+			updated_at = $3
+		where id = $1 and status = $4 and email_verify_token = $5 and email_verified_at is null`,
+		requestID,
+		registrationStatusPending,
+		now,
+		registrationStatusApproved,
+		emailVerifyToken,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
+}
+
 func (a *Application) rejectRegistrationRequestByID(requestID int64, reason string) (*registrationRequest, error) {
 	now := time.Now().UTC()
 	row := a.db.QueryRow(
@@ -398,7 +427,20 @@ func (a *Application) handleAdminApproveRegistration(w http.ResponseWriter, r *h
 
 	if err := a.sendRegistrationApprovedEmail(req); err != nil {
 		a.logger.Printf("admin send approved email: %v", err)
-		http.Redirect(w, r, adminUsersRedirectURL("", "Заявка одобрена, но письмо отправить не удалось."), http.StatusSeeOther)
+
+		rolledBack, rollbackErr := a.rollbackApprovedRegistrationRequestByID(requestID, emailVerifyToken)
+		if rollbackErr != nil {
+			a.logger.Printf("admin rollback approved registration request: %v", rollbackErr)
+		}
+
+		failureMessage := "Заявка одобрена, но письмо отправить не удалось."
+		if rollbackErr != nil {
+			failureMessage = "Заявка одобрена, но письмо не отправлено. Откат в pending не удался, проверьте вручную."
+		} else if rolledBack {
+			failureMessage = "Письмо не отправлено. Статус заявки возвращен в pending, попробуйте снова."
+		}
+
+		http.Redirect(w, r, adminUsersRedirectURL("", failureMessage), http.StatusSeeOther)
 		return
 	}
 
