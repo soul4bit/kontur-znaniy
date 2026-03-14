@@ -26,7 +26,6 @@
           <a class="button button-ghost" href="/app/admin/users">Админка</a>
         {{end}}
         <a class="button button-ghost" href="/app/search">Поиск</a>
-        <a class="button button-ghost" href="/app/profile">Профиль</a>
         <a class="atlas-user-chip atlas-user-chip-link" href="/app/profile" aria-label="Открыть профиль @{{.User.Name}}">
           {{if .User.AvatarURL}}
             <img class="atlas-user-chip-avatar" src="{{.User.AvatarURL}}" alt="Аватар @{{.User.Name}}" loading="lazy" />

@@ -2981,7 +2981,7 @@ body {
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   justify-content: flex-end;
   flex-wrap: wrap;
 }
@@ -3019,6 +3019,7 @@ body {
 }
 
 .atlas-user-chip-link {
+  margin-left: 8px;
   text-decoration: none;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -3059,6 +3060,9 @@ body {
   display: inline-flex;
   align-items: center;
   min-width: 0;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-family: "IBM Plex Mono", "Consolas", monospace;
 }
 
@@ -3554,6 +3558,7 @@ body {
   }
 
   .atlas-user-chip-link {
+    margin-left: 0;
     width: 100%;
     justify-content: flex-start;
   }
